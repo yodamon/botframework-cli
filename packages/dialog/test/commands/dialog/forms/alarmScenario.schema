@@ -25,12 +25,12 @@
         },         
     },
     "required": [
-        ""
+        "Alarm"
     ],
     "$requires": [
         "standard.schema"
     ],
     "$templates":[
-
+        "RepeatIntent.dialog"
     ]
 }
