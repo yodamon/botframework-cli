@@ -19,11 +19,4 @@
 - alarm for {datetimeV2}
 
 # NoIntent
-- {NoValues}
-- no
-- false
-- nope
-- nop
-- not
-- disagree
-- {NoValues} {datetimeV2}
+- {datetimeV2}
