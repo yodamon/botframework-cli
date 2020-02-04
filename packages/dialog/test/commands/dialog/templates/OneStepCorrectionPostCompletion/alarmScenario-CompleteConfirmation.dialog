@@ -7,7 +7,7 @@
             "$kind": "Microsoft.Ask",
             "activity": "@{endConversation()}",
             "expectedProperties": [
-                "StartConversation"
+                
             ] 
         }
     ]
