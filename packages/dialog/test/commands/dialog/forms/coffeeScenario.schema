@@ -1,0 +1,61 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "DrinkSize": {
+            "type": "string",
+            "enum": [
+                "short",
+                "tall",
+                "grande",
+                "venti"
+            ]
+        },        
+        "Drink": {
+            "type": "string",
+            "enum": [
+                "coffee",
+                "black tea"
+            ]
+        },
+        "ToppingSize": {
+            "type": "string",
+            "enum": [
+                "extra",
+                "normal",
+                "none"
+            ]
+        },
+        "Topping": {
+            "type": "string",
+            "enum": [
+                "milk",
+                "cream",
+                "notopping"
+            ]
+        },
+        "Sugar": {
+            "type": "number",
+            "$entities": ["number"],
+            "minimum": "0"
+        },  
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ],
+            "$templates": [
+                "StartConversationSet.dialog"
+            ]
+        }    
+    },
+    "required": [
+        "DrinkSize", "Drink", "ToppingSize", "Topping", "Sugar"
+    ],
+    "$requires": [
+        "standard.schema"
+    ],
+    "$templates":[
+        ""
+    ]
+}
