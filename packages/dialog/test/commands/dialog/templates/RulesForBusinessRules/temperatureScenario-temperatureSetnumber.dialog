@@ -1,0 +1,35 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnIntent",
+    "intent": "SetTemperature",
+    "condition": "@number",
+    "actions": [
+        {
+            "$kind": "Microsoft.IfCondition",
+            "condition":"or(less(@number, dialogClass.schema.properties['temperature'].minimum), greater(@number, dialogClass.schema.properties['temperature'].maximum))",
+            "actions":[
+                {
+                    "$kind": "Microsoft.SendActivity",
+                    "activity": "@{numberValidation('temperature', @number)}"
+                }                    
+            ],
+            "elseActions":[
+                {
+                    "$kind": "Microsoft.SendActivity",
+                    "activity": "@{setPropertyMessage('temperature', @number)}"
+                },
+                {
+                    "$kind": "Microsoft.SetProperty",
+                    "property": "$temperature",
+                    "value": "=@number"          
+                },
+                {
+                    "$kind": "Microsoft.Ask",
+                    "activity": "@{endConversation()}",
+                    "expectedProperties": [] 
+                }
+            ]
+        }
+    ]               
+}

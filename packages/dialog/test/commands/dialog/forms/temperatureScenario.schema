@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "temperature": {
+            "type": "number",
+            "$entities": ["number"],
+            "minimum": 30
+        },        
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ],
+            "$templates": [
+                "StartConversationSet.dialog"
+            ]
+        },
+        "temperatureIncrease": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ]
+        }     
+    },
+    "required": [
+        ""
+    ],
+    "$requires": [
+        "standard.schema"
+    ],
+    "$templates":[
+       "warmerIntent.dialog"
+    ]
+}
