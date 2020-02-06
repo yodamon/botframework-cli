@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "FirstNumber": {
+            "type": "number",
+            "$entities": ["number"]
+        }, 
+        "SecondNumber": {
+            "type": "number",
+            "$entities": ["number"]
+        },       
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ],
+            "$templates": [
+                "StartConversationSet.dialog"
+            ]
+        }  
+    },
+    "required": [
+        "FirstNumber", "SecondNumber"
+    ],
+    "$requires": [
+        "standard.schema"
+    ],
+    "$templates":[
+        "addnumbersIntent.lu",
+        "addnumbersIntent.dialog"
+    ]
+}

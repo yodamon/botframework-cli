@@ -1,0 +1,68 @@
+# AddNumber
+- add numbers
+- add 1 and 1
+- add 5 and 1
+- add one and 1
+- add five and 1
+- add 1 and 5
+- add 5 and 5
+- add one and 5
+- add five and 5
+- add 1 and one
+- add 5 and one
+- add one and one
+- add five and one
+- add 1 and five
+- add 5 and five
+- add one and five
+- add five and five
+- add {number:AddNumber.FirstNumber} and {number:AddNumber.SecondNumber}
+- 1 plus 1
+- 5 plus 1
+- one plus 1
+- five plus 1
+- 1 plus 5
+- 5 plus 5
+- one plus 5
+- five plus 5
+- 1 plus one
+- 5 plus one
+- one plus one
+- five plus one
+- 1 plus five
+- 5 plus five
+- one plus five
+- five plus five
+- {number:AddNumber.FirstNumber} plus {number:AddNumber.SecondNumber}
+- 1 + 1
+- 5 + 1
+- one + 1
+- five + 1
+- 1 + 5
+- 5 + 5
+- one + 5
+- five + 5
+- 1 + one
+- 5 + one
+- one + one
+- five + one
+- 1 + five
+- 5 + five
+- one + five
+- five + five
+- {number:AddNumber.FirstNumber} + {number:AddNumber.SecondNumber}
+- first is 1
+- first is 5
+- first is one
+- first is five
+- first is {number:AddNumber.FirstNumber}
+- second is 1
+- second is 5
+- second is one
+- second is five
+- second is {number:AddNumber.SecondNumber}
+- add 1
+- add 5
+- add one
+- add five
+- add {number:AddNumber.FirstNumber}

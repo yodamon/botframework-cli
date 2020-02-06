@@ -1,0 +1,27 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnEndOfActions",
+    "condition": "dialog['FirstNumber'] && dialog['SecondNumber']",
+    "actions": [
+        {
+            "$kind": "Microsoft.SendActivity",
+            "activity": "@{formText()}"
+        },
+        {
+            "$kind": "Microsoft.DeleteProperty",
+            "property": "$FirstNumber"
+        },
+        {
+            "$kind": "Microsoft.DeleteProperty",
+            "property": "$SecondNumber"
+        },
+        {
+            "$kind": "Microsoft.Ask",
+            "activity": "@{endConversation()}",
+            "expectedProperties": [
+                
+            ] 
+        }
+    ]
+}
+
