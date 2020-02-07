@@ -1,0 +1,12 @@
+# AskSecondNumber
+- @{askNumber('SecondNumber')}
+
+# SecondNumberName
+- second number
+
+# SecondNumber(val)
+- @{SecondNumberEntity(val)}
+
+[addnumbersScenario-SecondNumberEntity.lg](addnumbersScenario-SecondNumberEntity.lg)
+
+[addnumbersScenario-common.lg](addnumbersScenario-common.lg)

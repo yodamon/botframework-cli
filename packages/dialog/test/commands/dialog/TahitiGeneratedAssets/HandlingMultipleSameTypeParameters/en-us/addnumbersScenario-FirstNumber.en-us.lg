@@ -1,0 +1,12 @@
+# AskFirstNumber
+- @{askNumber('FirstNumber')}
+
+# FirstNumberName
+- first number
+
+# FirstNumber(val)
+- @{FirstNumberEntity(val)}
+
+[addnumbersScenario-FirstNumberEntity.lg](addnumbersScenario-FirstNumberEntity.lg)
+
+[addnumbersScenario-common.lg](addnumbersScenario-common.lg)

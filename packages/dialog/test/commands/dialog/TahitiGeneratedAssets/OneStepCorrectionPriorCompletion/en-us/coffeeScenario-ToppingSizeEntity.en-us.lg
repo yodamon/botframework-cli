@@ -1,0 +1,15 @@
+# ToppingSizeEntity(value) 
+- SWITCH: @{value}
+- CASE: @{'extra'} 
+ - extra
+- CASE: @{'normal'} 
+ - normal
+- CASE: @{'none'} 
+ - none
+- DEFAULT: 
+ - I don't understand @{value}
+
+# chooseToppingSizeEntity
+- @{chooseEnumEntity('ToppingSize')}
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

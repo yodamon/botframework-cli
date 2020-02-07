@@ -1,0 +1,12 @@
+# AskToppingSize
+- @{askEnum('ToppingSize')}
+
+# ToppingSizeName
+- topping size
+
+# ToppingSize(val)
+- @{ToppingSizeEntity(val)}
+
+[coffeeScenario-ToppingSizeEntity.lg](coffeeScenario-ToppingSizeEntity.lg)
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

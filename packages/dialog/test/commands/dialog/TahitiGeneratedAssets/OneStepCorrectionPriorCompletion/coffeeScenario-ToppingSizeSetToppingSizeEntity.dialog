@@ -1,0 +1,18 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnAssignEntity",
+    "property": "ToppingSize",
+    "entity": "ToppingSizeEntity",
+    "actions": [
+        {
+            "$kind": "Microsoft.SendActivity",
+            "activity": "@{setPropertyMessage('ToppingSize', @ToppingSizeEntity)}"
+        },    
+        {
+            "$kind": "Microsoft.SetProperty",
+            "property": "$ToppingSize",
+            "value": "=@ToppingSizeEntity"
+        }
+    ]
+}

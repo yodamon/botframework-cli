@@ -1,0 +1,8 @@
+$ToppingEntity:milk=
+- milk
+
+$ToppingEntity:cream=
+- cream
+
+$ToppingEntity:notopping=
+- notopping

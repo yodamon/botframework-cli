@@ -1,0 +1,31 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnAssignEntity",
+    "property": "Sugar",
+    "entity": "number",
+    "actions": [
+        {
+            "$kind": "Microsoft.IfCondition",
+            "condition":"or(less(@number, dialogClass.schema.properties['Sugar'].minimum), greater(@number, dialogClass.schema.properties['Sugar'].maximum))",
+            "actions":[
+                {
+                    "$kind": "Microsoft.SendActivity",
+                    "activity": "@{numberValidation('Sugar', @number)}"
+                }                    
+            ],
+            "elseActions":[
+                {
+                    "$kind": "Microsoft.SendActivity",
+                    "activity": "@{setPropertyMessage('Sugar', @number)}"
+                },
+                {
+                    "$kind": "Microsoft.SetProperty",
+                    "property": "$Sugar",
+                    "value": "=@number"          
+                }
+            ]
+        }
+        
+    ]               
+}

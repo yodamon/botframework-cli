@@ -1,0 +1,6 @@
+# PROPERTYName(value) 
+- SWITCH: @{value}
+- CASE: @{'Value'} 
+ - value
+- DEFAULT: 
+ - I don't understand @{value}

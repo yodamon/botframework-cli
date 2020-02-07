@@ -1,0 +1,13 @@
+# DrinkEntity(value) 
+- SWITCH: @{value}
+- CASE: @{'coffee'} 
+ - coffee
+- CASE: @{'black tea'} 
+ - black tea
+- DEFAULT: 
+ - I don't understand @{value}
+
+# chooseDrinkEntity
+- @{chooseEnumEntity('Drink')}
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

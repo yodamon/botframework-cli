@@ -1,0 +1,30 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.AdaptiveDialog",
+    "recognizer": "temperatureScenario.lu",
+    "generator": "temperatureScenario.lg",
+    "schema": "temperatureScenario.schema",
+    "triggers": [ 
+        "temperatureScenario-temperatureAsk",
+"temperatureScenario-temperatureSetnumber",
+"temperatureScenario-StartConversationSet",
+"temperatureScenario-temperatureIncreaseAsk",
+"temperatureScenario-temperatureIncreaseSetnumber",
+"temperatureScenario-CancelConfirmation",
+"temperatureScenario-CancelConfirmationSet",
+"temperatureScenario-ChangePropertyConfirmationSet",
+"temperatureScenario-CompleteConfirmation",
+"temperatureScenario-CompleteSetConfirmation",
+"temperatureScenario-CompleteSetPropertyname",
+"temperatureScenario-PropertyToChangeSet",
+"temperatureScenario-PropertyToRememberSet",
+"temperatureScenario-warmerIntent",
+"temperatureScenario-BeginDialog",
+"temperatureScenario-ChooseProperty",
+"temperatureScenario-HelpIntent",
+"temperatureScenario-NotUnderstood",
+"temperatureScenario-temperatureScenarioIntent",
+"temperatureScenario-ReadPropertyIntent" 
+        ]
+}

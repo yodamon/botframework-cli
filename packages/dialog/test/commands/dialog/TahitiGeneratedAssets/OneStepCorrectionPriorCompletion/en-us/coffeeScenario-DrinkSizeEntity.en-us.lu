@@ -1,0 +1,11 @@
+$DrinkSizeEntity:short=
+- short
+
+$DrinkSizeEntity:tall=
+- tall
+
+$DrinkSizeEntity:grande=
+- grande
+
+$DrinkSizeEntity:venti=
+- venti

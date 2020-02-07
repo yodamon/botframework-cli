@@ -1,0 +1,7 @@
+$DrinkEntity:coffee=
+- coffee
+
+$DrinkEntity:black tea=
+- black
+- tea
+- black tea

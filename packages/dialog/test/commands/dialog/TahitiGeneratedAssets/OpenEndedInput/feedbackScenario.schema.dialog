@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "Subject": {
+            "type": "string",
+            "$entities": [
+                "utterance"
+            ]
+        },
+        "Body": {
+            "type": "string",
+            "$entities": [
+                "utterance"
+            ]
+        },
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "utterance"
+            ]
+        },
+        "CancelConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "ChangePropertyConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CompleteConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation",
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToChange": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToRemember": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    },
+    "required": [
+        "Subject",
+        "Body"
+    ],
+    "$expectedOnly": [
+        "Confirmation",
+        "PROPERTYName",
+        "utterance",
+        "keyPhrase",
+        "personName"
+    ],
+    "$public": [
+        "Subject",
+        "Body",
+        "StartConversation"
+    ],
+    "definitions": {
+        "PROPERTYName": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "$type": "Microsoft.MultiLanguageRecognizer",
+    "recognizers": {
+        "en-us": "coffeeScenario.en-us.lu",
+        "": "coffeeScenario.en-us.lu"
+    }
+}

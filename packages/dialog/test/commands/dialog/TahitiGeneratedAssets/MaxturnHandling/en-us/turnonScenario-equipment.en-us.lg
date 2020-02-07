@@ -1,0 +1,12 @@
+# Askequipment
+- @{askEnum('equipment')}
+
+# equipmentName
+- equipment
+
+# equipment(val)
+- @{equipmentEntity(val)}
+
+[turnonScenario-equipmentEntity.lg](turnonScenario-equipmentEntity.lg)
+
+[turnonScenario-common.lg](turnonScenario-common.lg)

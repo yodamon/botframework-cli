@@ -1,0 +1,12 @@
+# AskBody
+- @{askString('Body')}
+
+# BodyName
+- body
+
+# Body(val)
+- @{BodyEntity(val)}
+
+[feedbackScenario-BodyEntity.lg](feedbackScenario-BodyEntity.lg)
+
+[feedbackScenario-common.lg](feedbackScenario-common.lg)

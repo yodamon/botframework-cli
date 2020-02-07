@@ -1,0 +1,8 @@
+$ToppingSizeEntity:extra=
+- extra
+
+$ToppingSizeEntity:normal=
+- normal
+
+$ToppingSizeEntity:none=
+- none

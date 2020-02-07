@@ -1,0 +1,28 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.AdaptiveDialog",
+    "recognizer": "turnonScenario.lu",
+    "generator": "turnonScenario.lg",
+    "schema": "turnonScenario.schema",
+    "triggers": [ 
+        "turnonScenario-equipmentAsk",
+"turnonScenario-equipmentSetequipmentEntity",
+"turnonScenario-equipmentEntityChoose",
+"turnonScenario-StartConversationSet",
+"turnonScenario-CancelConfirmation",
+"turnonScenario-CancelConfirmationSet",
+"turnonScenario-ChangePropertyConfirmationSet",
+"turnonScenario-CompleteConfirmation",
+"turnonScenario-CompleteSetConfirmation",
+"turnonScenario-CompleteSetPropertyname",
+"turnonScenario-PropertyToChangeSet",
+"turnonScenario-PropertyToRememberSet",
+"turnonScenario-BeginDialog",
+"turnonScenario-ChooseProperty",
+"turnonScenario-HelpIntent",
+"turnonScenario-NotUnderstood",
+"turnonScenario-turnonScenarioIntent",
+"turnonScenario-ReadPropertyIntent" 
+        ]
+}

@@ -1,0 +1,10 @@
+# PROPERTYName(value) 
+- SWITCH: @{value}
+- CASE: @{'FirstNumber'} 
+ - first number
+- CASE: @{'SecondNumber'} 
+ - second number
+- CASE: @{'StartConversation'} 
+ - start conversation
+- DEFAULT: 
+ - I don't understand @{value}

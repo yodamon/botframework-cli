@@ -1,0 +1,12 @@
+$equipmentEntity:echo bot=
+- echo
+- bot
+- echo bot
+
+$equipmentEntity:air conditioner=
+- air
+- conditioner
+- air conditioner
+
+$equipmentEntity:lights=
+- lights

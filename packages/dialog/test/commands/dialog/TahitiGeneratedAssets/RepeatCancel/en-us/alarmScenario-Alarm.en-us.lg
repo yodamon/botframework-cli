@@ -1,0 +1,7 @@
+# AskAlarm
+- @{askString('Alarm')}
+
+# AlarmName
+- alarm
+
+[alarmScenario-common.lg](alarmScenario-common.lg)

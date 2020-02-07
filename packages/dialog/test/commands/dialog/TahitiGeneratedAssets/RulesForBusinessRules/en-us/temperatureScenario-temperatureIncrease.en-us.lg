@@ -1,0 +1,12 @@
+# AsktemperatureIncrease
+- @{askNumber('temperatureIncrease')}
+
+# temperatureIncreaseName
+- temperature increase
+
+# temperatureIncrease(val)
+- @{temperatureIncreaseEntity(val)}
+
+[temperatureScenario-temperatureIncreaseEntity.lg](temperatureScenario-temperatureIncreaseEntity.lg)
+
+[temperatureScenario-common.lg](temperatureScenario-common.lg)

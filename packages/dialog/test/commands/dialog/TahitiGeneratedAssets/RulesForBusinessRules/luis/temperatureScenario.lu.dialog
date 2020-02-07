@@ -1,0 +1,7 @@
+{
+    "$type": "Microsoft.MultiLanguageRecognizer",
+    "recognizers": {
+        "en-us": "temperatureScenario.en-us.lu",
+        "": "temperatureScenario.en-us.lu"
+    }
+}

@@ -1,0 +1,10 @@
+$PROPERTYName:temperature=
+- temperature
+$PROPERTYName:StartConversation=
+- start
+- conversation
+- start conversation
+$PROPERTYName:temperatureIncrease=
+- temperature
+- increase
+- temperature increase

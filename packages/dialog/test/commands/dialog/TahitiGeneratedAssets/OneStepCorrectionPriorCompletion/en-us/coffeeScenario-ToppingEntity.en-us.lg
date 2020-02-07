@@ -1,0 +1,15 @@
+# ToppingEntity(value) 
+- SWITCH: @{value}
+- CASE: @{'milk'} 
+ - milk
+- CASE: @{'cream'} 
+ - cream
+- CASE: @{'notopping'} 
+ - notopping
+- DEFAULT: 
+ - I don't understand @{value}
+
+# chooseToppingEntity
+- @{chooseEnumEntity('Topping')}
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

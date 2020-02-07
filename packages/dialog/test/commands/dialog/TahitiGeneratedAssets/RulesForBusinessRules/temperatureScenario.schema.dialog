@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "temperature": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ],
+            "minimum": 30
+        },
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "temperatureIncrease": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ]
+        },
+        "CancelConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "ChangePropertyConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CompleteConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation",
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToChange": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToRemember": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    },
+    "required": [
+        ""
+    ],
+    "$expectedOnly": [
+        "Confirmation",
+        "PROPERTYName",
+        "utterance",
+        "keyPhrase",
+        "personName"
+    ],
+    "$public": [
+        "temperature",
+        "StartConversation",
+        "temperatureIncrease"
+    ],
+    "definitions": {
+        "PROPERTYName": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    }
+}

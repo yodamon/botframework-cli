@@ -1,0 +1,12 @@
+# AskStartConversation
+- @{askString('StartConversation')}
+
+# StartConversationName
+- start conversation
+
+# StartConversation(val)
+- @{StartConversationEntity(val)}
+
+[feedbackScenario-StartConversationEntity.lg](feedbackScenario-StartConversationEntity.lg)
+
+[feedbackScenario-common.lg](feedbackScenario-common.lg)

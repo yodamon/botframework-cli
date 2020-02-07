@@ -1,0 +1,69 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "Value": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ],
+            "minimum": 10,
+            "maximum": 15
+        },
+        "CancelConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "ChangePropertyConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CompleteConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation",
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToChange": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToRemember": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    },
+    "required": [
+        "Value"
+    ],
+    "$expectedOnly": [
+        "Confirmation",
+        "PROPERTYName",
+        "utterance",
+        "keyPhrase",
+        "personName"
+    ],
+    "$public": [
+        "Value"
+    ],
+    "definitions": {
+        "PROPERTYName": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    }
+}

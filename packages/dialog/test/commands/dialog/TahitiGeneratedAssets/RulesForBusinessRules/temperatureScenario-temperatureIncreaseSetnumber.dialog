@@ -1,0 +1,19 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnAssignEntity",
+    "property": "temperatureIncrease",
+    "condition": "dialog['temperature']",
+    "entity": "number",
+    "actions": [
+        {
+            "$kind": "Microsoft.SetProperty",
+            "property": "$temperature",
+            "value": "=add(@number, $temperature)" 
+        },
+        {
+            "$kind": "Microsoft.SendActivity",
+            "activity": "@{temperatureIncreaseConfirm(@number)}"
+        }
+    ]               
+}

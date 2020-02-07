@@ -1,0 +1,82 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "FirstNumber": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ]
+        },
+        "SecondNumber": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ]
+        },
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CancelConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "ChangePropertyConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CompleteConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation",
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToChange": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToRemember": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    },
+    "required": [
+        "FirstNumber",
+        "SecondNumber"
+    ],
+    "$expectedOnly": [
+        "Confirmation",
+        "PROPERTYName",
+        "utterance",
+        "keyPhrase",
+        "personName"
+    ],
+    "$public": [
+        "FirstNumber",
+        "SecondNumber",
+        "StartConversation"
+    ],
+    "definitions": {
+        "PROPERTYName": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    }
+}

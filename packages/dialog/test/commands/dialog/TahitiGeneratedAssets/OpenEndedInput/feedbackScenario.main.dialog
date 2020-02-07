@@ -1,0 +1,30 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.AdaptiveDialog",
+    "recognizer": "feedbackScenario.lu",
+    "generator": "feedbackScenario.lg",
+    "schema": "feedbackScenario.schema",
+    "triggers": [ 
+        "feedbackScenario-SubjectAsk",
+"feedbackScenario-SubjectSetutterance",
+"feedbackScenario-BodyAsk",
+"feedbackScenario-BodySetutterance",
+"feedbackScenario-StartConversationAsk",
+"feedbackScenario-StartConversationSetutterance",
+"feedbackScenario-CancelConfirmation",
+"feedbackScenario-CancelConfirmationSet",
+"feedbackScenario-ChangePropertyConfirmationSet",
+"feedbackScenario-CompleteConfirmation",
+"feedbackScenario-CompleteSetConfirmation",
+"feedbackScenario-CompleteSetPropertyname",
+"feedbackScenario-PropertyToChangeSet",
+"feedbackScenario-PropertyToRememberSet",
+"feedbackScenario-BeginDialog",
+"feedbackScenario-ChooseProperty",
+"feedbackScenario-HelpIntent",
+"feedbackScenario-NotUnderstood",
+"feedbackScenario-feedbackScenarioIntent",
+"feedbackScenario-ReadPropertyIntent" 
+        ]
+}

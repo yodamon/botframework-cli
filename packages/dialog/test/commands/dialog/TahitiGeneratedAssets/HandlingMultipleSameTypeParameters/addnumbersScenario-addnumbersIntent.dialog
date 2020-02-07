@@ -1,0 +1,29 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnIntent",
+    "intent": "AddNumber",
+    "actions": [
+        {
+            "$kind": "Microsoft.IfCondition",
+            "condition": "@AddNumber_FirstNumber",
+            "actions": [
+                {
+                    "$kind": "Microsoft.SetProperty",
+                    "property": "$FirstNumber",
+                    "value": "=@AddNumber_FirstNumber"
+                }
+            ]
+        },
+        {
+            "$kind": "Microsoft.IfCondition",
+            "condition": "@AddNumber_SecondNumber",
+            "actions": [
+                {
+                    "$kind": "Microsoft.SetProperty",
+                    "property": "$SecondNumber",
+                    "value": "=@AddNumber_SecondNumber"
+                }
+            ]
+        }
+    ]
+}

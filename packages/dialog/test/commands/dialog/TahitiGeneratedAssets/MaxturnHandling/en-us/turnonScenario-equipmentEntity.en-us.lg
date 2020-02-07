@@ -1,0 +1,15 @@
+# equipmentEntity(value) 
+- SWITCH: @{value}
+- CASE: @{'echo bot'} 
+ - echo bot
+- CASE: @{'air conditioner'} 
+ - air conditioner
+- CASE: @{'lights'} 
+ - lights
+- DEFAULT: 
+ - I don't understand @{value}
+
+# chooseequipmentEntity
+- @{chooseEnumEntity('equipment')}
+
+[turnonScenario-common.lg](turnonScenario-common.lg)

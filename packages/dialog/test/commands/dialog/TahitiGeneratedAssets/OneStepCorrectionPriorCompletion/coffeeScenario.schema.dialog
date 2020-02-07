@@ -1,0 +1,127 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "type": "object",
+    "properties": {
+        "DrinkSize": {
+            "type": "string",
+            "enum": [
+                "short",
+                "tall",
+                "grande",
+                "venti"
+            ],
+            "$entities": [
+                "DrinkSizeEntity"
+            ]
+        },
+        "Drink": {
+            "type": "string",
+            "enum": [
+                "coffee",
+                "black tea"
+            ],
+            "$entities": [
+                "DrinkEntity"
+            ]
+        },
+        "ToppingSize": {
+            "type": "string",
+            "enum": [
+                "extra",
+                "normal",
+                "none"
+            ],
+            "$entities": [
+                "ToppingSizeEntity"
+            ]
+        },
+        "Topping": {
+            "type": "string",
+            "enum": [
+                "milk",
+                "cream",
+                "notopping"
+            ],
+            "$entities": [
+                "ToppingEntity"
+            ]
+        },
+        "Sugar": {
+            "type": "number",
+            "$entities": [
+                "number"
+            ],
+            "minimum": "0"
+        },
+        "StartConversation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CancelConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "ChangePropertyConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation"
+            ]
+        },
+        "CompleteConfirmation": {
+            "type": "string",
+            "$entities": [
+                "Confirmation",
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToChange": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        },
+        "PropertyToRemember": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    },
+    "required": [
+        "DrinkSize",
+        "Drink",
+        "ToppingSize",
+        "Topping",
+        "Sugar"
+    ],
+    "$expectedOnly": [
+        "Confirmation",
+        "PROPERTYName",
+        "utterance",
+        "keyPhrase",
+        "personName"
+    ],
+    "$public": [
+        "DrinkSize",
+        "Drink",
+        "ToppingSize",
+        "Topping",
+        "Sugar",
+        "StartConversation"
+    ],
+    "definitions": {
+        "PROPERTYName": {
+            "type": "string",
+            "enum": "properties",
+            "$entities": [
+                "PROPERTYName"
+            ]
+        }
+    }
+}

@@ -1,0 +1,7 @@
+# coffeeScenario
+- {DrinkSizeEntity}
+- {DrinkEntity}
+- {ToppingSizeEntity}
+- {ToppingEntity}
+- {number}
+

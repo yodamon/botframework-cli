@@ -1,0 +1,17 @@
+# DrinkSizeEntity(value) 
+- SWITCH: @{value}
+- CASE: @{'short'} 
+ - short
+- CASE: @{'tall'} 
+ - tall
+- CASE: @{'grande'} 
+ - grande
+- CASE: @{'venti'} 
+ - venti
+- DEFAULT: 
+ - I don't understand @{value}
+
+# chooseDrinkSizeEntity
+- @{chooseEnumEntity('DrinkSize')}
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

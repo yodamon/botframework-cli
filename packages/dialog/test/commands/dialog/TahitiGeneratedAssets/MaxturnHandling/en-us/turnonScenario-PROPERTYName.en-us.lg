@@ -1,0 +1,8 @@
+# PROPERTYName(value) 
+- SWITCH: @{value}
+- CASE: @{'equipment'} 
+ - equipment
+- CASE: @{'StartConversation'} 
+ - start conversation
+- DEFAULT: 
+ - I don't understand @{value}

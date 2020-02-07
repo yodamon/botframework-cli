@@ -1,0 +1,12 @@
+# AskSubject
+- @{askString('Subject')}
+
+# SubjectName
+- subject
+
+# Subject(val)
+- @{SubjectEntity(val)}
+
+[feedbackScenario-SubjectEntity.lg](feedbackScenario-SubjectEntity.lg)
+
+[feedbackScenario-common.lg](feedbackScenario-common.lg)

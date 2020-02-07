@@ -1,0 +1,8 @@
+$PROPERTYName:Subject=
+- subject
+$PROPERTYName:Body=
+- body
+$PROPERTYName:StartConversation=
+- start
+- conversation
+- start conversation

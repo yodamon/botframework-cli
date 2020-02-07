@@ -1,0 +1,16 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnEndOfActions",
+    "condition":"!$temperature",
+    "priority": "indexOf(dialog.requiredProperties, 'temperature')",
+    "actions": [        
+        {
+            "$kind": "Microsoft.Ask",
+            "activity": "@{Asktemperature()}",
+            "expectedProperties": [
+                "temperature"
+            ]
+        }
+    ]
+}

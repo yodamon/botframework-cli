@@ -1,0 +1,12 @@
+# AskValue
+- @{askNumber('Value')}
+
+# ValueName
+- value
+
+# Value(val)
+- @{ValueEntity(val)}
+
+[valueScenario-ValueEntity.lg](valueScenario-ValueEntity.lg)
+
+[valueScenario-common.lg](valueScenario-common.lg)

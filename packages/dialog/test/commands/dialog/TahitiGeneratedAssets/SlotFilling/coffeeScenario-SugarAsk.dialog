@@ -1,0 +1,16 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnEndOfActions",
+    "condition":"!$Sugar",
+    "priority": "indexOf(dialog.requiredProperties, 'Sugar')",
+    "actions": [        
+        {
+            "$kind": "Microsoft.Ask",
+            "activity": "@{AskSugar()}",
+            "expectedProperties": [
+                "Sugar"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,12 @@
+# AskDrinkSize
+- @{askEnum('DrinkSize')}
+
+# DrinkSizeName
+- drink size
+
+# DrinkSize(val)
+- @{DrinkSizeEntity(val)}
+
+[coffeeScenario-DrinkSizeEntity.lg](coffeeScenario-DrinkSizeEntity.lg)
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

@@ -1,0 +1,18 @@
+$PROPERTYName:DrinkSize=
+- drink
+- size
+- drink size
+$PROPERTYName:Drink=
+- drink
+$PROPERTYName:ToppingSize=
+- topping
+- size
+- topping size
+$PROPERTYName:Topping=
+- topping
+$PROPERTYName:Sugar=
+- sugar
+$PROPERTYName:StartConversation=
+- start
+- conversation
+- start conversation

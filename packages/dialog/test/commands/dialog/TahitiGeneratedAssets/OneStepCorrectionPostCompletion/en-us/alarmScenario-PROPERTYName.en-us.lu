@@ -1,0 +1,13 @@
+$PROPERTYName:Alarm=
+- alarm
+$PROPERTYName:SetAlarmConfirmation=
+- set
+- alarm
+- confirmation
+- set alarm
+- alarm confirmation
+- set alarm confirmation
+$PROPERTYName:StartConversation=
+- start
+- conversation
+- start conversation

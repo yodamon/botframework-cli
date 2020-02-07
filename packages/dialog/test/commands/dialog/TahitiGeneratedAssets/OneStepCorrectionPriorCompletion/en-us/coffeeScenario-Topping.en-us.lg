@@ -1,0 +1,12 @@
+# AskTopping
+- @{askEnum('Topping')}
+
+# ToppingName
+- topping
+
+# Topping(val)
+- @{ToppingEntity(val)}
+
+[coffeeScenario-ToppingEntity.lg](coffeeScenario-ToppingEntity.lg)
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)

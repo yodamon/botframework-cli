@@ -1,0 +1,27 @@
+
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.AdaptiveDialog",
+    "recognizer": "alarmScenario.lu",
+    "generator": "alarmScenario.lg",
+    "schema": "alarmScenario.schema",
+    "triggers": [ 
+        "alarmScenario-AlarmAsk",
+"alarmScenario-AlarmSetdatetime",
+"alarmScenario-StartConversationSet",
+"alarmScenario-CancelConfirmation",
+"alarmScenario-CancelConfirmationSet",
+"alarmScenario-ChangePropertyConfirmationSet",
+"alarmScenario-CompleteConfirmation",
+"alarmScenario-CompleteSetConfirmation",
+"alarmScenario-CompleteSetPropertyname",
+"alarmScenario-PropertyToChangeSet",
+"alarmScenario-PropertyToRememberSet",
+"alarmScenario-BeginDialog",
+"alarmScenario-ChooseProperty",
+"alarmScenario-HelpIntent",
+"alarmScenario-NotUnderstood",
+"alarmScenario-alarmScenarioIntent",
+"alarmScenario-ReadPropertyIntent" 
+        ]
+}

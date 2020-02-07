@@ -1,0 +1,28 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/botbuilder-dotnet/master/schemas/sdk.schema",
+    "$kind": "Microsoft.OnEndOfActions",
+    "condition":"!$equipment",
+    "priority": "indexOf(dialog.requiredProperties, 'equipment')",
+    "actions": [
+        {
+            "$kind": "Microsoft.IfCondition",
+            "condition": "$retries > 1",
+            "actions": [
+                {
+                    "$kind": "Microsoft.SendActivity",
+                    "activity": "@{endConversation()}"
+                },
+                {
+                    "$kind": "Microsoft.EndDialog"
+                }
+            ]
+        },       
+        {
+            "$kind": "Microsoft.Ask",
+            "activity": "@{Turnon()}",
+            "expectedProperties": [
+                "equipment"
+            ]
+        }
+    ]
+}

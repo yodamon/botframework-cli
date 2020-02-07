@@ -1,0 +1,10 @@
+# PROPERTYName(value) 
+- SWITCH: @{value}
+- CASE: @{'Alarm'} 
+ - alarm
+- CASE: @{'SetAlarmConfirmation'} 
+ - set alarm confirmation
+- CASE: @{'StartConversation'} 
+ - start conversation
+- DEFAULT: 
+ - I don't understand @{value}

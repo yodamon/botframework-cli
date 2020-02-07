@@ -1,0 +1,12 @@
+# AskSugar
+- @{askNumber('Sugar')}
+
+# SugarName
+- sugar
+
+# Sugar(val)
+- @{SugarEntity(val)}
+
+[coffeeScenario-SugarEntity.lg](coffeeScenario-SugarEntity.lg)
+
+[coffeeScenario-common.lg](coffeeScenario-common.lg)
