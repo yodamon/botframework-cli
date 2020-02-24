@@ -62,7 +62,7 @@
         "locale.lu",
         "locale.lg",
         "luis.lu",
-        "BeginDialog.dialog",
+        "BeginHttpDialog.dialog",
         "ChooseProperty.dialog",
         "HelpIntent.dialog",
         "NotUnderstood.dialog",

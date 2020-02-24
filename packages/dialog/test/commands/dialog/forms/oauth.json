@@ -1,0 +1,123 @@
+{
+  "info": {
+    "version": "1.0.1",
+    "description": "This OData service is located at https://graph.microsoft.com/v1.0",
+    "title": "OData Service for namespace microsoft.graph"
+  },
+  "securityDefinitions": {
+    "oauth2": {
+      "flow": "implicit",
+      "type": "oauth2",
+      "authorizationUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+      "scopes": {
+        "User.Read": "",
+        "MailboxSettings.Read": ""
+      }
+    }
+  },
+  "paths": {
+    "/me": {
+      "get": {
+        "summary": "Get me",
+        "security": [{"oauth2": ["User.Read","MailBoxSettings.Read"]}],
+        "responses": {
+          "200": {
+            "description": "Retrieved entity",
+              "examples": {
+                  "application/json": {
+                    "id": "4f114216-7215-477a-87bb-662833413733",
+                    "accountEnabled": true,
+                    "assignedLicenses": [
+                        {
+                            "disabledPlans": [
+                                "0b03f40b-c404-40c3-8651-2aceb74365fa",
+                                "fafd7243-e5c1-4a3a-9e40-495efcb1d3c3"
+                            ],
+                            "skuId": "ea126fc5-a19e-42e2-a731-da9d437bffcf"
+                        }
+                    ],
+                    "assignedPlans": [
+                        {
+                            "assignedDateTime": "2018-01-09T00:23:45Z",
+                            "capabilityStatus": "Enabled",
+                            "service": "ProjectWorkManagement",
+                            "servicePlanId": "b737dad2-2f6c-4c65-90e3-ca563267e8b9"
+                        }
+                    ],
+                    "businessPhones": [
+                        "+86 (10) 59173803 X73803"
+                    ],
+                    "city": "Beijing",
+                    "companyName": "MICROSOFT CHINA CO LTD",
+                    "department": "Cortana Eng_STCA BJ",
+                    "displayName": "Guang Yang (STC)",
+                    "givenName": "Guang",
+                    "jobTitle": "SR. SOFTWARE ENGINEER",
+                    "mail": "guangya@microsoft.com",
+                    "mailNickname": "guangya",
+                    "mobilePhone": "13910381386",
+                    "onPremisesImmutableId": "303092",
+                    "onPremisesLastSyncDateTime": "2018-03-06T02:50:12Z",
+                    "onPremisesSecurityIdentifier": "S-1-5-21-2146773085-903363285-719344707-365478",
+                    "onPremisesSyncEnabled": true,
+                    "passwordPolicies": "DisablePasswordExpiration",
+                    "officeLocation": "BEIJING-BJW-2/10108",
+                    "provisionedPlans": [
+                        {
+                            "capabilityStatus": "Enabled",
+                            "provisioningStatus": "Success",
+                            "service": "MicrosoftOffice"
+                        }
+                    ],
+                    "proxyAddresses": [
+                        "smtp:guangya@064d.mgd.microsoft.com"
+                    ],
+                    "imAddresses": [
+                        "guangya@microsoft.com"
+                    ],
+                    "surname": "Yang (STC)",
+                    "usageLocation": "CN",
+                    "userPrincipalName": "guangya@microsoft.com",
+                    "birthday": "2000-09-06T00:00:00Z",
+                    "hireDate": "0001-01-01T00:00:00Z",
+                    "interests": [
+                        "big data"
+                    ],
+                    "mySite": "https://microsoft-my.sharepoint.com/personal/guangya_microsoft_com/",
+                    "pastProjects": [
+                        "Virtual Earth China"
+                    ],
+                    "preferredName": "",
+                    "responsibilities": [],
+                    "schools": [
+                        "NKU"
+                    ],
+                    "skills": [
+                        "C++, C",
+                        "C#"
+                    ]
+                  }
+              }
+          }
+        },
+        "parameters": [
+          {
+            "description": "Select properties to be returned",
+            "type": "string",
+            "in": "query",
+            "uniqueItems": true,
+            "name": "$select"
+          }
+        ]
+      }
+    }
+  },
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/v1.0",
+  "host": "graph.microsoft.com",
+  "definitions": {
+  },
+  "swagger": "2.0"
+}

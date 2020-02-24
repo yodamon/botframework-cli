@@ -16,12 +16,29 @@
             "condition":"$CompleteConfirmation == 'no'",
             "actions": [
                 {
-                  "$kind": "Microsoft.HttpRequest",
-                  "method": "@{swaggerMethod}",
-                  "url": "@{swaggerApi}",
-                  "responseType": "Json",
-                  "resultProperty": "@{swaggerResponse}",
-                  "body": @{swaggerBody}
+                    "$kind": "Microsoft.IfCondition",
+                    "condition": "@{oauth}",
+                    "actions": [
+                        {
+                            "$kind": "Microsoft.HttpRequest",
+                            "method": "@{swaggerMethod}",
+                            "url": "@{swaggerApi}",
+                            "header": "Bearer {user.token}",
+                            "responseType": "Json",
+                            "resultProperty": "@{swaggerResponse}",
+                            "body": @{swaggerBody}
+                        }
+                    ],
+                    "elseActions": [
+                        {
+                            "$kind": "Microsoft.HttpRequest",
+                            "method": "@{swaggerMethod}",
+                            "url": "@{swaggerApi}",
+                            "responseType": "Json",
+                            "resultProperty": "@{swaggerResponse}",
+                            "body": @{swaggerBody}
+                        }
+                    ]
                 },
                 {
                   "$kind": "Microsoft.SendActivity",

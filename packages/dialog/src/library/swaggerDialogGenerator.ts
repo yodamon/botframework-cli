@@ -59,7 +59,8 @@ function generateJsonProperties(url: string, method: string, property: string) {
     swaggerApi: url,
     swaggerMethod: method,
     swaggerResponse: property,
-    swaggerBody: {}
+    swaggerBody: {},
+    oauth: false
   }
 }
 
@@ -77,18 +78,17 @@ export async function generate(
   await fs.remove(output)
   await fs.ensureDir(output)
 
-  let protocol = swfile.schemes? `${swfile.schemes[0]}://`: 'http://';
+  let protocol = swfile.schemes ? `${swfile.schemes[0]}://` : 'http://';
 
   // the name of output schema file to be used in dialogGenerator
   let url = protocol + swfile.host as string + swfile.basePath as string + route;
 
   // make url valid to the http request action
-  url = url.replace('{', '@{$')
+  url = `${url.replace('{', '@{$')}?`
 
   // the output schema file structure, pass the swagger related param in
   let result = generateJsonSchema()
   let jsonProperties = generateJsonProperties(url, method, property)
-
   let body = {}
   for (let param of swfile.paths[route][method].parameters) {
     if (param.type === undefined) {
@@ -106,16 +106,33 @@ export async function generate(
         body[param.name] = subBody
       }
     } else {
-      if(param.in == "query"){
-        url = url +"&" + param.name+"=@{$"+param.name+"}"
-      }else{
+      if (param.in == "query") {
+        if (url.endsWith('?')) {
+          url = url + param.name + "=@{$" + param.name + "}"
+        }
+        else {
+          url = url + '&' + param.name + "=@{$" + param.name + "}"
+        }
+      } else {
         body[param.name] = '{$' + param.name + '}'
       }
       result.properties[param.name] = generateParam(param)
       result.required.push(param.name)
     }
   }
-  
+
+  if (swfile.securityDefinitions !== undefined) {
+    for (let security of swfile.paths[route][method].security) {
+      for (let key in security) {
+        if (swfile.securityDefinitions[key]?.type === 'oauth2') {
+          // currently only support oauth in botbuilder
+          jsonProperties.oauth = true
+        }
+      }
+    }
+  }
+
+
   jsonProperties.swaggerApi = url;
   jsonProperties.swaggerBody = body;
   let propertiesFile = ppath.join(output, `properties.json`)
