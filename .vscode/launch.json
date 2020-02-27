@@ -103,11 +103,58 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "LUIS Build Sandwich",
+            "name": "Generate Swagger Schema",
             "preLaunchTask": "${defaultBuildTask}",
-            "program": "${workspaceFolder}/packages/lu/bin/run",
+            "program": "${workspaceFolder}/packages/dialog/bin/run",
             "outFiles": [
-                "./packages/lu/lib/**"
+                "./packages/dialog/lib/**"
+            ],
+            "args": [
+                "dialog:generate:swagger",
+                "${workspaceFolder}/packages/dialog/test/commands/dialog/forms/testSwagger.json",
+                "-o",
+                "${env:TEMP}/order",
+                "--verbose",
+                "-r",
+                "/store/order",
+                "-m",
+                "post",
+                "-p",
+                "dialog.response",
+                "-n",
+                "order.schema"
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Generate Bot From Swagger Schema",
+            "preLaunchTask": "${defaultBuildTask}",
+            "program": "${workspaceFolder}/packages/dialog/bin/run",
+            "outFiles": [
+                "./packages/dialog/lib/**"
+            ],
+            "args": [
+                "dialog:generate",
+                "${env:TEMP}/order/order.schema",
+                "-o",
+                "${env:TEMP}/order/",
+                "--force",
+                "--verbose",
+                "-j",
+                "${env:TEMP}/order/properties.json"
+            ],
+            "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LUIS Build Swagger",
+            "preLaunchTask": "${defaultBuildTask}",
+            "program": "${workspaceFolder}/packages/luis/bin/run",
+            "outFiles": [
+                "./packages/luis/lib/**"
             ],
             "args": [
                 "luis:build",
@@ -116,13 +163,13 @@
                 "--authoringKey",
                 "${env:LUIS_AUTHORING_KEY}",
                 "--botName",
-                "sandwich",
+                "swagger",
                 "--dialog",
                 "--suffix",
                 "${env:USERNAME}"
             ],
             "internalConsoleOptions": "openOnSessionStart",
-            "cwd": "${env:TEMP}/sandwich.out/luis"
+            "cwd":  "${env:TEMP}/order/luis"
         },
         {
             "type": "node",
@@ -164,6 +211,30 @@
                 "--verbose"
             ],
             "internalConsoleOptions": "openOnSessionStart"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "LUIS Build Sandwich",
+            "preLaunchTask": "${defaultBuildTask}",
+            "program": "${workspaceFolder}/packages/lu/bin/run",
+            "outFiles": [
+                "./packages/lu/lib/**"
+            ],
+            "args": [
+                "luis:build",
+                "--in",
+                ".",
+                "--authoringKey",
+                "${env:LUIS_AUTHORING_KEY}",
+                "--botName",
+                "sandwich",
+                "--dialog",
+                "--suffix",
+                "${env:USERNAME}"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "cwd": "${env:TEMP}/sandwich.out/luis"
         },
         {
             "type": "node",

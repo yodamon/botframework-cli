@@ -181,12 +181,12 @@ async function processTemplate(
                                 result = template.evaluateTemplate('template', scope)
                                 if (Array.isArray(result)) {
                                     result = result.join('\n')
-                                }
-                                if (template.templates.some(f => f.name === 'filename')) {
+                                }          
+                                 if (template.templates.some(f => f.name === 'filename')) {
                                     filename = template.evaluateTemplate('filename', scope)
                                 }
                             }
-
+                            
                             // See if generated file has been overridden in templates
                             let existing = await findTemplate(filename, templateDirs, scope.locale)
                             if (existing) {
@@ -199,7 +199,7 @@ async function processTemplate(
                             await fs.writeFile(outPath, result)
                             scope.templates[ppath.extname(outPath).substring(1)].push(ref)
                         } else {
-                            feedback(FeedbackType.warning, `Skipping already existing ${outPath}`)
+                        feedback(FeedbackType.warning, `Skipping already existing ${outPath}`)
                         }
                     }
                 }
@@ -297,6 +297,8 @@ function expandSchema(schema: any, scope: any, path: string, inProperties: boole
             } else {
                 if (missingIsError) {
                     feedback(FeedbackType.error, `${expr}: ${error}`)
+                } else {
+                    newSchema = expr;
                 }
             }
         } catch (e) {
@@ -335,6 +337,7 @@ export async function generate(
     allLocales?: string[],
     templateDirs?: string[],
     force?: boolean,
+    jsonProperties?: string,
     feedback?: Feedback)
     : Promise<void> {
 
@@ -366,6 +369,11 @@ export async function generate(
     feedback(FeedbackType.message, `Locales: ${JSON.stringify(allLocales)} `)
     feedback(FeedbackType.message, `Templates: ${JSON.stringify(templateDirs)} `)
     feedback(FeedbackType.message, `App.schema: ${metaSchema} `)
+
+    if (jsonProperties) {
+        feedback(FeedbackType.message, `Additional Json Properties to include: ${jsonProperties}`)
+    }
+
     try {
         templateDirs = expandStandard(templateDirs)
         await fs.ensureDir(outDir)
@@ -380,6 +388,19 @@ export async function generate(
             triggerIntent: schema.triggerIntent(),
             appSchema: metaSchema
         }
+
+        // copy the additional properties to the scope
+        if (jsonProperties) {
+            let fileContent = await fs.readFile(jsonProperties, 'utf8')
+            let jsonContent = JSON.parse(fileContent)
+            for (let key in jsonContent) {
+                let value = jsonContent[key]
+                if (!scope[key]) {
+                    scope[key] = value
+                }
+            }
+        }
+        
         for (let currentLoc of allLocales) {
             await fs.ensureDir(ppath.join(outDir, currentLoc))
             scope.locale = currentLoc
