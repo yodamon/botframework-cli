@@ -82,6 +82,6 @@ jobs:
     - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
       displayName: 'Component Detection'
 
-    - script: 'rush report:coverage'
-      displayName: 'rush report:coverage'
+    - script: 'rush reportcoverage'
+      displayName: 'rush reportcoverage'
       enabled: false

@@ -63,8 +63,14 @@ jobs:
     - script: 'rush posttest'
       displayName: 'rush posttest'
 
+    - script: 'rush reportcoverage
+      displayName: 'rush reportcoverage
+      enabled: true
+      continueOnError: true
+
     - script: 'node ./common/scripts/version-and-pack.js --version $(_version)'
       displayName: 'Version and Pack'
+      enabled: false
 
     - task: CopyFiles@2
       displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
@@ -73,15 +79,15 @@ jobs:
         Contents: '**/*.tgz'
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
         flattenFolders: true
+      enabled: false
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
       inputs:
         artifactName: 'drop'
+      enabled: false
 
     - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
       displayName: 'Component Detection'
+      enabled: false
 
-    - script: 'rush report:coverage'
-      displayName: 'rush report:coverage'
-      enabled: true
