@@ -44,6 +44,13 @@
     },
     {
       "commandKind": "bulk",
+      "name": "reportcoverage",
+      "summary": "Run tests with coverage report",
+      "enableParallelism": false,
+      "allowWarningsInSuccessfulBuild": true
+    },
+    {
+      "commandKind": "bulk",
       "name": "doc",
       "summary": "Generate documentation",
       "enableParallelism": true
