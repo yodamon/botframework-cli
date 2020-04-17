@@ -84,4 +84,4 @@ jobs:
 
     - script: 'rush report:coverage'
       displayName: 'rush report:coverage'
-      enabled: false
+      enabled: true
