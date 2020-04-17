@@ -59,9 +59,11 @@ jobs:
 
     - script: 'rush test -p 2 -v'
       displayName: 'rush test'
+      enabled: false
     
     - script: 'rush posttest'
       displayName: 'rush posttest'
+      enabled: false
 
     - script: 'rush coverage'
       displayName: 'rush coverage'
