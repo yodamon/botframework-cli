@@ -63,7 +63,7 @@ jobs:
     - script: 'rush posttest'
       displayName: 'rush posttest'
 
-    - script: 'rush reportcoverage
+    - script: 'rush reportcoverage'
       displayName: 'rush reportcoverage'
       enabled: true
       continueOnError: true
