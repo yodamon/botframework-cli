@@ -98,3 +98,7 @@ jobs:
       displayName: 'Component Detection'
       enabled: false
 
+    - powershell: 'Get-ChildItem .. -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}'
+      displayName: 'Dir workspace except node_modules'
+      continueOnError: true
+      condition: succeededOrFailed()
