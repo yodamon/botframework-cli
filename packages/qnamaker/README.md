@@ -472,7 +472,7 @@ _See code: [src/commands/qnamaker/kb/publish.ts](https://github.com/microsoft/bo
 
 ## `bf qnamaker:kb:replace`
 
-Replace a knowledgebase contents with new contents
+Replace a knowledgebase contents with new contents.
 
 ```
 USAGE
