@@ -27,6 +27,7 @@ export class OrchestratorHelper {
   }
 
   public static writeToFile(filePath: string, content: string): string {
+    fs.mkdirSync(path.dirname(filePath), {recursive: true});
     fs.writeFileSync(filePath, content);
     return filePath;
   }
@@ -153,6 +154,7 @@ export class OrchestratorHelper {
       }
       let labels: string = items[0] ? items[0] : '';
       const utteranceIdx: number = (items.length === 3 && !bluFormat) ? 2 : 1;
+      const embeddingIdx: number = (items.length === 3 && bluFormat) ? 2 : -1;
       let utterance: string = items[utteranceIdx] ? items[utteranceIdx] : '';
       labels = labels.trim();
       utterance = utterance.trim();
