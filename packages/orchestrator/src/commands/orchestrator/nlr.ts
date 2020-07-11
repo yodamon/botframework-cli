@@ -6,7 +6,6 @@
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
 import {Utility} from '@microsoft/bf-orchestrator';
-import {OrchestratorHelper} from '../../utils';
 
 export default class OrchestratorNlr extends Command {
   static description = 'describe the command here'
@@ -19,15 +18,13 @@ export default class OrchestratorNlr extends Command {
     force: flags.boolean({char: 'f'}),
   }
 
-  static args = [{name: 'file'}]
-
   async run() {
-    const {args, flags} = this.parse(OrchestratorNlr)
+    const {flags} = this.parse(OrchestratorNlr)
 
     const name = flags.name ?? 'world'
     this.log(`hello ${name}`)
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
-    }
+    
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
+
   }
 }

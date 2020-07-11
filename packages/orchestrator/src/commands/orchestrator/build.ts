@@ -37,6 +37,8 @@ export default class OrchestratorBuild extends Command {
       nlrPath = 'D:\\src\\TScience\\Orchestrator\\oc\\dep\\model';
     }
 
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
+
     const labelResolver = await LabelResolver.createAsync(nlrPath);
     const example = { 
         label: 'travel', 

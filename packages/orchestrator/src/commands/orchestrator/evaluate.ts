@@ -38,6 +38,8 @@ export default class OrchestratorEvaluate extends Command {
       args += ` --model ${nlrPath}`;
     }
 
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
+
     if (debug) {
       const loggingMessage: string = `evaluate.ts: arguments = ${args}`;
       const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);

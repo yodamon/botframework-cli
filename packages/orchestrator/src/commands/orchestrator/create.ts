@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator} from '@microsoft/bf-orchestrator';
+import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorCreate extends Command {
   static description: string = 'Create orchestrator example file from .lu/.qna files, which represent bot modules';
@@ -35,36 +35,14 @@ export default class OrchestratorCreate extends Command {
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
-    const debug: boolean = flags.debug;
+
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
-      await Orchestrator.createAsync(nlrPath, input, path.join(output, 'orchestrator.blu'), debug);
+      await Orchestrator.createAsync(nlrPath, input, path.join(output, 'orchestrator.blu'));
     } catch (error) {
       throw (new CLIError(error));
     }
-
-    /*
-    const tsvFilePath: string = path.join(output, 'create.tsv');
-    let tsvContent: string = '';
-
-    OrchestratorHelper.deleteFile(tsvFilePath);
-    tsvContent = await OrchestratorHelper.getTsvContent(input, flags.hierarchical);
-    if (tsvContent.length === 0) {
-      const errorMsg: string = 'Invalid input';
-      this.log(errorMsg);
-      throw new CLIError(errorMsg);
-    }
-
-    OrchestratorHelper.writeToFile(tsvFilePath, tsvContent);
-
-    let args: string = `create --in ${tsvFilePath} --out ${output}`;
-    if (flags.debug) {
-      args += ' --debug';
-    }
-    if (nlrPath) {
-      args += ` --model ${nlrPath}`;
-    }
-    */
 
     return 0;
   }

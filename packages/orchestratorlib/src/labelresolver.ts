@@ -11,6 +11,7 @@ const oc = require('oc_node_authoring/oc_node_authoring.node');
 
 export class LabelResolver {
   public static Orchestrator: any;
+  public static LabelResolver: any;
 
   public static async createAsync(nlrPath: string) {
     try {
@@ -30,7 +31,8 @@ export class LabelResolver {
       }
 
       Utility.writeToConsole('Creating labeler..');
-      return LabelResolver.Orchestrator.createLabelResolver();
+      LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
+      return LabelResolver.LabelResolver;
     } catch (error) {
       throw new Error(error);
     }
@@ -38,5 +40,18 @@ export class LabelResolver {
 
   public static createWithSnapshot(snapshot: any) {
     return LabelResolver.Orchestrator.createLabelResolver(snapshot);
+  }
+
+  public static addExamples(utterancesLabelsMap: any) {
+    // eslint-disable-next-line guard-for-in
+    for (const utterance in utterancesLabelsMap) {
+      const labels: any = utterancesLabelsMap[utterance];
+      for (const label of labels) {
+        const success = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
+        if (success) {
+          Utility.debuggingLog(`Added { label: ${label}, text: ${utterance}}`);
+        }
+      }
+    }
   }
 }

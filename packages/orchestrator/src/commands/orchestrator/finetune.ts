@@ -4,6 +4,8 @@
  */
 
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
+import {Utility} from '@microsoft/bf-orchestrator';
+
 import * as utils from '../../utils';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -49,6 +51,8 @@ export default class OrchestratorFinetune extends Command {
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
+
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     let cli_args: string = `finetune ${args.command} `;
     switch (args.command) {

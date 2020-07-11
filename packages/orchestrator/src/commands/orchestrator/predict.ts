@@ -25,11 +25,12 @@ export default class OrchestratorPredict extends Command {
 
     const input: string = flags.in;
     const output: string = flags.out;
-    const debug: boolean = flags.debug;
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
+
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     let args: string = `predict --in ${input} --out ${output}`;
     if (flags.debug) {
@@ -39,7 +40,7 @@ export default class OrchestratorPredict extends Command {
       args += ` --model ${nlrPath}`;
     }
 
-    if (debug) {
+    if (flags.debug) {
       const loggingMessage: string = `predict.ts: arguments = ${args}`;
       const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
       this.log(loggingMessageCodified);
@@ -47,7 +48,7 @@ export default class OrchestratorPredict extends Command {
 
     try {
       const command: string = 'dotnet "' + path.join(...[__dirname, 'netcoreapp3.1', 'OrchestratorCli.dll']) + '" ' + args;
-      if (debug) {
+      if (flags.debug) {
         const loggingMessage: string = `predict.ts: command = ${command}`;
         const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
         this.log(loggingMessageCodified);
