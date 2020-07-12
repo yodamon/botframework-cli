@@ -30,14 +30,14 @@ export class LabelResolver {
     }
   }
 
-  public static async createAsync(nlrPath: string) {
+  public static async createAsync(nlrPath: string, useCompactEmbeddings: boolean = true) {
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.writeToConsole('Creating labeler..');
-    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
+    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver(useCompactEmbeddings);
     return LabelResolver.LabelResolver;
   }
 
-  public static async createWithSnapshotAsync(nlrPath: string, snapshot: any, useCompactEmbeddings = true) {
+  public static async createWithSnapshotAsync(nlrPath: string, snapshot: any, useCompactEmbeddings: boolean = true) {
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.writeToConsole('Creating labeler..');
     return LabelResolver.Orchestrator.createLabelResolver(snapshot, useCompactEmbeddings);
