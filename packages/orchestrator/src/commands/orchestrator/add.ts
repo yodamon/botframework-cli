@@ -28,12 +28,12 @@ export default class OrchestratorAdd extends Command {
   }
 
   async run() {
-    const {flags} = this.parse(OrchestratorAdd)
+    const {flags}: flags.Output = this.parse(OrchestratorAdd);
 
     const input: string = path.resolve(flags.in);
     const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
     const snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
-    const labelPrefix: string = path.resolve(flags.prefix || '');
+    const labelPrefix: string = flags.prefix || '';
 
     let nlrPath: string = flags.model;
     if (nlrPath) {
@@ -41,13 +41,17 @@ export default class OrchestratorAdd extends Command {
     }
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
+    Utility.debuggingLog('snapshot path ' + snapshot);
+    Utility.debuggingLog('output path ' + output);
+    Utility.debuggingLog('input path ' + input);
+    Utility.debuggingLog('prefix ' + labelPrefix);
 
     try {
       await Orchestrator.addAsync(nlrPath, input, output, snapshot, labelPrefix);
     } catch (error) {
       throw (new CLIError(error));
     }
-    
+
     return 0;
   }
 }

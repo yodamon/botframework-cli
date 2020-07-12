@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/typedef */
 /*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
@@ -10,7 +9,7 @@ import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorCreate {
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string) {  
+  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string) {
     if (!nlrPath || nlrPath.length === 0) {
       throw new Error('Please provide path to Orchestrator model');
     }
@@ -25,11 +24,19 @@ export class OrchestratorCreate {
 
     nlrPath = path.resolve(nlrPath);
 
-    const labelResolver = await LabelResolver.createAsync(nlrPath);
+    const labelResolver: any = await LabelResolver.createAsync(nlrPath);
     LabelResolver.addExamples(await OrchestratorHelper.getUtteranceLabelsMap(inputPath));
 
-    const snapshot = labelResolver.createSnapshot();
-    Utility.debuggingLog(snapshot);
+    const snapshot: any = labelResolver.createSnapshot();
     OrchestratorHelper.writeToFile(outputPath, snapshot);
+
+    /*
+    const labelResolver2: any = await LabelResolver.Orchestrator.createLabelResolver(snapshot);
+    
+    if (labelResolver2) {
+      Utility.debuggingLog('Created labelResolver2');
+    }
+    */
+    Utility.debuggingLog(`Snapshot written to ${outputPath}`);
   }
 }

@@ -66,7 +66,6 @@ export class OrchestratorHelper {
     filePath: string,
     hierarchical: boolean = false)  {
     const utterancesLabelsMap: any = {};
-    let tsvContent: string = '';
 
     if (OrchestratorHelper.isDirectory(filePath)) {
       await OrchestratorHelper.iterateInputFolder(filePath, utterancesLabelsMap, hierarchical);

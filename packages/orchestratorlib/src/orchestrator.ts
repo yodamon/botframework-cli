@@ -1,13 +1,8 @@
-/* eslint-disable @typescript-eslint/typedef */
 /*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
 
-import * as path from 'path';
-import {Utility} from './utility';
-import {LabelResolver} from './labelresolver';
-import {OrchestratorHelper} from './orchestratorhelper';
 import {OrchestratorAdd} from './add';
 import {OrchestratorBuild} from './build';
 import {OrchestratorCreate} from './create';
@@ -18,12 +13,11 @@ import {OrchestratorPredict} from './predict';
 import {OrchestratorTest} from './test';
 
 export class Orchestrator {
-  public static LabelResolver: any;
-
   public static async createAsync(nlrPath: string, inputPath: string, outputPath: string) {
     await OrchestratorCreate.runAsync(nlrPath, inputPath, outputPath);
   }
 
+  // eslint-disable-next-line max-params
   public static async addAsync(nlrPath: string, inputPath: string, outputPath: string, snapshotPath: string, labelPrefix: string = "") {
     await OrchestratorAdd.runAsync(nlrPath, inputPath, outputPath, snapshotPath, labelPrefix);
   }
@@ -50,15 +44,5 @@ export class Orchestrator {
 
   public static async testAsync(nlrPath: string, inputPath: string, outputPath: string) {
     await OrchestratorTest.runAsync(nlrPath, inputPath, outputPath);
-  }
-
-  public static addSnapshot(snapshot: string) {
-    try {
-      Orchestrator.LabelResolver.addSnapshot(snapshot);
-
-      // save snapshot to .blu file
-    } catch (error) {
-      throw new Error(error);
-    }
   }
 }

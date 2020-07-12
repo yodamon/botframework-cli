@@ -75,7 +75,7 @@ export default class OrchestratorBuild extends Command {
     var snapshot = labelResolver.createSnapshot();
     this.log('Created snapshot!');
     this.log('Going to create labeler #2');
-    let labeler2 = LabelResolver.createWithSnapshot(snapshot); 
+    let labeler2 = LabelResolver.Orchestrator.createLabelResolver(snapshot); 
     this.log('Created Labeler #2.');
 
 

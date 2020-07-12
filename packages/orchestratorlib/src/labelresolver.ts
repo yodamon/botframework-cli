@@ -11,35 +11,36 @@ const oc = require('oc_node_authoring/oc_node_authoring.node');
 
 export class LabelResolver {
   public static Orchestrator: any;
+
   public static LabelResolver: any;
 
-  public static async createAsync(nlrPath: string) {
-    try {
-      if (nlrPath) {
-        nlrPath = path.resolve(nlrPath);
-      }
-      if (nlrPath.length === 0) {
-        throw new Error('Please provide path to Orchestrator model');
-      }
+  public static async loadNlrAsync(nlrPath: string) {
+    if (nlrPath) {
+      nlrPath = path.resolve(nlrPath);
+    }
+    if (nlrPath.length === 0) {
+      throw new Error('Please provide path to Orchestrator model');
+    }
+    Utility.writeToConsole('Creating Orchestrator..');
+    LabelResolver.Orchestrator = new oc.Orchestrator();
 
-      Utility.writeToConsole('Creating Orchestrator..');
-      LabelResolver.Orchestrator = new oc.Orchestrator();
-
-      Utility.writeToConsole('Loading NLR..');
-      if (await LabelResolver.Orchestrator.load(nlrPath) === false) {
-        Utility.writeToConsole('Loading NLR failed!!');
-      }
-
-      Utility.writeToConsole('Creating labeler..');
-      LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
-      return LabelResolver.LabelResolver;
-    } catch (error) {
-      throw new Error(error);
+    Utility.writeToConsole('Loading NLR..');
+    if (await LabelResolver.Orchestrator.load(nlrPath) === false) {
+      throw new Error('Loading NLR failed!');
     }
   }
 
-  public static createWithSnapshot(snapshot: any) {
-    return LabelResolver.Orchestrator.createLabelResolver(snapshot);
+  public static async createAsync(nlrPath: string) {
+    await LabelResolver.loadNlrAsync(nlrPath);
+    Utility.writeToConsole('Creating labeler..');
+    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
+    return LabelResolver.LabelResolver;
+  }
+
+  public static async createWithSnapshotAsync(nlrPath: string, snapshot: any, useCompactEmbeddings = true) {
+    await LabelResolver.loadNlrAsync(nlrPath);
+    Utility.writeToConsole('Creating labeler..');
+    return LabelResolver.Orchestrator.createLabelResolver(snapshot, useCompactEmbeddings);
   }
 
   public static addExamples(utterancesLabelsMap: any) {
