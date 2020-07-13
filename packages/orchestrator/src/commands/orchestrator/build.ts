@@ -14,11 +14,12 @@ export default class OrchestratorBuild extends Command {
   static description = 'describe the command here'
 
   static flags: flags.Input<any> = {
-    help: flags.help({char: 'h'}),
-    // flag with a value (-n, --name=VALUE)
-    name: flags.string({char: 'n', description: 'name to print'}),
-    // flag with no value (-f, --force)
-    force: flags.boolean({char: 'f'}),
+    in: flags.string({char: 'i', description: 'Path to source label files.'}),
+    model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
+    out: flags.string({char: 'o', description: 'Path where generated orchestrator example file will be placed. Default to current working directory.'}),
+    force: flags.boolean({char: 'f', description: 'If --out flag is provided with the path to an existing file, overwrites that file.', default: false}),
+    debug: flags.boolean({char: 'd'}),
+    help: flags.help({char: 'h', description: 'Orchestrator add command help'}),
   }
 
   static args = [{name: 'file'}];
