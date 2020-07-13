@@ -81,3 +81,6 @@ packages/dialog/tsconfig.tsbuildinfo
 
 # BuildInfo
 tsconfig.tsbuildinfo
+packages/orchestrator/src/commands/orchestrator/netcoreapp3.1/**
+*.tsv
+*.blu

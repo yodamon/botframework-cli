@@ -7,10 +7,30 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "bf CLI",
-            "preLaunchTask": "${defaultBuildTask}",
-            "program": "${workspaceFolder}/packages/cli/bin/run",
-            "outputCapture": "std",
+            "name": "Orchestrator",
+            //"preLaunchTask": "${defaultBuildTask}",
+            "program": "${workspaceFolder}/packages/orchestrator/bin/run",
+            "args": [
+                "orchestrator:create",
+                // "--debug",
+                // "--in",
+                // "resources/data/Columnar/Email.txt",
+                // "--out",
+                // "resources/data/Columnar/OrchestratorModel_Email",
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Public bf cli",
+            "program": "C:/Users/chrimc/AppData/Roaming/npm/node_modules/@microsoft/botframework-cli/bin/run",
+            "args": [
+                "dialog:generate",
+                "c:/tmp/sandwich/sandwich.schema",
+                "-o",
+                "${env:TEMP}/cli.out"
+            ],
             "outFiles": [
                 "${workspaceFolder}/packages/luis/lib/**"
             ],

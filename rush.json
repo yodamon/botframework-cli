@@ -36,7 +36,7 @@
     {
       "packageName": "@microsoft/bf-luis-cli",
       "projectFolder": "packages/luis"
-    },
+    }, 
     {
       "packageName": "@microsoft/bf-qnamaker",
       "projectFolder": "packages/qnamaker"
@@ -48,6 +48,14 @@
     {
       "packageName": "@microsoft/botframework-cli",
       "projectFolder": "packages/cli"
+    },
+    {
+      "packageName": "@microsoft/bf-orchestrator",
+      "projectFolder": "packages/orchestratorlib"
+    },
+    {
+      "packageName": "@microsoft/bf-orchestrator-cli",
+      "projectFolder": "packages/orchestrator"
     }
   ]
 }
