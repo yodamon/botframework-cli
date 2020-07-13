@@ -74,10 +74,23 @@ export default class OrchestratorBuild extends Command {
     var results = labelResolver.score("hey");
     Utility.writeToConsole(JSON.stringify(results));
     var snapshot = labelResolver.createSnapshot();
+
     this.log('Created snapshot!');
+
+    this.log('Saving snapshot');
+    OrchestratorHelper.writeToFile('D:\\src\\snapshot.blu', snapshot);
+
+    const snapshotFromFile = OrchestratorHelper.readFile('D:\\src\\snapshot.blu');
+    const encoder = new TextEncoder();
+    const uint8array = encoder.encode(snapshotFromFile);
+    
     this.log('Going to create labeler #2');
     let labeler2 = LabelResolver.Orchestrator.createLabelResolver(snapshot); 
     this.log('Created Labeler #2.');
+
+    this.log('Going to create labeler #3');
+    let labeler3 = LabelResolver.Orchestrator.createLabelResolver(uint8array); 
+    this.log('Created Labeler #3.');
 
 
     //
@@ -86,6 +99,14 @@ export default class OrchestratorBuild extends Command {
     console.log('Getting examples')
     let examples = labeler2.getExamples();
     this.log("EXAMPLES " + JSON.stringify(examples));
+
+
+     //
+    // Get Examples
+    //
+    console.log('Getting examples 3')
+    let examples3 = labeler3.getExamples();
+    this.log("EXAMPLES " + JSON.stringify(examples3));
     
     // 
     // Remove Example
