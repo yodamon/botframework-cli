@@ -39,7 +39,8 @@ export default class OrchestratorBuild extends Command {
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    const labelResolver = await LabelResolver.createAsync(nlrPath);
+    const labelResolver =await LabelResolver.createAsync(nlrPath, false);
+    this.log('Use compact embedding == false!');
     const example = { 
         label: 'travel', 
         text: 'book a flight to miami.',
@@ -84,6 +85,7 @@ export default class OrchestratorBuild extends Command {
     //
     console.log('Getting examples')
     let examples = labeler2.getExamples();
+    this.log("EXAMPLES " + JSON.stringify(examples));
     
     // 
     // Remove Example

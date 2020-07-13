@@ -11,14 +11,7 @@
             "preLaunchTask": "${defaultBuildTask}",
             "program": "d:/src/botframework-cli/packages/orchestrator/bin/run",
             "args": [
-                "orchestrator:create",
-                "--in",
-                "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",          
-                "--out",
-                "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",
-                "--model",
-                "D:/src/Orchestrator/nlr",
-                "--hierarchical"
+                "orchestrator:build"
             ],
             "internalConsoleOptions": "openOnSessionStart",
         }
