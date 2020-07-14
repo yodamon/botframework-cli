@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
+import {Orchestrator, OrchestratorHelper, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorAdd extends Command {
   static description: string = 'Add examples from .lu/.qna/.json/.blu files to existing orchestrator examples file';
@@ -24,6 +24,7 @@ export default class OrchestratorAdd extends Command {
     snapshot: flags.string({char: 's', description: 'Existing orchestrator snapshot to append to.'}),
     force: flags.boolean({char: 'f', description: 'If --out flag is provided with the path to an existing file, overwrites that file.', default: false}),
     debug: flags.boolean({char: 'd'}),
+    hierarchical: flags.boolean({description: 'Add hierarchical labels based on input file name.'}),
     help: flags.help({char: 'h', description: 'Orchestrator add command help'}),
   }
 
@@ -31,13 +32,21 @@ export default class OrchestratorAdd extends Command {
     const {flags}: flags.Output = this.parse(OrchestratorAdd);
 
     const input: string = path.resolve(flags.in);
-    const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
-    const snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
+    let output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
+    let snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
     const labelPrefix: string = flags.prefix || '';
 
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
+    }
+
+    if (OrchestratorHelper.isDirectory(snapshot)) {
+      snapshot = path.join(snapshot, 'orchestrator.blu');
+    }
+
+    if (OrchestratorHelper.isDirectory(output)) {
+      output = path.join(output, 'orchestrator.blu');
     }
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
