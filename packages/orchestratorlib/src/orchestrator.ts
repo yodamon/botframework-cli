@@ -13,8 +13,8 @@ import {OrchestratorPredict} from './predict';
 import {OrchestratorTest} from './test';
 
 export class Orchestrator {
-  public static async createAsync(nlrPath: string, inputPath: string, outputPath: string) {
-    await OrchestratorCreate.runAsync(nlrPath, inputPath, outputPath);
+  public static async createAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false) {
+    await OrchestratorCreate.runAsync(nlrPath, inputPath, outputPath, hierarchical);
   }
 
   // eslint-disable-next-line max-params

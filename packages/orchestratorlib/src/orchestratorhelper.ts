@@ -101,11 +101,13 @@ export class OrchestratorHelper {
         OrchestratorHelper.getLabelFromFileName(fileName, ext, hierarchical),
         utterancesLabelsMap);
     } else if (ext === '.tsv' || ext === '.txt') {
+      Utility.writeToConsole(`Processing ${filePath}...\n`);
       OrchestratorHelper.parseTsvFile(
         filePath,
         OrchestratorHelper.getLabelFromFileName(fileName, ext, hierarchical),
         utterancesLabelsMap);
     } else if (ext === '.blu') {
+      Utility.writeToConsole(`Processing ${filePath}...\n`);
       OrchestratorHelper.parseBluFile(
         filePath,
         utterancesLabelsMap);
@@ -116,9 +118,10 @@ export class OrchestratorHelper {
 
   static async parseBluFile(bluFile: string, utterancesLabelsMap: any) {
     const lines: string[] = OrchestratorHelper.readFile(bluFile).split('\n');
-    if (lines.length === 0) {
+    if (lines.length === 0 || lines.length === 1) {
       return;
     }
+    lines.shift();
     OrchestratorHelper.tryParseLabelUtteranceTsv(lines, utterancesLabelsMap, true);
   }
 
@@ -153,7 +156,6 @@ export class OrchestratorHelper {
       }
       let labels: string = items[0] ? items[0] : '';
       const utteranceIdx: number = (items.length === 3 && !bluFormat) ? 2 : 1;
-      const embeddingIdx: number = (items.length === 3 && bluFormat) ? 2 : -1;
       let utterance: string = items[utteranceIdx] ? items[utteranceIdx] : '';
       labels = labels.trim();
       utterance = utterance.trim();
