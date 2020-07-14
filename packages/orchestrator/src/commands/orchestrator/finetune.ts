@@ -4,9 +4,7 @@
  */
 
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Utility} from '@microsoft/bf-orchestrator';
-
-import * as utils from '../../utils';
+import {Utility, OrchestratorHelper} from '@microsoft/bf-orchestrator';
 import * as path from 'path';
 import * as fs from 'fs';
 import ErrnoException = NodeJS.ErrnoException;
@@ -157,14 +155,14 @@ export default class OrchestratorFinetune extends Command {
     const tsvFilePath: string = path.join(output, 'create.tsv');
     let tsvContent: string = '';
     try {
-      utils.OrchestratorHelper.deleteFile(tsvFilePath);
-      tsvContent = await utils.OrchestratorHelper.getTsvContent(input, false, true);
+      OrchestratorHelper.deleteFile(tsvFilePath);
+      tsvContent = await OrchestratorHelper.getTsvContent(input, false, true);
       if (tsvContent.length === 0) {
         const errorMsg: string  = 'Invalid input';
         this.log(errorMsg);
         throw new CLIError(errorMsg);
       }
-      utils.OrchestratorHelper.writeToFile(tsvFilePath, tsvContent);
+      OrchestratorHelper.writeToFile(tsvFilePath, tsvContent);
     } catch (error) {
       throw new CLIError('Unable to write file - ' + tsvFilePath + ' Error: ' + error.message);
     }

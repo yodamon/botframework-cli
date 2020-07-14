@@ -32,14 +32,11 @@ export class OrchestratorAdd {
       throw new Error('Please provide snapshot path');
     }
 
-    const encoder: TextEncoder = new TextEncoder();
-    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
-
-    const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, snapshot);
+    const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, snapshotPath);
 
     const ext: string = OrchestratorHelper.isDirectory(inputPath) ? '' : path.extname(inputPath);
     if (ext === '.blu') {
-      labelResolver.addSnapshot(encoder.encode(OrchestratorHelper.readFile(inputPath)), labelPrefix);
+      labelResolver.addSnapshot(new TextEncoder().encode(OrchestratorHelper.readFile(inputPath)), labelPrefix);
     } else {
       LabelResolver.addExamples(await OrchestratorHelper.getUtteranceLabelsMap(inputPath));
     }
