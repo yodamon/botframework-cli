@@ -9,7 +9,7 @@ import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorCreate {
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string) {
+  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false) {
     if (!nlrPath || nlrPath.length === 0) {
       throw new Error('Please provide path to Orchestrator model');
     }
@@ -25,7 +25,7 @@ export class OrchestratorCreate {
     nlrPath = path.resolve(nlrPath);
 
     const labelResolver: any = await LabelResolver.createAsync(nlrPath);
-    LabelResolver.addExamples(await OrchestratorHelper.getUtteranceLabelsMap(inputPath));
+    LabelResolver.addExamples(await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical));
 
     const snapshot: any = labelResolver.createSnapshot();
     OrchestratorHelper.writeToFile(outputPath, snapshot);

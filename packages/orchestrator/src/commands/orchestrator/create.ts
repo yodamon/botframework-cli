@@ -39,7 +39,7 @@ export default class OrchestratorCreate extends Command {
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
-      await Orchestrator.createAsync(nlrPath, input, path.join(output, 'orchestrator.blu'));
+      await Orchestrator.createAsync(nlrPath, input, path.join(output, 'orchestrator.blu'), flags.hierarchical);
     } catch (error) {
       throw (new CLIError(error));
     }
