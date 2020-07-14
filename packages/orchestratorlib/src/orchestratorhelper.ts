@@ -62,6 +62,27 @@ export class OrchestratorHelper {
     return tsvContent;
   }
 
+  public static async getTsvContent(
+    filePath: string,
+    hierarchical: boolean = false,
+    outputDteFormat: boolean = false)  {
+    const utterancesLabelsMap: any = OrchestratorHelper.getUtteranceLabelsMap(filePath, hierarchical);
+    let tsvContent: string = '';
+
+    if (outputDteFormat) {
+      tsvContent = OrchestratorHelper.createDteContent(utterancesLabelsMap);
+    } else {
+      // eslint-disable-next-line guard-for-in
+      for (const utterance in utterancesLabelsMap) {
+        const labels: any = utterancesLabelsMap[utterance];
+        const line: string = labels.join() + '\t' + utterance + '\n';
+        tsvContent += line;
+      }
+    }
+
+    return tsvContent;
+  }
+
   public static async getUtteranceLabelsMap(
     filePath: string,
     hierarchical: boolean = false)  {

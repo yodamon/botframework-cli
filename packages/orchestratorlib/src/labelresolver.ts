@@ -6,6 +6,7 @@
 
 import * as path from 'path';
 import {Utility} from './utility';
+import {OrchestratorHelper} from './orchestratorhelper';
 
 const oc = require('oc_node_authoring/oc_node_authoring.node');
 
@@ -37,7 +38,9 @@ export class LabelResolver {
     return LabelResolver.LabelResolver;
   }
 
-  public static async createWithSnapshotAsync(nlrPath: string, snapshot: any, useCompactEmbeddings: boolean = true) {
+  public static async createWithSnapshotAsync(nlrPath: string, snapshotPath: string, useCompactEmbeddings: boolean = true) {
+    const encoder: TextEncoder = new TextEncoder();
+    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.writeToConsole('Creating labeler..');
     return LabelResolver.Orchestrator.createLabelResolver(snapshot, useCompactEmbeddings);

@@ -5,8 +5,7 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {LabelResolver, Utility, Orchestrator} from '@microsoft/bf-orchestrator';
-import {OrchestratorHelper} from '../../utils';
+import {LabelResolver, Utility, OrchestratorHelper} from '@microsoft/bf-orchestrator';
 
 const LuisBuilder: any = require('@microsoft/bf-lu').V2.LuisBuilder;
 
