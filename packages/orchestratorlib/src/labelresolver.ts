@@ -38,12 +38,13 @@ export class LabelResolver {
     return LabelResolver.LabelResolver;
   }
 
-  public static async createWithSnapshotAsync(nlrPath: string, snapshotPath: string, useCompactEmbeddings: boolean = true) {
+  public static async createWithSnapshotAsync(nlrPath: string, snapshotPath: string) {
     const encoder: TextEncoder = new TextEncoder();
     const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.writeToConsole('Creating labeler..');
-    return LabelResolver.Orchestrator.createLabelResolver(snapshot, useCompactEmbeddings);
+    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver(snapshot);
+    return LabelResolver.LabelResolver;
   }
 
   public static addExamples(utterancesLabelsMap: any) {
