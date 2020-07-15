@@ -29,14 +29,6 @@ export class OrchestratorCreate {
 
     const snapshot: any = labelResolver.createSnapshot();
     OrchestratorHelper.writeToFile(outputPath, snapshot);
-
-    /*
-    const labelResolver2: any = await LabelResolver.Orchestrator.createLabelResolver(snapshot);
-    
-    if (labelResolver2) {
-      Utility.debuggingLog('Created labelResolver2');
-    }
-    */
     Utility.debuggingLog(`Snapshot written to ${outputPath}`);
   }
 }
