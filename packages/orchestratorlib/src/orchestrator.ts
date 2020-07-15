@@ -26,8 +26,8 @@ export class Orchestrator {
     await OrchestratorBuild.runAsync(nlrPath, inputPath, outputPath);
   }
 
-  public static async evaluateAsync(nlrPath: string, inputPath: string, outputPath: string) {
-    await OrchestratorEvaluate.runAsync(nlrPath, inputPath, outputPath);
+  public static async evaluateAsync(inputPath: string, outputPath: string, nlrPath: string = '') {
+    await OrchestratorEvaluate.runAsync(inputPath, outputPath, nlrPath);
   }
 
   public static async fineTuneAsync(nlrPath: string, inputPath: string, outputPath: string) {

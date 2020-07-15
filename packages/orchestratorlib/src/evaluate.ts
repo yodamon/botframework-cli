@@ -10,10 +10,7 @@ import {OrchestratorHelper} from "./orchestratorhelper";
 
 export class OrchestratorEvaluate {
 
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string, isDebug: boolean = false) {  
-    if (!nlrPath || nlrPath.length === 0) {
-      throw new Error('Please provide path to Orchestrator model');
-    }
+  public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = '') {  
 
     if (!inputPath || inputPath.length === 0) {
       throw new Error('Please provide path to input file/folder');
@@ -23,29 +20,41 @@ export class OrchestratorEvaluate {
       throw new Error('Please provide output path');
     }
 
-    Utility.toPrintDebuggingLogToConsole = isDebug;
+    var labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync}`);
 
-    nlrPath = path.resolve(nlrPath);
+    const examples = labelResolver.getExamples();
+    const example = examples[0];
+    const example_name = example.name;
+    const labels = example.labels;
+    const label = labels[0];
+    const label_name = label.name;
+    const label_type = label.label_type;
+    const span = label.span;
+    const offset = span.offset;
+    const length = span.length;
+    // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(examples)=${JSON.stringify(examples)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(example)=${JSON.stringify(example)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(example)=${Object.keys(example)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), example_name=${example_name}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(labels)=${Object.keys(labels)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(label)=${JSON.stringify(label)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(label)=${Object.keys(label)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.name=${label_name}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.label_type=${label_type}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(span)=${JSON.stringify(span)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(span)=${Object.keys(span)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.offset=${offset}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.length=${length}`);
+    // for (const key in examples) {
+    //   Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.key=${examples.key}`);
+    // }
 
-    var labelResolver = await LabelResolver.createAsync(nlrPath);
-    var utterancesLabelsMap = await OrchestratorHelper.getUtteranceLabelsMap(inputPath);
-    
-    // eslint-disable-next-line guard-for-in
-    for (const utterance in utterancesLabelsMap) {
-      const labels: any = utterancesLabelsMap[utterance];
-      for (const label of labels) {
-        var success = labelResolver.addExample({ label: label, text: utterance});
-        if (success) {
-          Utility.debuggingLog(`Added { label: ${label}, text: ${utterance}}`);
-        }
-      }
-    }
+    // var snapshotJson = JSON.stringify(snapshot);
+    // Utility.debuggingLog(snapshotJson);
 
-    var snapshot = labelResolver.createSnapshot();
-    var snapshotJson = JSON.stringify(snapshot);
-    Utility.debuggingLog(snapshot);
-
-    OrchestratorHelper.writeToFile(outputPath, snapshot);
+    // OrchestratorHelper.writeToFile(path.join(outputPath, 'orchestrator_blu.json'), snapshotJson);
   }
 
   // protected debug: boolean = false;

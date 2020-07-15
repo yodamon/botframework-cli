@@ -13,6 +13,11 @@ const QnaMakerBuilder: any = require('@microsoft/bf-lu').V2.QnAMakerBuilder;
 const processedFiles: string[] = [];
 
 export class OrchestratorHelper {
+
+  public static exists(path: string): boolean {
+    return fs.existsSync(path);
+  }
+
   public static isDirectory(path: string): boolean {
     try {
       const stats: fs.Stats = fs.statSync(path);

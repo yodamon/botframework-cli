@@ -4,16 +4,19 @@
  */
 
 import * as path from 'path';
-
-// import {CLIError, Command, flags, utils} from '@microsoft/bf-cli-command'
-import {Command, flags} from '@microsoft/bf-cli-command';
-import {Utility} from '@microsoft/bf-orchestrator';
+import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
+import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorTest extends Command {
   static description: string = 'Run orchestrator test evaluation using given test file';
 
+  static examples: Array<string> = [`
+    $ bf orchestrator:evaluate 
+    $ bf orchestrator:evaluate --in ./path/to/file/
+    $ bf orchestrator:evaluate --in ./path/to/file/ --out ./path/to/output/`]
+
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'The path to source label file from where orchestrator example file will be created from.'}),
+    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator example file will be created from. Default to current working directory.'}),
     test: flags.string({char: 't', description: 'The path to test label file from where orchestrator example file will be created from.'}),
     out: flags.string({char: 'o', description: 'Path where generated orchestrator example file will be placed. Default to current working directory.'}),
     model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
@@ -31,9 +34,20 @@ export default class OrchestratorTest extends Command {
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
-    
+  
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): input=${input}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): output=${output}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): nlrPath=${nlrPath}`);
+
+    try {
+      await Orchestrator.testAsync(nlrPath, input, output);
+    } catch (error) {
+      throw (new CLIError(error));
+    }
+
+    /*
     let args: string = `test --in ${input} --test ${test} --out ${output}`;
     if (flags.debug) {
       args += ' --debug';
@@ -64,6 +78,7 @@ export default class OrchestratorTest extends Command {
     } catch (error) {
       return 1;
     }
+    */
     return 0;
   }
 }

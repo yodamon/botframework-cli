@@ -36,7 +36,7 @@ export default class OrchestratorCreate extends Command {
       nlrPath = path.resolve(nlrPath);
     }
 
-    if (OrchestratorHelper.isDirectory(output)) {
+    if (!OrchestratorHelper.exists(output) || (OrchestratorHelper.isDirectory(output))) {
       output = path.join(output, 'orchestrator.blu');
     }
 

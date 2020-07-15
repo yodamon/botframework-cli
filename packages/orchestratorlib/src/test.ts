@@ -10,7 +10,7 @@ import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorTest {
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string, debug: boolean = false) {
+  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string) {
     try {
       if (nlrPath) {
         nlrPath = path.resolve(nlrPath);
