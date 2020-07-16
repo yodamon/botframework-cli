@@ -5,7 +5,8 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator, OrchestratorHelper, Utility} from '@microsoft/bf-orchestrator';
+import {Orchestrator} from '@microsoft/bf-orchestrator';
+import {OrchestratorSettings} from '../../utils/settings';
 
 export default class OrchestratorAdd extends Command {
   static description: string = 'Add examples from .lu/.qna/.json/.blu files to existing orchestrator examples file';
@@ -31,36 +32,17 @@ export default class OrchestratorAdd extends Command {
   async run() {
     const {flags}: flags.Output = this.parse(OrchestratorAdd);
 
-    const input: string = path.resolve(flags.in);
-    let output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
-    let snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
+    const input: string = path.resolve(flags.in || __dirname);
+    const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
+    const snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
     const labelPrefix: string = flags.prefix || '';
 
-    let nlrPath: string = flags.model;
-    if (nlrPath) {
-      nlrPath = path.resolve(nlrPath);
-    }
-
-    if (OrchestratorHelper.isDirectory(snapshot)) {
-      snapshot = path.join(snapshot, 'orchestrator.blu');
-    }
-
-    if (OrchestratorHelper.isDirectory(output)) {
-      output = path.join(output, 'orchestrator.blu');
-    }
-
-    Utility.toPrintDebuggingLogToConsole = flags.debug;
-    Utility.debuggingLog('snapshot path ' + snapshot);
-    Utility.debuggingLog('output path ' + output);
-    Utility.debuggingLog('input path ' + input);
-    Utility.debuggingLog('prefix ' + labelPrefix);
-
     try {
-      await Orchestrator.addAsync(nlrPath, input, output, snapshot, labelPrefix);
+      OrchestratorSettings.init(__dirname, flags.model, output);
+      await Orchestrator.addAsync(OrchestratorSettings.ModelPath, input, OrchestratorSettings.SnapshotPath, snapshot, labelPrefix);
     } catch (error) {
       throw (new CLIError(error));
     }
-
     return 0;
   }
 }

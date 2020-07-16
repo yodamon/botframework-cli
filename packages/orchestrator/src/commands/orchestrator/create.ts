@@ -5,7 +5,8 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator, OrchestratorHelper, Utility} from '@microsoft/bf-orchestrator';
+import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
+import {OrchestratorSettings} from '../../utils/settings';
 
 export default class OrchestratorCreate extends Command {
   static description: string = 'Create orchestrator example file from .lu/.qna files, which represent bot modules';
@@ -30,20 +31,15 @@ export default class OrchestratorCreate extends Command {
     const {flags}: flags.Output = this.parse(OrchestratorCreate);
 
     const input: string = path.resolve(flags.in || __dirname);
-    let output: string = path.resolve(flags.out || __dirname);
-    let nlrPath: string = flags.model;
-    if (nlrPath) {
-      nlrPath = path.resolve(nlrPath);
-    }
-
-    if (!OrchestratorHelper.exists(output) || (OrchestratorHelper.isDirectory(output))) {
-      output = path.join(output, 'orchestrator.blu');
-    }
+    const output: string = path.resolve(flags.out || __dirname);
+    const nlrPath: string = flags.model;
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
-      await Orchestrator.createAsync(nlrPath, input, output, flags.hierarchical);
+      OrchestratorSettings.init(__dirname, nlrPath, output);
+      await Orchestrator.createAsync(OrchestratorSettings.ModelPath, input, OrchestratorSettings.ModelPath, flags.hierarchical);
+      OrchestratorSettings.persist();
     } catch (error) {
       throw (new CLIError(error));
     }

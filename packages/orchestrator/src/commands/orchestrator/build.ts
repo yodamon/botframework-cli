@@ -4,8 +4,9 @@
  */
 
 import * as path from 'path';
-import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
+import {Command, flags} from '@microsoft/bf-cli-command';
 import {LabelResolver, Utility, OrchestratorHelper} from '@microsoft/bf-orchestrator';
+import {OrchestratorSettings} from '../../utils/settings';
 
 const LuisBuilder: any = require('@microsoft/bf-lu').V2.LuisBuilder;
 
@@ -21,28 +22,23 @@ export default class OrchestratorBuild extends Command {
     help: flags.help({char: 'h', description: 'Orchestrator add command help'}),
   }
 
-  static args = [{name: 'file'}];
-
   async run() {
-    const {args, flags} = this.parse(OrchestratorBuild)
+    const {flags}: flags.Output = this.parse(OrchestratorBuild)
+    const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
 
-    const name = flags.name ?? 'world'
-    this.log(`hello ${name} from D:\\src\\botframework-cli\\packages\\orchestrator\\src\\commands\\build.ts`)
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
-    }
-    
-    let nlrPath = flags.model;
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
+
+    let nlrPath: string = flags.model;
     if (!nlrPath || nlrPath.length == 0) {
       nlrPath = 'D:\\src\\TScience\\Orchestrator\\oc\\dep\\model';
     }
 
-    Utility.toPrintDebuggingLogToConsole = flags.debug;
+    OrchestratorSettings.init(__dirname, nlrPath, output);
 
-    const labelResolver =await LabelResolver.createAsync(nlrPath, false);
+    const labelResolver: any = await LabelResolver.createAsync(nlrPath, false);
     this.log('Use compact embedding == false!');
-    const example = { 
-        label: 'travel', 
+    const example: any = {
+        label: 'travel',
         text: 'book a flight to miami.',
         };
     
