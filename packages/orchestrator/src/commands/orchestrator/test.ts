@@ -38,47 +38,15 @@ export default class OrchestratorTest extends Command {
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     Utility.debuggingLog(`OrchestratorEvaluate.run(): input=${input}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): test=${test}`);
     Utility.debuggingLog(`OrchestratorEvaluate.run(): output=${output}`);
     Utility.debuggingLog(`OrchestratorEvaluate.run(): nlrPath=${nlrPath}`);
 
     try {
-      await Orchestrator.testAsync(nlrPath, input, output);
+      await Orchestrator.testAsync(nlrPath, input, test, output);
     } catch (error) {
       throw (new CLIError(error));
     }
-
-    /*
-    let args: string = `test --in ${input} --test ${test} --out ${output}`;
-    if (flags.debug) {
-      args += ' --debug';
-    }
-    if (nlrPath) {
-      args += ` --model ${nlrPath}`;
-    }
-
-    if (flags.debug) {
-      const loggingMessage: string = `test.ts: arguments = ${args}`;
-      const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
-      this.log(loggingMessageCodified);
-    }
-
-    // TO-DO: figure out rush package dependency with regard to oclif folder structure
-    // require("dotnet-3.1") statement works only for local package install
-    // process.argv= [process.argv[0], process.argv[1], __dirname + '/netcoreapp3.1/OrchestratorCli.dll', ...process.argv.slice(2)]
-    // require("dotnet-3.1")
-
-    try {
-      const command: string = 'dotnet "' + path.join(...[__dirname, 'netcoreapp3.1', 'OrchestratorCli.dll']) + '" ' + args;
-      if (flags.debug) {
-        const loggingMessage: string = `test.ts: command = ${command}`;
-        const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
-        this.log(loggingMessageCodified);
-      }
-      require('child_process').execSync(command, {stdio: [0, 1, 2]});
-    } catch (error) {
-      return 1;
-    }
-    */
     return 0;
   }
 }

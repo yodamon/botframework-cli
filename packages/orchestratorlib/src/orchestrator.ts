@@ -42,7 +42,7 @@ export class Orchestrator {
     await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath);
   }
 
-  public static async testAsync(nlrPath: string, inputPath: string, outputPath: string) {
-    await OrchestratorTest.runAsync(nlrPath, inputPath, outputPath);
+  public static async testAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string) {
+    await OrchestratorTest.runAsync(nlrPath, inputPath, testPath, outputPath);
   }
 }

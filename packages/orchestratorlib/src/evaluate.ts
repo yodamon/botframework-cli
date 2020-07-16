@@ -20,8 +20,10 @@ export class OrchestratorEvaluate {
       throw new Error('Please provide output path');
     }
 
+    nlrPath = path.resolve(nlrPath);
+
     var labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync()`);
 
     const examples = labelResolver.getExamples();
     const example = examples[0];

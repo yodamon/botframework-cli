@@ -163,6 +163,7 @@ export class OrchestratorHelper {
 
   static async parseTsvFile(tsvFile: string, hierarchicalLabel: string, utterancesLabelsMap: any) {
     const lines: string[] = OrchestratorHelper.readFile(tsvFile).split('\n');
+    Utility.debuggingLog(`OrchestratorHelper.parseTsvFile(), lines=${lines.length}`);
     if (lines.length === 0) {
       return;
     }
@@ -315,34 +316,33 @@ export class OrchestratorHelper {
     utterance: string,
     label: string,
     hierarchicalLabel: string,
-    utterancesLabelsMap: any) {
+    utterancesLabelsMap: any): boolean {
     const existingLabels: string[] = utterancesLabelsMap[utterance];
     if (existingLabels) {
+      let notDuplicate: boolean = true;
       if (hierarchicalLabel && hierarchicalLabel.length > 0) {
-        OrchestratorHelper.addUniqueLabel(hierarchicalLabel, existingLabels);
+        notDuplicate = OrchestratorHelper.addUniqueLabel(hierarchicalLabel, existingLabels);
       } else {
-        OrchestratorHelper.addUniqueLabel(label, existingLabels);
+        notDuplicate = OrchestratorHelper.addUniqueLabel(label, existingLabels);
       }
-      utterancesLabelsMap[utterance] = existingLabels;
+      return notDuplicate;
     } else if (hierarchicalLabel && hierarchicalLabel.length > 0) {
       utterancesLabelsMap[utterance] = [hierarchicalLabel];
     } else {
       utterancesLabelsMap[utterance] = [label];
     }
+    return true;
   }
 
-  static addUniqueLabel(newLabel: string, labels: string[]) {
+  static addUniqueLabel(newLabel: string, labels: string[]): boolean {
     let labelExists: boolean = false;
     for (const label of labels) {
       if (label === newLabel) {
-        labelExists = true;
-        break;
+        return false;
       }
     }
-
-    if (!labelExists) {
-      labels.push(newLabel);
-    }
+    labels.push(newLabel);
+    return true;
   }
 
   static findLuFiles(srcId: string, idsToFind: string[]) {

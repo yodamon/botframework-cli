@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "@microsoft/bf-lu": "1.0.0",
+    "@microsoft/bf-dispatcher": "1.0.0",
     "@types/node-fetch": "~2.5.5",
     "node-fetch": "~2.6.0",
     "tslib": "^1.10.0",

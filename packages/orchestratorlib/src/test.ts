@@ -10,19 +10,34 @@ import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorTest {
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string) {
-    try {
-      if (nlrPath) {
-        nlrPath = path.resolve(nlrPath);
-      }
+  public static async runAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string) {
 
-      if (nlrPath.length === 0) {
-        throw new Error('Please provide path to Orchestrator model');
-      }
+    if (!inputPath || inputPath.length === 0) {
+      throw new Error('Please provide path to input file/folder');
+    }
 
-      var labelResolver = await LabelResolver.createAsync(nlrPath);
-    } catch (error) {
-      throw new Error(error);
+    if (!testPath || testPath.length === 0) {
+      throw new Error('Please provide test path');
+    }
+
+    nlrPath = path.resolve(nlrPath);
+
+    var labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), after calling LabelResolver.createWithSnapshotAsync()`);
+  
+  
+    const utterancesLabelsMap: any = {};
+
+    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utterancesLabelsMap, false);
+
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()}`);
+    // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utterancesLabelsMap)=${JSON.stringify(utterancesLabelsMap)}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), # unique utterances)=${Object.keys(utterancesLabelsMap).length}`);
+    for (const utterance in utterancesLabelsMap) {
+      const labelsPerUtterance: Array<string> = utterancesLabelsMap[utterance];
+      if (labelsPerUtterance.length > 1) {
+        Utility.debuggingLog(`OrchestratorTest.runAsync(), utterance "${utterance}" has more than 1 labels: ${labelsPerUtterance}`);
+      }
     }
   }
 }
