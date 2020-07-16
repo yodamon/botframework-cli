@@ -6,6 +6,11 @@
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
   
+  public static countMapValues(inputStringToStringArrayMap: { [id: string]: string[]; }): number {
+    return Object.entries(inputStringToStringArrayMap).reduce(
+        (accumulant: number,  [id, value]) => accumulant += value.length, 0);
+  }
+
   public static jsonstringify(input: any): string {
     return JSON.stringify(input, null, 4);
   }
