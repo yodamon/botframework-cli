@@ -25,7 +25,7 @@ export class OrchestratorCreate {
     nlrPath = path.resolve(nlrPath);
 
     const labelResolver: any = await LabelResolver.createAsync(nlrPath);
-    LabelResolver.addExamples(await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical));
+    LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical)).utterancesLabelsMap);
 
     const snapshot: any = labelResolver.createSnapshot();
     OrchestratorHelper.writeToFile(outputPath, snapshot);

@@ -26,13 +26,16 @@ export class OrchestratorTest {
     Utility.debuggingLog(`OrchestratorTest.runAsync(), after calling LabelResolver.createWithSnapshotAsync()`);
   
   
-    const utterancesLabelsMap: any = {};
+    const utterancesLabelsMap: { [id: string]: string[]; } = {};
+    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
 
-    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utterancesLabelsMap, false);
+    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utterancesLabelsMap, utterancesDuplicateLabelsMap, false);
 
-    Utility.debuggingLog(`OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()`);
     // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utterancesLabelsMap)=${JSON.stringify(utterancesLabelsMap)}`);
-    Utility.debuggingLog(`OrchestratorTest.runAsync(), # unique utterances)=${Object.keys(utterancesLabelsMap).length}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), utterancesDuplicateLabelsMap=${utterancesDuplicateLabelsMap}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of unique utterances=${Object.keys(utterancesLabelsMap).length}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of duplicate utterance/label pairs=${utterancesDuplicateLabelsMap.size}`);
     for (const utterance in utterancesLabelsMap) {
       const labelsPerUtterance: Array<string> = utterancesLabelsMap[utterance];
       if (labelsPerUtterance.length > 1) {

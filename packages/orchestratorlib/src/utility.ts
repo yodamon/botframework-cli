@@ -5,7 +5,29 @@
 
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
-  
+
+  public static insertStringPairToStringIdStringSetNativeMap(
+    key: string,
+    value: string,
+    stringKeyStringSetMap: Map<string, Set<string>>): Map<string, Set<string>> {
+    if (!stringKeyStringSetMap) {
+        stringKeyStringSetMap = new Map<string, Set<string>>();
+    }
+    if (key in stringKeyStringSetMap) {
+        let stringSet: Set<string> | undefined = stringKeyStringSetMap.get(key);
+        if (!stringSet) {
+            stringSet = new Set<string>();
+            stringKeyStringSetMap.set(key, stringSet);
+        }
+        stringSet.add(value);
+    } else {
+        const stringSet: Set<string> = new Set<string>();
+        stringKeyStringSetMap.set(key, stringSet);
+        stringSet.add(value);
+    }
+    return stringKeyStringSetMap;
+}
+
   public static countMapValues(inputStringToStringArrayMap: { [id: string]: string[]; }): number {
     return Object.entries(inputStringToStringArrayMap).reduce(
         (accumulant: number,  [id, value]) => accumulant += value.length, 0);

@@ -53,10 +53,10 @@ export class LabelResolver {
     return LabelResolver.LabelResolver;
   }
 
-  public static addExamples(utterancesLabelsMap: any) {
+  public static addExamples(utterancesLabelsMap: { [id: string]: string[]; }) {
     // eslint-disable-next-line guard-for-in
     for (const utterance in utterancesLabelsMap) {
-      const labels: any = utterancesLabelsMap[utterance];
+      const labels: string[] = utterancesLabelsMap[utterance];
       for (const label of labels) {
         const success = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
         if (success) {
