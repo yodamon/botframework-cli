@@ -13,7 +13,6 @@ const QnaMakerBuilder: any = require('@microsoft/bf-lu').V2.QnAMakerBuilder;
 const processedFiles: string[] = [];
 
 export class OrchestratorHelper {
-
   public static exists(path: string): boolean {
     return fs.existsSync(path);
   }
@@ -41,7 +40,7 @@ export class OrchestratorHelper {
     fs.unlinkSync(filePath);
   }
 
-  public static createDteContent(utterancesLabelsMap: { [id: string]: string[]; }) {
+  public static createDteContent(utterancesLabelsMap: { [id: string]: string[] }) {
     const labelUtteranceMap: { [label: string]: string} = {};
     // eslint-disable-next-line guard-for-in
     for (const utterance in utterancesLabelsMap) {
@@ -71,7 +70,7 @@ export class OrchestratorHelper {
     filePath: string,
     hierarchical: boolean = false,
     outputDteFormat: boolean = false)  {
-    const utterancesLabelsMap: { [id: string]: string[]; } = (await OrchestratorHelper.getUtteranceLabelsMap(filePath, hierarchical)).utterancesLabelsMap;
+    const utterancesLabelsMap: { [id: string]: string[] } = (await OrchestratorHelper.getUtteranceLabelsMap(filePath, hierarchical)).utterancesLabelsMap;
     let tsvContent: string = '';
 
     if (outputDteFormat) {
@@ -91,9 +90,9 @@ export class OrchestratorHelper {
   public static async getUtteranceLabelsMap(
     filePath: string,
     hierarchical: boolean = false): Promise<{
-      "utterancesLabelsMap": { [id: string]: string[]; },
-      "utterancesDuplicateLabelsMap": Map<string, Set<string>> }> {
-    const utterancesLabelsMap: { [id: string]: string[]; } = {};
+      'utterancesLabelsMap': { [id: string]: string[] };
+      'utterancesDuplicateLabelsMap': Map<string, Set<string>>; }> {
+    const utterancesLabelsMap: { [id: string]: string[] } = {};
     const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
 
     if (OrchestratorHelper.isDirectory(filePath)) {
@@ -102,13 +101,14 @@ export class OrchestratorHelper {
       await OrchestratorHelper.processFile(filePath, path.basename(filePath), utterancesLabelsMap, utterancesDuplicateLabelsMap, hierarchical);
     }
 
-    return { utterancesLabelsMap, utterancesDuplicateLabelsMap };
+    return {utterancesLabelsMap, utterancesDuplicateLabelsMap};
   }
 
+  // eslint-disable-next-line max-params
   static async processFile(
     filePath: string,
     fileName: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>,
     hierarchical: boolean) {
     const ext: string = path.extname(filePath);
@@ -153,7 +153,7 @@ export class OrchestratorHelper {
 
   static async parseBluFile(
     bluFile: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     const lines: string[] = OrchestratorHelper.readFile(bluFile).split('\n');
     if (lines.length === 0 || lines.length === 1) {
@@ -166,7 +166,7 @@ export class OrchestratorHelper {
   static async parseLuFile(
     luFile: string,
     hierarchicalLabel: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     const fileContents: string = OrchestratorHelper.readFile(luFile);
     const luObject: any = {
@@ -180,7 +180,7 @@ export class OrchestratorHelper {
   static async parseTsvFile(
     tsvFile: string,
     hierarchicalLabel: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     const lines: string[] = OrchestratorHelper.readFile(tsvFile).split('\n');
     Utility.debuggingLog(`OrchestratorHelper.parseTsvFile(), lines=${lines.length}`);
@@ -194,7 +194,7 @@ export class OrchestratorHelper {
 
   static tryParseLabelUtteranceTsv(
     lines: string[],
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>,
     bluFormat: boolean = false): boolean {
     if (!bluFormat && OrchestratorHelper.hasLabelUtteranceHeader(lines[0])) {
@@ -224,7 +224,7 @@ export class OrchestratorHelper {
   static tryParseQnATsvFile(
     lines: string[],
     label: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>): boolean {
     if (!OrchestratorHelper.isQnATsvHeader(lines[0])) {
       return false;
@@ -259,7 +259,7 @@ export class OrchestratorHelper {
   static async parseQnaFile(
     qnaFile: string,
     label: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     const fileContents: string = OrchestratorHelper.readFile(qnaFile);
     const lines: string[] = fileContents.split('\n');
@@ -284,7 +284,7 @@ export class OrchestratorHelper {
 
   static async iterateInputFolder(
     folderPath: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>,
     hierarchical: boolean) {
     const supportedFileFormats: string[] = ['.lu', '.json', '.qna', '.tsv', '.txt', '.blu'];
@@ -312,7 +312,7 @@ export class OrchestratorHelper {
   static getIntentsUtterances(
     luisObject: any,
     hierarchicalLabel: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     // eslint-disable-next-line no-prototype-builtins
     if (luisObject.hasOwnProperty('utterances')) {
@@ -334,7 +334,7 @@ export class OrchestratorHelper {
   static getQnaQuestionsAsUtterances(
     qnaObject: any,
     label: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     qnaObject.kb.qnaList.forEach((e: any) => {
       const questions: string[] = e.questions;
@@ -354,11 +354,12 @@ export class OrchestratorHelper {
     return hierarchical ? fileName.substr(0, fileName.length - ext.length) : '';
   }
 
+  // eslint-disable-next-line max-params
   static addNewLabelUtterance(
     utterance: string,
     label: string,
     hierarchicalLabel: string,
-    utterancesLabelsMap: { [id: string]: string[]; },
+    utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
     const existingLabels: string[] = utterancesLabelsMap[utterance];
     if (existingLabels) {
@@ -366,10 +367,8 @@ export class OrchestratorHelper {
         if (!OrchestratorHelper.addUniqueLabel(hierarchicalLabel, existingLabels)) {
           Utility.insertStringPairToStringIdStringSetNativeMap(utterance, hierarchicalLabel, utterancesDuplicateLabelsMap);
         }
-      } else {
-        if (!OrchestratorHelper.addUniqueLabel(label, existingLabels)) {
-          Utility.insertStringPairToStringIdStringSetNativeMap(utterance, hierarchicalLabel, utterancesDuplicateLabelsMap);
-        }
+      } else if (!OrchestratorHelper.addUniqueLabel(label, existingLabels)) {
+        Utility.insertStringPairToStringIdStringSetNativeMap(utterance, hierarchicalLabel, utterancesDuplicateLabelsMap);
       }
     } else if (hierarchicalLabel && hierarchicalLabel.length > 0) {
       utterancesLabelsMap[utterance] = [hierarchicalLabel];
@@ -379,7 +378,6 @@ export class OrchestratorHelper {
   }
 
   static addUniqueLabel(newLabel: string, labels: string[]): boolean {
-    let labelExists: boolean = false;
     for (const label of labels) {
       if (label === newLabel) {
         return false;
