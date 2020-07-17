@@ -34,12 +34,17 @@ export class OrchestratorSettings {
     }
   }
 
-  public static init(settingsDir: string, nlrPath: string, outputPath: string)  {
+  public static init(settingsDir: string, nlrPath: string, snapshotPath: string, defaultSnapshotPath: string)  {
     const settingsFile: string = path.join(settingsDir, 'orchestrator.json');
     OrchestratorSettings.SettingsPath = settingsFile;
+    const settingsFileExists: boolean = OrchestratorHelper.exists(settingsFile);
     let settings: any;
     OrchestratorSettings.ModelPath = '';
     OrchestratorSettings.SnapshotPath = '';
+
+    if (settingsFileExists) {
+      settings = JSON.parse(OrchestratorSettings.readFile(settingsFile));
+    }
 
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
@@ -48,34 +53,29 @@ export class OrchestratorSettings {
         Utility.debuggingLog(`Invalid model path ${nlrPath}`);
         throw new Error('Invalid model path');
       }
-    } else {
+    } else if (!settingsFileExists || !settings.modelPath || settings.modelPath.length === 0) {
       throw new Error('Missing model path');
+    } else {
+      nlrPath = settings.modelPath;
     }
 
-    if (outputPath) {
-      outputPath = path.resolve(outputPath);
+    if (snapshotPath) {
+      snapshotPath = path.resolve(snapshotPath);
 
-      if (OrchestratorHelper.isDirectory(outputPath)) {
-        outputPath = path.join(outputPath, 'orchestrator.blu');
-      } else {
-        const outputFolder: string = path.dirname(outputPath);
-        if (!OrchestratorHelper.exists(outputFolder)) {
-          Utility.debuggingLog(`Invalid output path ${outputPath}`);
-          throw new Error('Invalid output path');
-        }
+      if (OrchestratorHelper.isDirectory(snapshotPath)) {
+        snapshotPath = path.join(snapshotPath, 'orchestrator.blu');
+      } else if (!OrchestratorHelper.exists(snapshotPath)) {
+        Utility.debuggingLog(`Invalid output path ${snapshotPath}`);
+        throw new Error('Invalid output path');
       }
+    } else if (!settingsFileExists || !settings.snapshotPath || settings.snapshotPath.length === 0) {
+      snapshotPath = path.join(defaultSnapshotPath, 'orchestrator.blu');
     } else {
-      throw new Error('Missing output path');
+      snapshotPath = settings.snapshotPath;
     }
 
-    if (fs.existsSync(settingsFile)) {
-      settings = JSON.parse(OrchestratorSettings.readFile(settingsFile));
-      OrchestratorSettings.ModelPath = settings.modelPath;
-      OrchestratorSettings.SnapshotPath = settings.SnapshotPath;
-    } else {
-      OrchestratorSettings.ModelPath = nlrPath;
-      OrchestratorSettings.SnapshotPath = settings.SnapshotPath;
-    }
+    OrchestratorSettings.ModelPath = nlrPath;
+    OrchestratorSettings.SnapshotPath = snapshotPath;
   }
 
   public static persist()  {
@@ -88,7 +88,7 @@ export class OrchestratorSettings {
         snapshotPath: OrchestratorSettings.SnapshotPath,
       };
 
-      OrchestratorSettings.writeToFile(OrchestratorSettings.SettingsPath, JSON.stringify(settings));
+      OrchestratorSettings.writeToFile(OrchestratorSettings.SettingsPath, JSON.stringify(settings, null, 2));
     } catch (error) {
       throw new CLIError(error);
     }

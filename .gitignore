@@ -84,3 +84,4 @@ tsconfig.tsbuildinfo
 packages/orchestrator/src/commands/orchestrator/netcoreapp3.1/**
 *.tsv
 *.blu
+**/orchestrator.json

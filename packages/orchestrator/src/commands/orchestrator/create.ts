@@ -31,14 +31,14 @@ export default class OrchestratorCreate extends Command {
     const {flags}: flags.Output = this.parse(OrchestratorCreate);
 
     const input: string = path.resolve(flags.in || __dirname);
-    const output: string = path.resolve(flags.out || __dirname);
+    const output: string = flags.out;
     const nlrPath: string = flags.model;
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
-      OrchestratorSettings.init(__dirname, nlrPath, output);
-      await Orchestrator.createAsync(OrchestratorSettings.ModelPath, input, OrchestratorSettings.ModelPath, flags.hierarchical);
+      OrchestratorSettings.init(__dirname, nlrPath, output, __dirname);
+      await Orchestrator.createAsync(OrchestratorSettings.ModelPath, input, OrchestratorSettings.SnapshotPath, flags.hierarchical);
       OrchestratorSettings.persist();
     } catch (error) {
       throw (new CLIError(error));

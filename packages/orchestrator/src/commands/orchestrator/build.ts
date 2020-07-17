@@ -38,38 +38,34 @@ export default class OrchestratorBuild extends Command {
     const labelResolver: any = await LabelResolver.createAsync(nlrPath, false);
     this.log('Use compact embedding == false!');
     const example: any = {
-        label: 'travel',
-        text: 'book a flight to miami.',
-        };
-    
-    if (labelResolver.addExample(example) == true)
-    {
+      label: 'travel',
+      text: 'book a flight to miami.',
+    };
+
+    if (labelResolver.addExample(example) === true) {
       this.log('Added example!');
     }
 
-    const example2 = { 
-      label: 'schedule', 
+    const example2: any = {
+      label: 'schedule',
       text: 'when is my next appointment?',
-      };
-    let val = labelResolver.addExample(example2);
-    if (val == true)
-    {
-        this.log('Added example2!');
+    };
+    let val: any = labelResolver.addExample(example2);
+    if (val === true) {
+      this.log('Added example2!');
     }
-    const example3 = { 
-        label: 'greeting', 
-        text: 'hello there!',
-        };
+    const example3: any = {
+      label: 'greeting',
+      text: 'hello there!',
+    };
     val = labelResolver.addExample(example3);
-    if (val == true)
-    {
+    if (val === true) {
       this.log('Added example3!');
     }
 
-
-    var results = labelResolver.score("hey");
+    const results: any = labelResolver.score('hey');
     Utility.writeToConsole(JSON.stringify(results));
-    var snapshot = labelResolver.createSnapshot();
+    const snapshot: any = labelResolver.createSnapshot();
 
     this.log('Created snapshot!');
 
