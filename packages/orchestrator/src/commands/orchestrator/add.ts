@@ -33,12 +33,12 @@ export default class OrchestratorAdd extends Command {
     const {flags}: flags.Output = this.parse(OrchestratorAdd);
 
     const input: string = path.resolve(flags.in || __dirname);
-    const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
+    const output: string = flags.out;
     const snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
     const labelPrefix: string = flags.prefix || '';
 
     try {
-      OrchestratorSettings.init(__dirname, flags.model, output);
+      OrchestratorSettings.init(__dirname, flags.model, output, __dirname);
       await Orchestrator.addAsync(OrchestratorSettings.ModelPath, input, OrchestratorSettings.SnapshotPath, snapshot, labelPrefix);
     } catch (error) {
       throw (new CLIError(error));

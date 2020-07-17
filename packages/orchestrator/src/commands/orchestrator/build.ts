@@ -24,7 +24,7 @@ export default class OrchestratorBuild extends Command {
 
   async run() {
     const {flags}: flags.Output = this.parse(OrchestratorBuild)
-    const output: string = path.resolve(flags.out || path.join(__dirname, 'orchestrator.blu'));
+    const output: string = flags.out;
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
@@ -33,7 +33,7 @@ export default class OrchestratorBuild extends Command {
       nlrPath = 'D:\\src\\TScience\\Orchestrator\\oc\\dep\\model';
     }
 
-    OrchestratorSettings.init(__dirname, nlrPath, output);
+    OrchestratorSettings.init(__dirname, nlrPath, output, __dirname);
 
     const labelResolver: any = await LabelResolver.createAsync(nlrPath, false);
     this.log('Use compact embedding == false!');
