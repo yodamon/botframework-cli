@@ -21,8 +21,8 @@ export default class OrchestratorPredict extends Command {
   async run(): Promise<number> {
     const {flags}: flags.Output = this.parse(OrchestratorPredict);
 
-    const input: string = flags.in;
-    const output: string = flags.out;
+    // const input: string = flags.in;
+    // const output: string = flags.out;
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);

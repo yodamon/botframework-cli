@@ -210,13 +210,16 @@ export class OrchestratorHelper {
       let utterance: string = items[utteranceIdx] ? items[utteranceIdx] : '';
       labels = labels.trim();
       utterance = utterance.trim();
-      OrchestratorHelper.addNewLabelUtterance(
-        utterance,
-        labels,
-        '',
-        utterancesLabelsMap,
-        utterancesDuplicateLabelsMap
-      );
+      const labelArray: string[] = labels.split(',');
+      for (const label of labelArray) {
+        OrchestratorHelper.addNewLabelUtterance(
+          utterance,
+          label.trim(),
+          '',
+          utterancesLabelsMap,
+          utterancesDuplicateLabelsMap
+        );
+      }
     });
     return true;
   }

@@ -34,7 +34,7 @@ export default class OrchestratorTest extends Command {
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
-  
+
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     Utility.debuggingLog(`OrchestratorEvaluate.run(): input=${input}`);

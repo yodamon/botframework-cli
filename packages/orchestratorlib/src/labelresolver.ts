@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/typedef */
 /*
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
@@ -8,7 +7,7 @@ import * as path from 'path';
 import {Utility} from './utility';
 import {OrchestratorHelper} from './orchestratorhelper';
 
-const oc = require('oc_node_authoring/oc_node_authoring.node');
+const oc: any = require('oc_node_authoring/oc_node_authoring.node');
 
 export class LabelResolver {
   public static Orchestrator: any;
@@ -45,7 +44,7 @@ export class LabelResolver {
     const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): nlrPath=${nlrPath}`);
-    Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): typeof(snapshot)=${typeof(snapshot)}`);
+    Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): typeof(snapshot)=${typeof snapshot}`);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): snapshot.byteLength=${snapshot.byteLength}`);
     Utility.debuggingLog('LabelResolver.createWithSnapshotAsync(): Creating labeler..');
     LabelResolver.LabelResolver = await LabelResolver.Orchestrator.createLabelResolver(snapshot);
@@ -58,7 +57,7 @@ export class LabelResolver {
     for (const utterance in utterancesLabelsMap) {
       const labels: string[] = utterancesLabelsMap[utterance];
       for (const label of labels) {
-        const success = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
+        const success: any = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
         if (success) {
           Utility.debuggingLog(`LabelResolver.addExamples(): Added { label: ${label}, text: ${utterance}}`);
         }
