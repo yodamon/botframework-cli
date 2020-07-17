@@ -18,7 +18,7 @@ export class Orchestrator {
   }
 
   // eslint-disable-next-line max-params
-  public static async addAsync(nlrPath: string, inputPath: string, outputPath: string, snapshotPath: string, labelPrefix: string = "") {
+  public static async addAsync(nlrPath: string, inputPath: string, outputPath: string, snapshotPath: string, labelPrefix: string = '') {
     await OrchestratorAdd.runAsync(nlrPath, inputPath, outputPath, snapshotPath, labelPrefix);
   }
 

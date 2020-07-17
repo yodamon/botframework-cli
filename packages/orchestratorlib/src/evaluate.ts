@@ -3,38 +3,34 @@
  * Licensed under the MIT License.
  */
 
-import * as path from "path";
-import {Utility} from "./utility";
-import {LabelResolver} from "./labelresolver";
-import {OrchestratorHelper} from "./orchestratorhelper";
+import * as path from 'path';
+import {Utility} from './utility';
+import {LabelResolver} from './labelresolver';
+// import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorEvaluate {
-
-  public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = '') {  
-
+  public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = '') {
     if (!inputPath || inputPath.length === 0) {
       throw new Error('Please provide path to input file/folder');
     }
-
     if (!outputPath || outputPath.length === 0) {
       throw new Error('Please provide output path');
     }
-
     nlrPath = path.resolve(nlrPath);
 
-    var labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync()`);
+    const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync()');
 
-    const examples = labelResolver.getExamples();
-    const example = examples[0];
-    const example_name = example.name;
-    const labels = example.labels;
-    const label = labels[0];
-    const label_name = label.name;
-    const label_type = label.label_type;
-    const span = label.span;
-    const offset = span.offset;
-    const length = span.length;
+    const examples: any = labelResolver.getExamples();
+    const example: any = examples[0];
+    const example_name: string = example.name;
+    const labels: any = example.labels;
+    const label: any = labels[0];
+    const label_name: string = label.name;
+    const label_type: any = label.label_type;
+    const span: any = label.span;
+    const offset: number = span.offset;
+    const length: number = span.length;
     // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(examples)=${JSON.stringify(examples)}`);
     Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(example)=${JSON.stringify(example)}`);
     Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(example)=${Object.keys(example)}`);
@@ -72,7 +68,7 @@ export class OrchestratorEvaluate {
   //       nlrPath = path.resolve(nlrPath);
   //     }
   //     if (nlrPath.length === 0) {
-  //       throw new Error("Please provide path to Orchestrator model");
+  //       throw new Error('Please provide path to Orchestrator model');
   //     }
   //     this.labelResolver = await LabelResolver.createAsync(nlrPath);
   //   } catch (error) {
