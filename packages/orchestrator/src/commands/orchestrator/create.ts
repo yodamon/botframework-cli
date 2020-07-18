@@ -9,7 +9,7 @@ import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 import {OrchestratorSettings} from '../../utils/settings';
 
 export default class OrchestratorCreate extends Command {
-  static description: string = 'Create orchestrator example file from .lu/.qna files, which represent bot modules';
+  static description: string = 'Creates Orchestrator example file from .lu/.qna files, which represent bot modules';
 
   static examples: Array<string> = [`
     $ bf orchestrator:create 

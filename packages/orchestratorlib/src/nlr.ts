@@ -5,11 +5,10 @@
 
 import * as path from 'path';
 import {Utility} from './utility';
-import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
 export class OrchestratorNlr {
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string, debug: boolean = false) {
+  public static async getAsync(nlrPath: string, versionId: string) {
     try {
       if (nlrPath) {
         nlrPath = path.resolve(nlrPath);
@@ -19,9 +18,14 @@ export class OrchestratorNlr {
         throw new Error('Please provide path to Orchestrator model');
       }
 
-      var labelResolver = await LabelResolver.createAsync(nlrPath);
+      Utility.debuggingLog(`Version id: ${versionId}`);
+      OrchestratorHelper.writeToFile(nlrPath, 'boooooo');
     } catch (error) {
       throw new Error(error);
     }
+  }
+
+  public static async listAsync(): Promise<string> {
+    return '';
   }
 }
