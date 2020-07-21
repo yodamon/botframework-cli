@@ -11,15 +11,15 @@ export default class OrchestratorNlrGet extends Command {
   static description: string = 'Gets Orchestrator model'
 
   static flags: flags.Input<any> = {
-    out: flags.string({char: 'o', description: 'Path where generated orchestrator snapshot file will be placed. Default to current working directory.'}),
+    model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
     versionId: flags.string({description: 'Model version to download.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h', description: 'Orchestrator nlr:get command help'}),
   }
 
   async run() {
-    const {flags}: flags.Output = this.parse(OrchestratorNlrGet)
-    const output: string = flags.out || __dirname;
+    const {flags}: flags.Output = this.parse(OrchestratorNlrGet);
+    const output: string = flags.model || __dirname;
 
     this.log(`hello ${flags.versionId}`);
 
