@@ -11,17 +11,29 @@ export class ScoreStructure {
     utterance: string,
     labelsPredictedEvaluation: number, // ---- 0: TP, 1, FN, 2: FP, 3: TN
     labels: string[],
+    labelsConcatenated: string,
     labelsPredicted: string[],
+    labelsPredictedConcatenated: string,
     labelsPredictedScore: number,
     labelsPredictedIndexes: number[],
-    scoreResultArray: Result[]) {
+    labelsPredictedClosestText: string[],
+    scoreResultArray: Result[],
+    scoreArray: number[],
+    predictedScoreStructureHtmlTable: string,
+    labelsScoreStructureHtmlTable: string) {
     this.utterance = utterance;
     this.labelsPredictedEvaluation = labelsPredictedEvaluation;
     this.labels = labels;
+    this.labelsConcatenated = labelsConcatenated;
     this.labelsPredicted = labelsPredicted;
+    this.labelsPredictedConcatenated = labelsPredictedConcatenated;
     this.labelsPredictedScore = labelsPredictedScore;
     this.labelsPredictedIndexes = labelsPredictedIndexes;
+    this.labelsPredictedClosestText = labelsPredictedClosestText;
     this.scoreResultArray = scoreResultArray;
+    this.scoreArray = scoreArray;
+    this.predictedScoreStructureHtmlTable = predictedScoreStructureHtmlTable;
+    this.labelsScoreStructureHtmlTable = labelsScoreStructureHtmlTable;
   }
 
   public utterance: string;
@@ -30,11 +42,23 @@ export class ScoreStructure {
 
   public labels: string[];
 
+  public labelsConcatenated: string;
+
   public labelsPredicted: string[];
+
+  public labelsPredictedConcatenated: string;
 
   public labelsPredictedScore: number;
 
   public labelsPredictedIndexes: number[];
 
+  public labelsPredictedClosestText: string[];
+
   public scoreResultArray: Result[];
+
+  public scoreArray: number[];
+
+  public predictedScoreStructureHtmlTable: string;
+
+  public labelsScoreStructureHtmlTable: string;
 }

@@ -5,14 +5,49 @@
 
 import * as fs from 'fs';
 
-import {Span}  from './span';
-import {Label}  from './label';
-import {Result}  from './result';
+import {Span} from './span';
+import {Label} from './label';
+import {Result} from './result';
+import {ScoreStructure} from './score-structure';
 
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
+
+  // eslint-disable-next-line max-params
+  public static selectedScoreStructureToHtmlTable(
+    scoreStructure: ScoreStructure,
+    tableDescription: string = '',
+    selectedOutputDataArraryHeaders: string[] = [],
+    outputDataColumnWidthSettings: string[] = [],
+    indexes: number[] = []): string {
+    if (Utility.isEmptyNumberArray(indexes)) {
+      indexes = scoreStructure.labelsPredictedIndexes;
+    }
+    return Utility.selectedScoreResultsToHtmlTable(
+      scoreStructure.scoreResultArray,
+      indexes,
+      tableDescription,
+      selectedOutputDataArraryHeaders,
+      outputDataColumnWidthSettings);
+  }
+
+  // eslint-disable-next-line max-params
+  public static selectedScoreResultsToHtmlTable(
+    scoreResultArray: Result[],
+    indexes: number[],
+    tableDescription: string = '',
+    selectedOutputDataArraryHeaders: string[] = [],
+    outputDataColumnWidthSettings: string[] = []): string {
+    const labelsSelectedArrays: any[][] = indexes.map((x: number) => [scoreResultArray[x].label.name, scoreResultArray[x].score, scoreResultArray[x].closest_text]);
+    const selectedScoreStructureHtmlTable: string = Utility.convertDataArraysToHtmlTable(
+      tableDescription,
+      labelsSelectedArrays,
+      selectedOutputDataArraryHeaders,
+      outputDataColumnWidthSettings);
+    return selectedScoreStructureHtmlTable;
+  }
 
   public static evaluateMultiLabelPrediction(groundTruths: any[], predictions: any[]): number {
     if (predictions.length <= 0) {
@@ -86,6 +121,7 @@ export class Utility {
     tableDescription: string,
     outputEvaluationReportDataArrays: any[][],
     outputDataArraryHeaders: string[] = [],
+    outputDataColumnWidthSettings: string[] = [],
     indentCumulative: string = '  ',
     indent: string = '  '): string {
     const outputLines: string[] = [];
@@ -99,8 +135,13 @@ export class Utility {
     outputLines.push(indentCumulative + '<table class="table">');
     if (!Utility.isEmptyStringArray(outputDataArraryHeaders)) {
       outputLines.push(indentCumulative + indent + '<tr>');
-      for (const headerEntry of outputDataArraryHeaders) {
-        outputLines.push(indentCumulative + indent + indent + '<th>');
+      for (let i: number = 0; i < outputDataArraryHeaders.length; i++) {
+        const headerEntry: string = outputDataArraryHeaders[i];
+        let widthSetting: string = '';
+        if (!Utility.isEmptyStringArray(outputDataColumnWidthSettings) && (outputDataColumnWidthSettings.length > i)) {
+          widthSetting = ` width=${outputDataColumnWidthSettings[i]}`;
+        }
+        outputLines.push(indentCumulative + indent + indent + '<th' + widthSetting + '>');
         outputLines.push(indentCumulative + indent + indent + headerEntry);
         outputLines.push(indentCumulative + indent + indent + '</th>');
       }

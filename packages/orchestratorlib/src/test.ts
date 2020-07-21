@@ -127,6 +127,7 @@ export class OrchestratorTest {
       if (utteranceLabels) {
         const utterance: string = utteranceLabels[0];
         const labels: string[] = utteranceLabels[1];
+        const labelsConcatenated: string = labels.join(',');
         const scoreresults: any = labelResolver.score(utterance);
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`OrchestratorTest.runAsync(), scoreresults=${JSON.stringify(scoreresults)}`);
@@ -142,9 +143,36 @@ export class OrchestratorTest {
         }
         const labelsPredictedScore: number = argMax.max;
         const labelsPredictedIndexes: number[] = argMax.indexesMax;
-        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => labelArrayAndMap.stringArray[x]);
+        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].label.name);
+        const labelsPredictedConcatenated: string = labelsPredicted.join(',');
         const labelsPredictedEvaluation: number = Utility.evaluateMultiLabelPrediction(labels, labelsPredicted);
-        scoreStructureArray.push(new ScoreStructure(utterance, labelsPredictedEvaluation, labels, labelsPredicted, labelsPredictedScore, labelsPredictedIndexes, scoreResultArray));
+        const labelsPredictedClosestText: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].closest_text);
+        const predictedScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labelsPredictedIndexes,
+          '',
+          ['Label', 'Score', 'Closest Text'],
+          ['30%', '10%', '60%']);
+        const labelsScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labels.map((x: string) => labelArrayAndMap.stringMap[x]),
+          '',
+          ['Label', 'Score', 'Closest Text'],
+          ['30%', '10%', '60%']);
+        scoreStructureArray.push(new ScoreStructure(
+          utterance,
+          labelsPredictedEvaluation,
+          labels,
+          labelsConcatenated,
+          labelsPredicted,
+          labelsPredictedConcatenated,
+          labelsPredictedScore,
+          labelsPredictedIndexes,
+          labelsPredictedClosestText,
+          scoreResultArray,
+          scoreArray,
+          predictedScoreStructureHtmlTable,
+          labelsScoreStructureHtmlTable));
         // ---- NOTE ---- debugging ouput.
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           for (const result of scoreresults) {
@@ -179,67 +207,87 @@ export class OrchestratorTest {
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
       if (scoreStructure) {
         const predictedScore: number = scoreStructure.labelsPredictedScore;
-        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
-        const scoreArrayAmbiguous: [string, number][] = scoreArray.map(
+        const scoreArray: number[] = scoreStructure.scoreArray;
+        const scoreArrayAmbiguous: number[][] = scoreArray.map(
           (x: number, index: number) => [x, index, Math.abs((predictedScore - x) / predictedScore)]).filter(
           (x: number[]) => ((x[2] < 0.2) && (x[2] > 0))).map(
-          (x: number[]) => [labelArrayAndMap.stringArray[x[1]], x[0]]);
-        if (scoreArrayAmbiguous.length > scoreStructure.labelsPredicted.length) {
-          const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-          const labelConcatenated: string = scoreStructure.labels.join(',');
-          const labelsPredictedScore: number = scoreStructure.labelsPredictedScore;
-          const scoreArrayAmbiguousConcatenated: string = scoreArrayAmbiguous.map(
-            (x: [string, number]) => x[0] + '=' + x[1]).join(',');
-          const scoreOutputLine: any[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, labelsPredictedScore, scoreArrayAmbiguousConcatenated];
+          (x: number[]) => [x[1], x[0], x[2]]);
+        if (scoreArrayAmbiguous.length > 0) {
+          const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+          const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+          const ambiguousScoreStructureHtmlTable: string = Utility.selectedScoreStructureToHtmlTable(
+            scoreStructure,
+            '',
+            ['Label', 'Score', 'Closest Text'],
+            ['30%', '10%', '60%'],
+            scoreArrayAmbiguous.map((x: number[]) => x[0]));
+          const scoreOutputLine: any[] = [
+            scoreStructure.utterance,
+            labelsScoreStructureHtmlTable,
+            labelsPredictedConcatenated,
+            ambiguousScoreStructureHtmlTable,
+          ];
           testingSetScoreOutputLinesAmbiguous.push(scoreOutputLine);
         }
       }
     }
     const utterancesAmbiguousArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
-      'Low confidence utterances and their intents',
+      'Ambiguous utterances and their intents',
       testingSetScoreOutputLinesAmbiguous,
-      ['Utterance', 'Intents', 'Predicted Intents', 'Prediction Score', 'Close Prediction Intent and Score']);
+      ['Utterance', 'Intents', 'Predictions', 'Close Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', utterancesAmbiguousArraysHtml);
     // ---- NOTE ---- generate misclassified HTML.
     const testingSetScoreOutputLinesMisclassified: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
       if (scoreStructure) {
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-        const labelConcatenated: string = scoreStructure.labels.join(',');
-        const scoreOutputLine: string[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated];
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const predictedScoreStructureHtmlTable: string = scoreStructure.predictedScoreStructureHtmlTable;
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          predictedScoreStructureHtmlTable,
+        ];
         testingSetScoreOutputLinesMisclassified.push(scoreOutputLine);
       }
     }
     const utterancesMisclassifiedArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Misclassified utterances and their intents',
       testingSetScoreOutputLinesMisclassified,
-      ['Utterance', 'Intents', 'Predicted Intents']);
+      ['Utterance', 'Intents', 'Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', utterancesMisclassifiedArraysHtml);
     // ---- NOTE ---- generate low-confidence HTML.
     const testingSetScoreOutputLinesLowConfidence: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
       if (scoreStructure) {
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-        const labelConcatenated: string = scoreStructure.labels.join(',');
-        const labelsPredictedScore: number = scoreStructure.labelsPredictedScore;
-        const scoreOutputLine: any[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, labelsPredictedScore];
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+        const scoreOutputLine: any[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          labelsPredictedConcatenated,
+        ];
         testingSetScoreOutputLinesLowConfidence.push(scoreOutputLine);
       }
     }
     const utterancesLowConfidenceArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Low confidence utterances and their intents',
       testingSetScoreOutputLinesLowConfidence,
-      ['Utterance', 'Intents', 'Predicted Intents', 'Prediction Score']);
+      ['Utterance', 'Intents', 'Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', utterancesLowConfidenceArraysHtml);
     // ---- NOTE ---- produce a score TSV file.
     const testingSetScoreOutputLines: string[][] = [];
     for (const scoreStructure of scoreStructureArray) {
       if (scoreStructure) {
         const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const labelConcatenated: string = scoreStructure.labels.join(',');
+        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const scoreArrayConcatenated: string = scoreArray.join('\t');
-        const scoreOutputLine: string[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, scoreArrayConcatenated];
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelConcatenated,
+          labelPredictedConcatenated,
+          scoreArrayConcatenated,
+        ];
         testingSetScoreOutputLines.push(scoreOutputLine);
       }
     }
