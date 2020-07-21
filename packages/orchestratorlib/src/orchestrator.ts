@@ -38,8 +38,8 @@ export class Orchestrator {
     await OrchestratorNlr.getAsync(nlrPath, versionId);
   }
 
-  public static async nlrListAsync() {
-    await OrchestratorNlr.listAsync();
+  public static async nlrListAsync(): Promise<string> {
+    return OrchestratorNlr.listAsync();
   }
 
   public static async predictAsync(nlrPath: string, inputPath: string, outputPath: string) {

@@ -6,6 +6,7 @@
 import * as path from 'path';
 import {Utility} from './utility';
 import {OrchestratorHelper} from './orchestratorhelper';
+const fetch = require('node-fetch');
 
 export class OrchestratorNlr {
   public static async getAsync(nlrPath: string, versionId: string) {
@@ -25,7 +26,13 @@ export class OrchestratorNlr {
     }
   }
 
+  public static async getNlrVersionsAsync(): Promise<string> {
+    const response: any = await fetch('https://aka.ms/nlrversions');
+    return response.json();
+  }
+
   public static async listAsync(): Promise<string> {
-    return '';
+    const json: any = await OrchestratorNlr.getNlrVersionsAsync();
+    return JSON.stringify(json, null, 2);
   }
 }

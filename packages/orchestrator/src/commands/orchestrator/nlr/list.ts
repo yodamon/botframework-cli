@@ -17,12 +17,11 @@ export default class OrchestratorNlrList extends Command {
   async run() {
     const {flags}: flags.Output = this.parse(OrchestratorNlrList)
 
-    this.log('hello list');
-
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
-      await Orchestrator.nlrListAsync();
+      const json: string = await Orchestrator.nlrListAsync();
+      this.log(json);
     } catch (error) {
       throw (new CLIError(error));
     }
