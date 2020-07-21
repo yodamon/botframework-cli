@@ -4,6 +4,9 @@
  */
 
 import * as path from 'path';
+import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
 import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
 import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
@@ -58,7 +61,7 @@ export class OrchestratorTest {
     await OrchestratorHelper.processFile(testPath, path.basename(testPath), utterancesLabelsMap, utterancesDuplicateLabelsMap, false);
     Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()');
     // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utterancesLabelsMap)=${JSON.stringify(utterancesLabelsMap)}`);
-    // ---- Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utterancesDuplicateLabelsMap))=${JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(testingSetUtterancesDuplicateLabelsMap))}`);
+    // ---- Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utterancesDuplicateLabelsMap))=${JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utterancesDuplicateLabelsMap))}`);
     Utility.debuggingLog(`OrchestratorTest.runAsync(), number of unique utterances=${Object.keys(utterancesLabelsMap).length}`);
     Utility.debuggingLog(`OrchestratorTest.runAsync(), number of duplicate utterance/label pairs=${utterancesDuplicateLabelsMap.size}`);
     // ---- NOTE ---- load the evaluation summary template.
@@ -127,6 +130,8 @@ export class OrchestratorTest {
       if (utteranceLabels) {
         const utterance: string = utteranceLabels[0];
         const labels: string[] = utteranceLabels[1];
+        const labelsIndexes: number[] = labels.map((x: string) => labelArrayAndMap.stringMap[x]);
+        const labelsConcatenated: string = labels.join(',');
         const scoreresults: any = labelResolver.score(utterance);
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`OrchestratorTest.runAsync(), scoreresults=${JSON.stringify(scoreresults)}`);
@@ -142,9 +147,37 @@ export class OrchestratorTest {
         }
         const labelsPredictedScore: number = argMax.max;
         const labelsPredictedIndexes: number[] = argMax.indexesMax;
-        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => labelArrayAndMap.stringArray[x]);
+        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].label.name);
+        const labelsPredictedConcatenated: string = labelsPredicted.join(',');
         const labelsPredictedEvaluation: number = Utility.evaluateMultiLabelPrediction(labels, labelsPredicted);
-        scoreStructureArray.push(new ScoreStructure(utterance, labelsPredictedEvaluation, labels, labelsPredicted, labelsPredictedScore, labelsPredictedIndexes, scoreResultArray));
+        const labelsPredictedClosestText: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].closest_text);
+        const predictedScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labelsPredictedIndexes,
+          '',
+          ['Label', 'Score', 'Closest Example'],
+          ['30%', '10%', '60%']);
+        const labelsScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labels.map((x: string) => labelArrayAndMap.stringMap[x]),
+          '',
+          ['Label', 'Score', 'Closest Example'],
+          ['30%', '10%', '60%']);
+        scoreStructureArray.push(new ScoreStructure(
+          utterance,
+          labelsPredictedEvaluation,
+          labels,
+          labelsConcatenated,
+          labelsIndexes,
+          labelsPredicted,
+          labelsPredictedConcatenated,
+          labelsPredictedScore,
+          labelsPredictedIndexes,
+          labelsPredictedClosestText,
+          scoreResultArray,
+          scoreArray,
+          predictedScoreStructureHtmlTable,
+          labelsScoreStructureHtmlTable));
         // ---- NOTE ---- debugging ouput.
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           for (const result of scoreresults) {
@@ -175,77 +208,170 @@ export class OrchestratorTest {
       }
     }
     // ---- NOTE ---- generate ambiguous HTML.
-    const testingSetScoreOutputLinesAmbiguous: string[][] = [];
+    const scoreOutputLinesAmbiguous: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
       if (scoreStructure) {
         const predictedScore: number = scoreStructure.labelsPredictedScore;
-        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
-        const scoreArrayAmbiguous: [string, number][] = scoreArray.map(
+        const scoreArray: number[] = scoreStructure.scoreArray;
+        const scoreArrayAmbiguous: number[][] = scoreArray.map(
           (x: number, index: number) => [x, index, Math.abs((predictedScore - x) / predictedScore)]).filter(
           (x: number[]) => ((x[2] < 0.2) && (x[2] > 0))).map(
-          (x: number[]) => [labelArrayAndMap.stringArray[x[1]], x[0]]);
-        if (scoreArrayAmbiguous.length > scoreStructure.labelsPredicted.length) {
-          const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-          const labelConcatenated: string = scoreStructure.labels.join(',');
-          const labelsPredictedScore: number = scoreStructure.labelsPredictedScore;
-          const scoreArrayAmbiguousConcatenated: string = scoreArrayAmbiguous.map(
-            (x: [string, number]) => x[0] + '=' + x[1]).join(',');
-          const scoreOutputLine: any[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, labelsPredictedScore, scoreArrayAmbiguousConcatenated];
-          testingSetScoreOutputLinesAmbiguous.push(scoreOutputLine);
+          (x: number[]) => [x[1], x[0], x[2]]);
+        if (scoreArrayAmbiguous.length > 0) {
+          const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+          const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+          const ambiguousScoreStructureHtmlTable: string = Utility.selectedScoreStructureToHtmlTable(
+            scoreStructure,
+            '',
+            ['Label', 'Score', 'Closest Example'],
+            ['30%', '10%', '60%'],
+            scoreArrayAmbiguous.map((x: number[]) => x[0]));
+          const scoreOutputLine: any[] = [
+            scoreStructure.utterance,
+            labelsScoreStructureHtmlTable,
+            labelsPredictedConcatenated,
+            ambiguousScoreStructureHtmlTable,
+          ];
+          scoreOutputLinesAmbiguous.push(scoreOutputLine);
         }
       }
     }
     const utterancesAmbiguousArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
-      'Low confidence utterances and their intents',
-      testingSetScoreOutputLinesAmbiguous,
-      ['Utterance', 'Intents', 'Predicted Intents', 'Prediction Score', 'Close Prediction Intent and Score']);
+      'Ambiguous utterances and their intents',
+      scoreOutputLinesAmbiguous,
+      ['Utterance', 'Intents', 'Predictions', 'Close Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', utterancesAmbiguousArraysHtml);
     // ---- NOTE ---- generate misclassified HTML.
-    const testingSetScoreOutputLinesMisclassified: string[][] = [];
+    const scoreOutputLinesMisclassified: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
       if (scoreStructure) {
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-        const labelConcatenated: string = scoreStructure.labels.join(',');
-        const scoreOutputLine: string[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated];
-        testingSetScoreOutputLinesMisclassified.push(scoreOutputLine);
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const predictedScoreStructureHtmlTable: string = scoreStructure.predictedScoreStructureHtmlTable;
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          predictedScoreStructureHtmlTable,
+        ];
+        scoreOutputLinesMisclassified.push(scoreOutputLine);
       }
     }
     const utterancesMisclassifiedArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Misclassified utterances and their intents',
-      testingSetScoreOutputLinesMisclassified,
-      ['Utterance', 'Intents', 'Predicted Intents']);
+      scoreOutputLinesMisclassified,
+      ['Utterance', 'Intents', 'Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', utterancesMisclassifiedArraysHtml);
     // ---- NOTE ---- generate low-confidence HTML.
-    const testingSetScoreOutputLinesLowConfidence: string[][] = [];
+    const scoreOutputLinesLowConfidence: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
       if (scoreStructure) {
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
-        const labelConcatenated: string = scoreStructure.labels.join(',');
-        const labelsPredictedScore: number = scoreStructure.labelsPredictedScore;
-        const scoreOutputLine: any[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, labelsPredictedScore];
-        testingSetScoreOutputLinesLowConfidence.push(scoreOutputLine);
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+        const scoreOutputLine: any[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          labelsPredictedConcatenated,
+        ];
+        scoreOutputLinesLowConfidence.push(scoreOutputLine);
       }
     }
     const utterancesLowConfidenceArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Low confidence utterances and their intents',
-      testingSetScoreOutputLinesLowConfidence,
-      ['Utterance', 'Intents', 'Predicted Intents', 'Prediction Score']);
+      scoreOutputLinesLowConfidence,
+      ['Utterance', 'Intents', 'Predictions']);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', utterancesLowConfidenceArraysHtml);
+    // ---- NOTE ---- produce confusion matrix result.
+    const scoreOutputLinesConfusionMatrix: string[][] = [];
+    const confusionMatrix: MultiLabelConfusionMatrix = new MultiLabelConfusionMatrix(
+      labelArrayAndMap.stringArray,
+      labelArrayAndMap.stringMap);
+    const multiLabelConfusionMatrixSubset: MultiLabelConfusionMatrixSubset = new MultiLabelConfusionMatrixSubset(
+      labelArrayAndMap.stringArray,
+      labelArrayAndMap.stringMap);
+    for (const scoreStructure of scoreStructureArray) {
+      if (scoreStructure) {
+        confusionMatrix.addInstanceByLabelIndexes(scoreStructure.labelsIndexes, scoreStructure.labelsPredictedIndexes);
+        multiLabelConfusionMatrixSubset.addInstanceByLabelIndexes(scoreStructure.labelsIndexes, scoreStructure.labelsPredictedIndexes);
+      }
+    }
+    const binaryConfusionMatrices: BinaryConfusionMatrix[] = confusionMatrix.getBinaryConfusionMatrices();
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices.length=${binaryConfusionMatrices.length}`);
+    for (let i: number = 0; i < binaryConfusionMatrices.length; i++) {
+      const label: string = labelArrayAndMap.stringArray[i];
+      const precision: number = Utility.round(binaryConfusionMatrices[i].getPrecision());
+      const recall: number = Utility.round(binaryConfusionMatrices[i].getRecall());
+      const f1: number = Utility.round(binaryConfusionMatrices[i].getF1Measure());
+      const truePositives: number = binaryConfusionMatrices[i].getTruePositives();
+      const falsePositives: number = binaryConfusionMatrices[i].getFalsePositives();
+      const trueNegatives: number = binaryConfusionMatrices[i].getTrueNegatives();
+      const falseNegatives: number = binaryConfusionMatrices[i].getFalseNegatives();
+      const total: number = binaryConfusionMatrices[i].getTotal();
+      const scoreOutputLineConfusionMatrix: any[] = [
+        label,
+        precision,
+        recall,
+        f1,
+        truePositives,
+        falsePositives,
+        trueNegatives,
+        falseNegatives,
+        total,
+      ];
+      scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrix);
+      Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices[${i}].getTotal()         =${binaryConfusionMatrices[i].getTotal()}`);
+      Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices[${i}].getTruePositives() =${binaryConfusionMatrices[i].getTruePositives()}`);
+      Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices[${i}].getFalsePositives()=${binaryConfusionMatrices[i].getFalsePositives()}`);
+      Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices[${i}].getTrueNegatives() =${binaryConfusionMatrices[i].getTrueNegatives()}`);
+      Utility.debuggingLog(`OrchestratorTest.runAsync(), binaryConfusionMatrices[${i}].getFalseNegatives()=${binaryConfusionMatrices[i].getFalseNegatives()}`);
+    }
+    const microAverageMetrics: {
+      'averagePrecisionRecallF1Accuracy': number;
+      'truePositives': number;
+      'total': number;
+    } = confusionMatrix.getMicroAverageMetrics();
+    const scoreOutputLineConfusionMatrixMicroAverage: any[] = [
+      'Micro-Average',
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      microAverageMetrics.truePositives,
+      microAverageMetrics.total - microAverageMetrics.truePositives,
+      'N/A',
+      'N/A',
+      microAverageMetrics.total,
+    ];
+    scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrixMicroAverage);
+    const confusionMatrixHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Confusion matrix metrics',
+      scoreOutputLinesConfusionMatrix,
+      ['Intent', 'Precision', 'Recall', 'F1', '#TruePositives', '#FalsePositives', '#TrueNegatives', '#FalseNegatives', 'Total']);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MODELEVALUATION}', confusionMatrixHtml);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(confusionMatrix.getMicroAverageMetrics())=${JSON.stringify(confusionMatrix.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())=${JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()         =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives()}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives()}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()}`);
     // ---- NOTE ---- produce a score TSV file.
-    const testingSetScoreOutputLines: string[][] = [];
+    const scoreOutputLines: string[][] = [];
     for (const scoreStructure of scoreStructureArray) {
       if (scoreStructure) {
         const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
-        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const labelConcatenated: string = scoreStructure.labels.join(',');
+        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const scoreArrayConcatenated: string = scoreArray.join('\t');
-        const scoreOutputLine: string[] = [scoreStructure.utterance, labelConcatenated, labelPredictedConcatenated, scoreArrayConcatenated];
-        testingSetScoreOutputLines.push(scoreOutputLine);
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelConcatenated,
+          labelPredictedConcatenated,
+          scoreArrayConcatenated,
+        ];
+        scoreOutputLines.push(scoreOutputLine);
       }
     }
     Utility.storeDataArraysToTsvFile(
       testingSetScoreOutputFile,
-      testingSetScoreOutputLines);
+      scoreOutputLines);
     // ---- NOTE ---- produce the evaluation summary file.
     Utility.dumpFile(testingSetSummaryOutputFile, evaluationSummaryTemplate);
     // ---- NOTE ---- the end

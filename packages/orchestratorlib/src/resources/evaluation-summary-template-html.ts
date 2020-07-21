@@ -38,7 +38,7 @@ export class EvaluationSummaryTemplateHtml {
         .navbar-header a {
             color: #fff;
         }
-        #dispatchName {
+        #orchestratorName {
             margin-right: 150px;
         }
         .nav-pills > li > a {
@@ -72,18 +72,22 @@ export class EvaluationSummaryTemplateHtml {
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header ms-fontSize-l">
-                <span id="dispatchName">{APP_NAME}</span>
+                <span id="orchestratorName">{APP_NAME}</span>
+                <!--
                 <span><a href="https://{PORTAL_URL}/applications/{APP_ID}/versions/{VERSION}/dashboard" target="_blank">LUIS Application ID: {APP_ID}</a></span>
+                -->
             </div>
         </div>
     </nav>
     <div style="clear:both"></div>
     <div class="container body-content" style="margin-top:60px">
-        <span class="ms-fontSize-xl ms-fontWeight-semibold">Dispatch Evaluation Summary</span>
+        <span class="ms-fontSize-xl ms-fontWeight-semibold">Orchestrator Evaluation Summary</span>
+        <!--
         <span style="float:right"><a href="https://{PORTAL_URL}/applications/{APP_ID}/versions/{VERSION}/dashboard" target="_blank">View in LUIS portal</a></span>
+        -->
         <div>
             <p>{EVAL_SUMMARY}</p>
-            <p>To improve dispatch, please update the source models and retrain the dispatch model by running the command "dispatch refresh".</p>
+            <p>To improve orchestrator, please update the source models and retrain the orchestrator model by running the command "orchestrator refresh".</p>
         </div>
         <br />
         <ul class="nav nav-pills ms-fontSize-mPlus ms-fontWeight-semibold" id="modelAnalysis" role="tablist" style="padding-bottom:10px">
@@ -103,11 +107,13 @@ export class EvaluationSummaryTemplateHtml {
                 <a class="nav-link" id="lowconfidence-tab" data-toggle="tab" href="#lowconfidence" role="tab" aria-controls="lowconfidence" aria-selected="false"><strong>Low Confidence</strong></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="modelevaluation-tab" data-toggle="tab" href="#modelevaluation" role="tab" aria-controls="modelevaluation" aria-selected="false"><strong>Cross Validation</strong></a>
+                <a class="nav-link" id="modelevaluation-tab" data-toggle="tab" href="#modelevaluation" role="tab" aria-controls="modelevaluation" aria-selected="false"><strong>Metrics</strong></a>
             </li>
+            <!--
             <li class="nav-item">
                 <a class="nav-link" id="modelevaluationtopposition-tab" data-toggle="tab" href="#modelevaluationtopposition" role="tab" aria-controls="modelevaluationtopposition" aria-selected="false"><strong>Top @Position Metrics</strong></a>
             </li>
+            -->
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="intentutterancestatistics" role="tabpanel" aria-labelledby="intentutterancestatistics-tab">
@@ -154,6 +160,7 @@ export class EvaluationSummaryTemplateHtml {
                     {CROSSENTROPY}
                 </p>
             </div>
+            <!--
             <div class="tab-pane" id="modelevaluationtopposition" role="tabpanel" aria-labelledby="modelevaluationtopposition-tab">
                 <p>Overall top-position multi-class confusion matrix evaluation metrics</p>
                 <p>
@@ -163,6 +170,7 @@ export class EvaluationSummaryTemplateHtml {
                     {MODELEVALUATIONTopPositionPerClassMetrics}
                 </p>
             </div>
+            -->
         </div>
         <br /><br />
     </div>
