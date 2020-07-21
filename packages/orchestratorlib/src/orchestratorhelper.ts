@@ -371,7 +371,7 @@ export class OrchestratorHelper {
           Utility.insertStringPairToStringIdStringSetNativeMap(utterance, hierarchicalLabel, utterancesDuplicateLabelsMap);
         }
       } else if (!OrchestratorHelper.addUniqueLabel(label, existingLabels)) {
-        Utility.insertStringPairToStringIdStringSetNativeMap(utterance, hierarchicalLabel, utterancesDuplicateLabelsMap);
+        Utility.insertStringPairToStringIdStringSetNativeMap(utterance, label, utterancesDuplicateLabelsMap);
       }
     } else if (hierarchicalLabel && hierarchicalLabel.length > 0) {
       utterancesLabelsMap[utterance] = [hierarchicalLabel];
