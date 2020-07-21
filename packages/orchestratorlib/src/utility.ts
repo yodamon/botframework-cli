@@ -321,14 +321,18 @@ export class Utility {
     return !(input && input.length > 0);
   }
 
+  public static round(input: number, digits: number = 10000): number {
+    if (digits > 0) {
+      input = Math.round(input * digits) / digits;
+    }
+    return input;
+  }
+
   public static scoreResultsToArray(results: any, labelIndexMap: {[id: string]: number}, digits: number = 10000): Result[] {
     const scoreResultArray: Result[] = [];
     for (const result of results) {
       if (result) {
-        let score: number = result.score;
-        if (digits > 0) {
-          score = Math.round(score * digits) / digits;
-        }
+        const score: number = Utility.round(result.score, digits);
         const result_label: any = result.label;
         const label: string = result_label.name;
         const label_type: number = result_label.label_type;

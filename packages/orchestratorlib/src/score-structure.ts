@@ -12,6 +12,7 @@ export class ScoreStructure {
     labelsPredictedEvaluation: number, // ---- 0: TP, 1, FN, 2: FP, 3: TN
     labels: string[],
     labelsConcatenated: string,
+    labelsIndexes: number[],
     labelsPredicted: string[],
     labelsPredictedConcatenated: string,
     labelsPredictedScore: number,
@@ -25,6 +26,7 @@ export class ScoreStructure {
     this.labelsPredictedEvaluation = labelsPredictedEvaluation;
     this.labels = labels;
     this.labelsConcatenated = labelsConcatenated;
+    this.labelsIndexes = labelsIndexes;
     this.labelsPredicted = labelsPredicted;
     this.labelsPredictedConcatenated = labelsPredictedConcatenated;
     this.labelsPredictedScore = labelsPredictedScore;
@@ -43,6 +45,8 @@ export class ScoreStructure {
   public labels: string[];
 
   public labelsConcatenated: string;
+
+  public labelsIndexes: number[];
 
   public labelsPredicted: string[];
 
