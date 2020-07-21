@@ -5,6 +5,10 @@
 
 import * as fs from 'fs';
 
+import {Span}  from './span';
+import {Label}  from './label';
+import {Result}  from './result';
+
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
 
@@ -276,20 +280,8 @@ export class Utility {
     return !(input && input.length > 0);
   }
 
-  public static scoreResultsToArray(results: any, labelIndexMap: {[id: string]: number}, digits: number = 10000): {
-    'label': string;
-    'score': number;
-    'closest_text': string;
-    'label_type': number;
-    'label_span_offset': number;
-    'label_span_length': number; }[] {
-    const scoreResultArray: {
-      'label': string;
-      'score': number;
-      'closest_text': string;
-      'label_type': number;
-      'label_span_offset': number;
-      'label_span_length': number; }[] = [];
+  public static scoreResultsToArray(results: any, labelIndexMap: {[id: string]: number}, digits: number = 10000): Result[] {
+    const scoreResultArray: Result[] = [];
     for (const result of results) {
       if (result) {
         let score: number = result.score;
@@ -303,19 +295,10 @@ export class Utility {
         const label_span_offset: number = label_span.offset;
         const label_span_length: number = label_span.length;
         const closest_text: string = result.closest_text;
-        const scoreResult: {
-          'label': string;
-          'score': number;
-          'closest_text': string;
-          'label_type': number;
-          'label_span_offset': number;
-          'label_span_length': number; } = {
-            label,
-            score,
-            closest_text,
-            label_type,
-            label_span_offset,
-            label_span_length};
+        const scoreResult: Result = new Result(
+          new Label(label_type, label, new Span(label_span_offset, label_span_length)),
+          score,
+          closest_text);
         const labelIndex: number = labelIndexMap[label];
         if (labelIndex >= 0) {
           scoreResultArray[labelIndex] = scoreResult;

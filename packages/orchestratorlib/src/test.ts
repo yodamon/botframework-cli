@@ -4,10 +4,12 @@
  */
 
 import * as path from 'path';
-import {Utility} from './utility';
+import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
 import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
-import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
+import {Result} from './result';
+import {ScoreStructure}  from './score-structure';
+import {Utility} from './utility';
 
 export class OrchestratorTest {
   // eslint-disable-next-line complexity
@@ -120,21 +122,7 @@ export class OrchestratorTest {
       utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
     // ---- NOTE ---- collect utterance prediction and scores.
-    const scoreStructureArray: {
-      'utterance': string;
-      'labelsPredictedEvaluation': number; // ---- 0: TP, 1, FN, 2: FP, 3: TN
-      'labels': string[];
-      'labelsPredicted': string[];
-      'labelsPredictedScore': number;
-      'labelsPredictedIndexes': number[];
-      'scoreResultArray': {
-        'label': string;
-        'score': number;
-        'closest_text': string;
-        'label_type': number;
-        'label_span_offset': number;
-        'label_span_length': number; }[];
-    }[] = [];
+    const scoreStructureArray: ScoreStructure[] = [];
     for (const utteranceLabels of Object.entries(utterancesLabelsMap)) {
       if (utteranceLabels) {
         const utterance: string = utteranceLabels[0];
@@ -143,23 +131,11 @@ export class OrchestratorTest {
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`OrchestratorTest.runAsync(), scoreresults=${JSON.stringify(scoreresults)}`);
         }
-        const scoreResultArray: {
-          'label': string;
-          'score': number;
-          'closest_text': string;
-          'label_type': number;
-          'label_span_offset': number;
-          'label_span_length': number; }[] = Utility.scoreResultsToArray(scoreresults, labelArrayAndMap.stringMap);
+        const scoreResultArray: Result[] = Utility.scoreResultsToArray(scoreresults, labelArrayAndMap.stringMap);
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(scoreResultArray)=${JSON.stringify(scoreResultArray)}`);
         }
-        const scoreArray: number[] = scoreResultArray.map((x: {
-          'label': string;
-          'score': number;
-          'closest_text': string;
-          'label_type': number;
-          'label_span_offset': number;
-          'label_span_length': number; }) => x.score);
+        const scoreArray: number[] = scoreResultArray.map((x: Result) => x.score);
         const argMax: { 'indexesMax': number[]; 'max': number } = Utility.getIndexesOnMaxEntries(scoreArray);
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(argMax.indexesMax)=${JSON.stringify(argMax.indexesMax)}`);
@@ -168,7 +144,7 @@ export class OrchestratorTest {
         const labelsPredictedIndexes: number[] = argMax.indexesMax;
         const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => labelArrayAndMap.stringArray[x]);
         const labelsPredictedEvaluation: number = Utility.evaluateMultiLabelPrediction(labels, labelsPredicted);
-        scoreStructureArray.push({utterance, labelsPredictedEvaluation, labels, labelsPredicted, labelsPredictedScore, labelsPredictedIndexes, scoreResultArray});
+        scoreStructureArray.push(new ScoreStructure(utterance, labelsPredictedEvaluation, labels, labelsPredicted, labelsPredictedScore, labelsPredictedIndexes, scoreResultArray));
         // ---- NOTE ---- debugging ouput.
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           for (const result of scoreresults) {
@@ -200,30 +176,10 @@ export class OrchestratorTest {
     }
     // ---- NOTE ---- generate ambiguous HTML.
     const testingSetScoreOutputLinesAmbiguous: string[][] = [];
-    for (const scoreStructure of scoreStructureArray.filter((x: {
-      'utterance': string;
-      'labelsPredictedEvaluation': number; // ---- 0: TP, 1, FN, 2: FP, 3: TN
-      'labels': string[];
-      'labelsPredicted': string[];
-      'labelsPredictedScore': number;
-      'labelsPredictedIndexes': number[];
-      'scoreResultArray': {
-        'label': string;
-        'score': number;
-        'closest_text': string;
-        'label_type': number;
-        'label_span_offset': number;
-        'label_span_length': number; }[];
-    }) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
       if (scoreStructure) {
         const predictedScore: number = scoreStructure.labelsPredictedScore;
-        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: {
-          'label': string;
-          'score': number;
-          'closest_text': string;
-          'label_type': number;
-          'label_span_offset': number;
-          'label_span_length': number; }) => x.score);
+        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
         const scoreArrayAmbiguous: [string, number][] = scoreArray.map(
           (x: number, index: number) => [x, index, Math.abs((predictedScore - x) / predictedScore)]).filter(
           (x: number[]) => ((x[2] < 0.2) && (x[2] > 0))).map(
@@ -246,21 +202,7 @@ export class OrchestratorTest {
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', utterancesAmbiguousArraysHtml);
     // ---- NOTE ---- generate misclassified HTML.
     const testingSetScoreOutputLinesMisclassified: string[][] = [];
-    for (const scoreStructure of scoreStructureArray.filter((x: {
-      'utterance': string;
-      'labelsPredictedEvaluation': number; // ---- 0: TP, 1, FN, 2: FP, 3: TN
-      'labels': string[];
-      'labelsPredicted': string[];
-      'labelsPredictedScore': number;
-      'labelsPredictedIndexes': number[];
-      'scoreResultArray': {
-        'label': string;
-        'score': number;
-        'closest_text': string;
-        'label_type': number;
-        'label_span_offset': number;
-        'label_span_length': number; }[];
-    }) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
       if (scoreStructure) {
         const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const labelConcatenated: string = scoreStructure.labels.join(',');
@@ -275,21 +217,7 @@ export class OrchestratorTest {
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', utterancesMisclassifiedArraysHtml);
     // ---- NOTE ---- generate low-confidence HTML.
     const testingSetScoreOutputLinesLowConfidence: string[][] = [];
-    for (const scoreStructure of scoreStructureArray.filter((x: {
-      'utterance': string;
-      'labelsPredictedEvaluation': number; // ---- 0: TP, 1, FN, 2: FP, 3: TN
-      'labels': string[];
-      'labelsPredicted': string[];
-      'labelsPredictedScore': number;
-      'labelsPredictedIndexes': number[];
-      'scoreResultArray': {
-        'label': string;
-        'score': number;
-        'closest_text': string;
-        'label_type': number;
-        'label_span_offset': number;
-        'label_span_length': number; }[];
-    }) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
       if (scoreStructure) {
         const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const labelConcatenated: string = scoreStructure.labels.join(',');
@@ -307,13 +235,7 @@ export class OrchestratorTest {
     const testingSetScoreOutputLines: string[][] = [];
     for (const scoreStructure of scoreStructureArray) {
       if (scoreStructure) {
-        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: {
-          'label': string;
-          'score': number;
-          'closest_text': string;
-          'label_type': number;
-          'label_span_offset': number;
-          'label_span_length': number; }) => x.score);
+        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
         const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
         const labelConcatenated: string = scoreStructure.labels.join(',');
         const scoreArrayConcatenated: string = scoreArray.join('\t');
