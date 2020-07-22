@@ -35,7 +35,7 @@ export default class OrchestratorBuild extends Command {
 
     OrchestratorSettings.init(__dirname, nlrPath, output, __dirname);
 
-    const labelResolver: any = await LabelResolver.createAsync(nlrPath, false);
+    const labelResolver: any = await LabelResolver.createAsync(nlrPath);
     this.log('Use compact embedding == false!');
     const example: any = {
       label: 'travel',

@@ -37,10 +37,10 @@ export default class OrchestratorTest extends Command {
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): input=${input}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): test=${test}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): output=${output}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): input=${input}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): test=${test}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): output=${output}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): nlrPath=${nlrPath}`);
 
     try {
       await Orchestrator.testAsync(nlrPath, input, test, output);
