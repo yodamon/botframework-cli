@@ -32,10 +32,10 @@ export class LabelResolver {
     }
   }
 
-  public static async createAsync(nlrPath: string, useCompactEmbeddings: boolean = true) {
+  public static async createAsync(nlrPath: string) {
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.debuggingLog('LabelResolver.createAsync(): Creating labeler..');
-    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver(useCompactEmbeddings);
+    LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
     return LabelResolver.LabelResolver;
   }
 

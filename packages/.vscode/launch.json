@@ -11,12 +11,10 @@
             "preLaunchTask": "${defaultBuildTask}",
             "program": "d:/src/botframework-cli/packages/orchestrator/bin/run",
             "args": [
-                "orchestrator:add",
+                "orchestrator:create",
                 "-m",
                 "D:/src/TScience/Orchestrator/oc/dep/model",
                 "-i",
-                "D:/src/Orchestrator/OrchestratorCli/Data/LU/skills/emailskill/en/email.lu",
-                "-s",
                 "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",
                 "-o",
                 "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",
