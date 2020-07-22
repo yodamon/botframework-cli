@@ -62,11 +62,11 @@ export class OrchestratorSettings {
     if (snapshotPath) {
       snapshotPath = path.resolve(snapshotPath);
 
+      if (!OrchestratorHelper.exists(snapshotPath)) {
+        fs.mkdirSync(snapshotPath, {recursive: true});
+      }
       if (OrchestratorHelper.isDirectory(snapshotPath)) {
         snapshotPath = path.join(snapshotPath, 'orchestrator.blu');
-      } else if (!OrchestratorHelper.exists(snapshotPath)) {
-        Utility.debuggingLog(`Invalid output path ${snapshotPath}`);
-        throw new Error('Invalid output path');
       }
     } else if (!settingsFileExists || !settings.snapshotPath || settings.snapshotPath.length === 0) {
       snapshotPath = path.join(defaultSnapshotPath, 'orchestrator.blu');
