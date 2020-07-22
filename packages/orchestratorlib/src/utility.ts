@@ -4,7 +4,7 @@
  */
 
 import * as fs from 'fs';
-
+import * as path from 'path';
 import {Span} from './span';
 import {Label} from './label';
 import {Result} from './result';
@@ -502,5 +502,14 @@ export class Utility {
     const dateTimeString: string = (new Date()).toISOString();
     const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${message}`;
     throw new Error(Utility.jsonstringify(logMessage));
+  }
+
+  public static moveFile(file: string, targetDir: string) {
+    const f: string = path.basename(file);
+    const dest: string = path.resolve(targetDir, f);
+
+    fs.rename(file, dest, (err: any) => {
+      if (err) throw err;
+    });
   }
 }

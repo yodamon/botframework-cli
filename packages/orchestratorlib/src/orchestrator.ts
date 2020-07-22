@@ -34,8 +34,8 @@ export class Orchestrator {
     await OrchestratorFineTune.runAsync(nlrPath, inputPath, outputPath);
   }
 
-  public static async nlrGetAsync(nlrPath: string, versionId: string) {
-    await OrchestratorNlr.getAsync(nlrPath, versionId);
+  public static async nlrGetAsync(nlrPath: string, versionId: string, onFinish: any = null) {
+    await OrchestratorNlr.getAsync(nlrPath, versionId, onFinish);
   }
 
   public static async nlrListAsync(): Promise<string> {

@@ -7,7 +7,7 @@ import * as path from 'path';
 import {Utility} from './utility';
 import {OrchestratorHelper} from './orchestratorhelper';
 
-const oc: any = require('oc_node_authoring/oc_node_authoring.node');
+const oc: any = require('orchestrator-core/orchestrator-core.node');
 
 export class LabelResolver {
   public static Orchestrator: any;

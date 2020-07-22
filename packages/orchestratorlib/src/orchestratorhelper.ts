@@ -140,7 +140,7 @@ export class OrchestratorHelper {
         OrchestratorHelper.getLabelFromFileName(fileName, ext, hierarchical),
         utterancesLabelsMap,
         utterancesDuplicateLabelsMap);
-    } else if (ext === '.blu') {
+    } else if (ext === '.blu' && fileName !== 'orchestrator.blu') {
       Utility.writeToConsole(`Processing ${filePath}...\n`);
       OrchestratorHelper.parseBluFile(
         filePath,
