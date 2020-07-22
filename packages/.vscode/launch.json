@@ -15,10 +15,9 @@
                 "-m",
                 "D:/src/TScience/Orchestrator/oc/dep/model",
                 "-i",
-                "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",
+                "C:/Users/tiens/Downloads/generated",
                 "-o",
-                "D:/src/Orchestrator/Samples/DispatchBot/CognitiveModels",
-                "--hierarchical"
+                "C:/Users/tiens/Downloads/generated"
             ],
             "internalConsoleOptions": "openOnSessionStart",
         }

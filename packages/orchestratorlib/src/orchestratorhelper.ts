@@ -140,7 +140,7 @@ export class OrchestratorHelper {
         OrchestratorHelper.getLabelFromFileName(fileName, ext, hierarchical),
         utterancesLabelsMap,
         utterancesDuplicateLabelsMap);
-    } else if (ext === '.blu' && fileName !== 'orchestrator.blu') {
+    } else if (ext === '.blu') {
       Utility.writeToConsole(`Processing ${filePath}...\n`);
       OrchestratorHelper.parseBluFile(
         filePath,
@@ -290,7 +290,7 @@ export class OrchestratorHelper {
     utterancesLabelsMap: { [id: string]: string[] },
     utterancesDuplicateLabelsMap: Map<string, Set<string>>,
     hierarchical: boolean) {
-    const supportedFileFormats: string[] = ['.lu', '.json', '.qna', '.tsv', '.txt', '.blu'];
+    const supportedFileFormats: string[] = ['.lu', '.json', '.qna', '.tsv', '.txt'];
     const items: string[] = fs.readdirSync(folderPath);
     for (const item of items) {
       const currentItemPath: string = path.join(folderPath, item);
