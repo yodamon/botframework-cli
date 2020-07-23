@@ -3,6 +3,7 @@ dependencies:
   '@azure/cognitiveservices-luis-authoring': 4.0.0-preview.1
   '@azure/cognitiveservices-luis-runtime': 5.0.0
   '@azure/ms-rest-azure-js': 2.0.1
+  '@microsoft/orchestrator-core': 0.1.36
   '@oclif/parser': 3.8.5
   '@rush-temp/bf-chatdown': 'file:projects/bf-chatdown.tgz'
   '@rush-temp/bf-cli-command': 'file:projects/bf-cli-command.tgz'
@@ -62,7 +63,6 @@ dependencies:
   nock: 11.9.1
   node-7z-forall: 1.0.5
   nyc: 14.1.1
-  orchestrator-core: 0.1.35
   os: 0.1.1
   pascal-case: 2.0.1
   path: 0.12.7
@@ -363,6 +363,17 @@ packages:
     dev: false
     resolution:
       integrity: sha1-nfA7vXxpalxYiFw0qgbaQchUN5Y=
+  /@microsoft/orchestrator-core/0.1.36:
+    dependencies:
+      bindings: 1.5.0
+      node-addon-api: 3.0.0
+      node-gyp: 7.0.0
+      node-pre-gyp: 0.15.0
+      nyc: 15.1.0
+    dev: false
+    requiresBuild: true
+    resolution:
+      integrity: sha1-+AhOUq6bO+4y3lUjzs0Nr7pJHSg=
   /@microsoft/recognizers-text-data-types-timex-expression/1.3.0:
     dev: false
     engines:
@@ -7945,6 +7956,7 @@ packages:
     version: 0.0.0
   'file:projects/bf-orchestrator.tgz':
     dependencies:
+      '@microsoft/orchestrator-core': 0.1.36
       '@oclif/test': 1.2.6
       '@types/chai': 4.2.11
       '@types/fs-extra': 8.1.1
@@ -7970,7 +7982,7 @@ packages:
     dev: false
     name: '@rush-temp/bf-orchestrator'
     resolution:
-      integrity: sha512-TOYYc+ze56aEqi9+NtuWQLxKRl2/9nAOko9t+e506bir+03LmcsHuHkAnVy3lwn4WclQPHO0DSgkpNwTYGhSUg==
+      integrity: sha512-QSOedcW+x05AUkl8kOvoerC/V6oZ1zUQG5n+F0kmgVIHqThB1d9SPXj1brTHPaLsTKk58loIMEJ+GvsxwGdiLw==
       tarball: 'file:projects/bf-orchestrator.tgz'
     version: 0.0.0
   'file:projects/bf-qnamaker.tgz':
@@ -8059,11 +8071,13 @@ packages:
       integrity: sha512-RvSJyVz/dc5glO45vQcWXP5L2c8E6Reo3TFMHz2rmA4VYTVziHwxkQ+Jr1NVfHpaYtzYsGW5H6aNe5hnMUhG1Q==
       tarball: 'file:projects/botframework-cli.tgz'
     version: 0.0.0
+registry: ''
 specifiers:
   '@apidevtools/json-schema-ref-parser': ^9.0.1
   '@azure/cognitiveservices-luis-authoring': 4.0.0-preview.1
   '@azure/cognitiveservices-luis-runtime': 5.0.0
   '@azure/ms-rest-azure-js': 2.0.1
+  '@microsoft/orchestrator-core': ^0.1.36
   '@oclif/parser': ~3.8.4
   '@rush-temp/bf-chatdown': 'file:./projects/bf-chatdown.tgz'
   '@rush-temp/bf-cli-command': 'file:./projects/bf-cli-command.tgz'
@@ -8123,7 +8137,6 @@ specifiers:
   nock: ^11.7.0
   node-7z-forall: ~1.0.5
   nyc: ^14.1.1
-  orchestrator-core: ^0.1.31
   os: ~0.1.1
   pascal-case: ^2.0.1
   path: ^0.12.7
