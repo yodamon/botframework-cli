@@ -7,7 +7,7 @@ import * as path from 'path';
 import {Utility} from './utility';
 import {OrchestratorHelper} from './orchestratorhelper';
 
-const oc: any = require('orchestrator-core/orchestrator-core.node');
+const oc: any = require('@microsoft/orchestrator-core');
 
 export class LabelResolver {
   public static Orchestrator: any;
@@ -57,9 +57,16 @@ export class LabelResolver {
     for (const utterance in utterancesLabelsMap) {
       const labels: string[] = utterancesLabelsMap[utterance];
       for (const label of labels) {
-        const success: any = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
-        if (success) {
-          Utility.debuggingLog(`LabelResolver.addExamples(): Added { label: ${label}, text: ${utterance}}`);
+        try {
+          const success: any = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
+          if (success) {
+            Utility.debuggingLog(`LabelResolver.addExamples(): Added { label: ${label}, text: ${utterance}}`);
+          } else {
+            Utility.debuggingLog(`LabelResolver.addExamples(): Failed adding { label: ${label}, text: ${utterance}}`);
+          }
+        }
+        catch (error) {
+          Utility.debuggingLog(`LabelResolver.addExamples(): Failed adding { label: ${label}, text: ${utterance}}\n${error}`);
         }
       }
     }
