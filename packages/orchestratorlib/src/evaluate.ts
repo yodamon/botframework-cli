@@ -5,16 +5,13 @@
 
 import * as path from 'path';
 
-import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
 import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
 import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
 
 import {LabelType} from './label-type';
-import {Result} from './result';
 import {ScoreStructure}  from './score-structure';
 
 import {LabelResolver} from './labelresolver';
-import {OrchestratorHelper} from './orchestratorhelper';
 
 import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
 import {Utility} from './utility';
@@ -74,19 +71,19 @@ export class OrchestratorEvaluate {
     } = Utility.generateLabelStatisticsAndHtmlTable(
       utterancesLabelsMap,
       labelArrayAndMap);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
     // ---- NOTE ---- generate utterance statistics
     const utteranceStatisticsAndHtmlTable: {
       'utteranceStatistics': string[][];
       'utteranceStatisticsHtml': string;
     } = Utility.generateUtteranceStatisticsAndHtmlTable(
       utterancesLabelsMap);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
     // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
     const intentsUtterancesStatisticsHtml: string =
     labelStatisticsAndHtmlTable.labelStatisticsHtml + utteranceStatisticsAndHtmlTable.utteranceStatisticsHtml;
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{INTENTUTTERANCESTATISTICS}', intentsUtterancesStatisticsHtml);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {INTENTUTTERANCESTATISTICS} content');
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {INTENTUTTERANCESTATISTICS} content');
 
     // ---- NOTE ---- generate duplicate report.
     const utterancesMultiLabelArrays: [string, string][] = Object.entries(utterancesLabelsMap).filter(
@@ -104,8 +101,14 @@ export class OrchestratorEvaluate {
     const duplicateStatisticsHtml: string =
       utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {DUPLICATES} content');
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {DUPLICATES} content');
 
+    // ---- NOTE ---- collect utterance prediction and scores.
+    const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utterancesLabelsMap);
+    const scoreStructureArray: ScoreStructure[] = Utility.score(
+      labelResolver,
+      utteranceLabelsPairArray,
+      labelArrayAndMap);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       const examples: any = labelResolver.getExamples();
       const example: any = examples[0];
@@ -133,6 +136,54 @@ export class OrchestratorEvaluate {
       Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.offset=${offset}`);
       Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.length=${length}`);
     }
+
+    // ---- NOTE ---- generate ambiguous HTML.
+    const ambiguousAnalysis: {
+      'scoringAmbiguousOutputLines': string[][];
+      'scoringAmbiguousUtterancesArraysHtml': string;
+    } = Utility.generateAmbiguousStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', ambiguousAnalysis.scoringAmbiguousUtterancesArraysHtml);
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {AMBIGUOUS} content');
+
+    // ---- NOTE ---- generate misclassified HTML.
+    const misclassifiedAnalysis: {
+      'scoringMisclassifiedOutputLines': string[][];
+      'scoringMisclassifiedUtterancesArraysHtml': string;
+    } = Utility.generateMisclassifiedStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', misclassifiedAnalysis.scoringMisclassifiedUtterancesArraysHtml);
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {MISCLASSIFICATION} content');
+
+    // ---- NOTE ---- generate low-confidence HTML.
+    const lowConfidenceAnalysis: {
+      'scoringLowConfidenceOutputLines': string[][];
+      'scoringLowConfidenceUtterancesArraysHtml': string;
+    } = Utility.generateLowConfidenceStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', lowConfidenceAnalysis.scoringLowConfidenceUtterancesArraysHtml);
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {LOWCONFIDENCE} content');
+
+    // ---- NOTE ---- produce confusion matrix result.
+    const confusionMatrixAnalysis: {
+      'confusionMatrix': MultiLabelConfusionMatrix;
+      'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+      'scoreOutputLinesConfusionMatrix': string[][];
+      'confusionMatrixHtml': string;
+    } = Utility.generateConfusionMatrixMetricsAndHtmlTable(
+      scoreStructureArray,
+      labelArrayAndMap);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MODELEVALUATION}', confusionMatrixAnalysis.confusionMatrixHtml);
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finished generating {MODELEVALUATION} content');
+
+    // ---- NOTE ---- produce a score TSV file.
+    const scoreOutputLines: string[][] = Utility.generateScoreOutputLines(
+      scoreStructureArray
+    );
+    Utility.storeDataArraysToTsvFile(
+      trainingSetScoreOutputFile,
+      scoreOutputLines);
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finishing calling Utility.storeDataArraysToTsvFile');
 
     // ---- NOTE ---- produce the evaluation summary file.
     Utility.dumpFile(trainingSetSummaryOutputFile, evaluationSummaryTemplate);

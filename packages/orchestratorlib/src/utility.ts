@@ -5,8 +5,14 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+
+import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
+
 import {Example} from './example';
 import {Label} from './label';
+import {LabelType} from './label-type';
 import {OrchestratorHelper} from './orchestratorhelper';
 import {Result} from './result';
 import {ScoreStructure} from './score-structure';
@@ -16,6 +22,305 @@ export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
+
+  public static generateScoreOutputLines(
+    scoreStructureArray: ScoreStructure[]): string[][] {
+    const scoreOutputLines: string[][] = [];
+    for (const scoreStructure of scoreStructureArray) {
+      if (scoreStructure) {
+        const scoreArray: number[] = scoreStructure.scoreResultArray.map((x: Result) => x.score);
+        const labelConcatenated: string = scoreStructure.labels.join(',');
+        const labelPredictedConcatenated: string = scoreStructure.labelsPredicted.join(',');
+        const scoreArrayConcatenated: string = scoreArray.join('\t');
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelConcatenated,
+          labelPredictedConcatenated,
+          scoreArrayConcatenated,
+        ];
+        scoreOutputLines.push(scoreOutputLine);
+      }
+    }
+    return scoreOutputLines;
+  }
+
+  public static generateConfusionMatrixMetricsAndHtmlTable(
+    scoreStructureArray: ScoreStructure[],
+    labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};}): {
+      'confusionMatrix': MultiLabelConfusionMatrix;
+      'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+      'scoreOutputLinesConfusionMatrix': string[][];
+      'confusionMatrixHtml': string;
+    } {
+    const scoreOutputLinesConfusionMatrix: string[][] = [];
+    const confusionMatrix: MultiLabelConfusionMatrix = new MultiLabelConfusionMatrix(
+      labelArrayAndMap.stringArray,
+      labelArrayAndMap.stringMap);
+    const multiLabelConfusionMatrixSubset: MultiLabelConfusionMatrixSubset = new MultiLabelConfusionMatrixSubset(
+      labelArrayAndMap.stringArray,
+      labelArrayAndMap.stringMap);
+    for (const scoreStructure of scoreStructureArray) {
+      if (scoreStructure) {
+        confusionMatrix.addInstanceByLabelIndexes(scoreStructure.labelsIndexes, scoreStructure.labelsPredictedIndexes);
+        multiLabelConfusionMatrixSubset.addInstanceByLabelIndexes(scoreStructure.labelsIndexes, scoreStructure.labelsPredictedIndexes);
+      }
+    }
+    const binaryConfusionMatrices: BinaryConfusionMatrix[] = confusionMatrix.getBinaryConfusionMatrices();
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices.length=${binaryConfusionMatrices.length}`);
+    for (let i: number = 0; i < binaryConfusionMatrices.length; i++) {
+      const label: string = labelArrayAndMap.stringArray[i];
+      const precision: number = Utility.round(binaryConfusionMatrices[i].getPrecision());
+      const recall: number = Utility.round(binaryConfusionMatrices[i].getRecall());
+      const f1: number = Utility.round(binaryConfusionMatrices[i].getF1Measure());
+      const accuracy: number = Utility.round(binaryConfusionMatrices[i].getAccuracy());
+      const truePositives: number = binaryConfusionMatrices[i].getTruePositives();
+      const falsePositives: number = binaryConfusionMatrices[i].getFalsePositives();
+      const trueNegatives: number = binaryConfusionMatrices[i].getTrueNegatives();
+      const falseNegatives: number = binaryConfusionMatrices[i].getFalseNegatives();
+      const total: number = binaryConfusionMatrices[i].getTotal();
+      const scoreOutputLineConfusionMatrix: any[] = [
+        label,
+        precision,
+        recall,
+        f1,
+        accuracy,
+        truePositives,
+        falsePositives,
+        trueNegatives,
+        falseNegatives,
+        total,
+      ];
+      scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrix);
+      Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTotal()         =${binaryConfusionMatrices[i].getTotal()}`);
+      Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTruePositives() =${binaryConfusionMatrices[i].getTruePositives()}`);
+      Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getFalsePositives()=${binaryConfusionMatrices[i].getFalsePositives()}`);
+      Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTrueNegatives() =${binaryConfusionMatrices[i].getTrueNegatives()}`);
+      Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getFalseNegatives()=${binaryConfusionMatrices[i].getFalseNegatives()}`);
+    }
+    const microAverageMetrics: {
+      'averagePrecisionRecallF1Accuracy': number;
+      'truePositives': number;
+      'total': number;
+    } = confusionMatrix.getMicroAverageMetrics();
+    const scoreOutputLineConfusionMatrixMicroAverage: any[] = [
+      'Micro-Average',
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      microAverageMetrics.truePositives,
+      'N/A',
+      'N/A',
+      'N/A',
+      microAverageMetrics.total,
+    ];
+    scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrixMicroAverage);
+    const confusionMatrixHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Confusion matrix metrics',
+      scoreOutputLinesConfusionMatrix,
+      ['Intent', 'Precision', 'Recall', 'F1', 'Accuracy', '#TruePositives', '#FalsePositives', '#TrueNegatives', '#FalseNegatives', 'Total']);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getMicroAverageMetrics())=${JSON.stringify(confusionMatrix.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())=${JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()         =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives()}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives()}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()}`);
+    Utility.debuggingLog('Utility.generateConfusionMatrixMetricsAndHtmlTable(), finished generating {MODELEVALUATION} content');
+    return {confusionMatrix, multiLabelConfusionMatrixSubset, scoreOutputLinesConfusionMatrix, confusionMatrixHtml};
+  }
+
+  public static generateLowConfidenceStatisticsAndHtmlTable(
+    scoreStructureArray: ScoreStructure[]): {
+      'scoringLowConfidenceOutputLines': string[][];
+      'scoringLowConfidenceUtterancesArraysHtml': string;
+    } {
+    const scoringLowConfidenceOutputLines: string[][] = [];
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
+      if (scoreStructure) {
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+        const scoreOutputLine: any[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          labelsPredictedConcatenated,
+        ];
+        scoringLowConfidenceOutputLines.push(scoreOutputLine);
+      }
+    }
+    const scoringLowConfidenceUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Low confidence utterances and their intents',
+      scoringLowConfidenceOutputLines,
+      ['Utterance', 'Intents', 'Predictions']);
+    return {scoringLowConfidenceOutputLines, scoringLowConfidenceUtterancesArraysHtml};
+  }
+
+  public static generateMisclassifiedStatisticsAndHtmlTable(
+    scoreStructureArray: ScoreStructure[]): {
+      'scoringMisclassifiedOutputLines': string[][];
+      'scoringMisclassifiedUtterancesArraysHtml': string;
+    } {
+    const scoringMisclassifiedOutputLines: string[][] = [];
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
+      if (scoreStructure) {
+        const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+        const predictedScoreStructureHtmlTable: string = scoreStructure.predictedScoreStructureHtmlTable;
+        const scoreOutputLine: string[] = [
+          scoreStructure.utterance,
+          labelsScoreStructureHtmlTable,
+          predictedScoreStructureHtmlTable,
+        ];
+        scoringMisclassifiedOutputLines.push(scoreOutputLine);
+      }
+    }
+    const scoringMisclassifiedUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Misclassified utterances and their intents',
+      scoringMisclassifiedOutputLines,
+      ['Utterance', 'Intents', 'Predictions']);
+    return {scoringMisclassifiedOutputLines, scoringMisclassifiedUtterancesArraysHtml};
+  }
+
+  public static generateAmbiguousStatisticsAndHtmlTable(
+    scoreStructureArray: ScoreStructure[]): {
+      'scoringAmbiguousOutputLines': string[][];
+      'scoringAmbiguousUtterancesArraysHtml': string;
+    } {
+    const scoringAmbiguousOutputLines: string[][] = [];
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
+      if (scoreStructure) {
+        const predictedScore: number = scoreStructure.labelsPredictedScore;
+        const scoreArray: number[] = scoreStructure.scoreArray;
+        const scoreArrayAmbiguous: number[][] = scoreArray.map(
+          (x: number, index: number) => [x, index, Math.abs((predictedScore - x) / predictedScore)]).filter(
+          (x: number[]) => ((x[2] < 0.2) && (x[2] > 0))).map(
+          (x: number[]) => [x[1], x[0], x[2]]);
+        if (scoreArrayAmbiguous.length > 0) {
+          const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
+          const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+          const ambiguousScoreStructureHtmlTable: string = Utility.selectedScoreStructureToHtmlTable(
+            scoreStructure,
+            '',
+            ['Label', 'Score', 'Closest Example'],
+            ['30%', '10%', '60%'],
+            scoreArrayAmbiguous.map((x: number[]) => x[0]));
+          const scoringAmbiguousOutputLine: any[] = [
+            scoreStructure.utterance,
+            labelsScoreStructureHtmlTable,
+            labelsPredictedConcatenated,
+            ambiguousScoreStructureHtmlTable,
+          ];
+          scoringAmbiguousOutputLines.push(scoringAmbiguousOutputLine);
+        }
+      }
+    }
+    const scoringAmbiguousUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Ambiguous utterances and their intents',
+      scoringAmbiguousOutputLines,
+      ['Utterance', 'Intents', 'Predictions', 'Close Predictions']);
+    return {scoringAmbiguousOutputLines, scoringAmbiguousUtterancesArraysHtml};
+  }
+
+  public static score(
+    labelResolver: any,
+    utteranceLabelsPairArray: [string, string[]][],
+    labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};}): ScoreStructure[] {
+    const scoreStructureArray: ScoreStructure[] = [];
+    for (const utteranceLabels of utteranceLabelsPairArray) {
+      if (utteranceLabels) {
+        const utterance: string = utteranceLabels[0];
+        if (Utility.isEmptyString(utterance)) {
+          continue;
+        }
+        const labels: string[] = utteranceLabels[1];
+        const labelsIndexes: number[] = labels.map((x: string) => labelArrayAndMap.stringMap[x]);
+        const labelsConcatenated: string = labels.join(',');
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          Utility.debuggingLog(`Utility.score(), before calling score(), utterance=${utterance}`);
+        }
+        const scoreResults: any = labelResolver.score(utterance, LabelType.Intent);
+        if (!scoreResults) {
+          continue;
+        }
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          Utility.debuggingLog(`Utility.score(), scoreResults=${JSON.stringify(scoreResults)}`);
+        }
+        const scoreResultArray: Result[] = Utility.scoreResultsToArray(scoreResults, labelArrayAndMap.stringMap);
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          Utility.debuggingLog(`Utility.score(), JSON.stringify(scoreResultArray)=${JSON.stringify(scoreResultArray)}`);
+        }
+        const scoreArray: number[] = scoreResultArray.map((x: Result) => x.score);
+        const argMax: { 'indexesMax': number[]; 'max': number } = Utility.getIndexesOnMaxEntries(scoreArray);
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          Utility.debuggingLog(`Utility.score(), JSON.stringify(argMax.indexesMax)=${JSON.stringify(argMax.indexesMax)}`);
+        }
+        const labelsPredictedScore: number = argMax.max;
+        const labelsPredictedIndexes: number[] = argMax.indexesMax;
+        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].label.name);
+        const labelsPredictedConcatenated: string = labelsPredicted.join(',');
+        const labelsPredictedEvaluation: number = Utility.evaluateMultiLabelPrediction(labels, labelsPredicted);
+        const labelsPredictedClosestText: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].closest_text);
+        const predictedScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labelsPredictedIndexes,
+          '',
+          ['Label', 'Score', 'Closest Example'],
+          ['30%', '10%', '60%']);
+        const labelsScoreStructureHtmlTable: string = Utility.selectedScoreResultsToHtmlTable(
+          scoreResultArray,
+          labels.map((x: string) => labelArrayAndMap.stringMap[x]),
+          '',
+          ['Label', 'Score', 'Closest Example'],
+          ['30%', '10%', '60%']);
+        scoreStructureArray.push(new ScoreStructure(
+          utterance,
+          labelsPredictedEvaluation,
+          labels,
+          labelsConcatenated,
+          labelsIndexes,
+          labelsPredicted,
+          labelsPredictedConcatenated,
+          labelsPredictedScore,
+          labelsPredictedIndexes,
+          labelsPredictedClosestText,
+          scoreResultArray,
+          scoreArray,
+          predictedScoreStructureHtmlTable,
+          labelsScoreStructureHtmlTable));
+        // ---- NOTE ---- debugging ouput.
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          for (const result of scoreResults) {
+            // eslint-disable-next-line max-depth
+            if (result) {
+              Utility.debuggingLog(`Utility.score(), result=${JSON.stringify(result)}`);
+              const closest_text: string = result.closest_text;
+              const score: number = result.score;
+              const label: any = result.label;
+              const label_name: string = label.name;
+              const label_type: any = label.label_type;
+              const span: any = label.span;
+              const offset: number = span.offset;
+              const length: number = span.length;
+              Utility.debuggingLog(`Utility.score(), closest_text=${closest_text}`);
+              Utility.debuggingLog(`Utility.score(), score=${score}`);
+              Utility.debuggingLog(`Utility.score(), JSON.stringify(label)=${JSON.stringify(label)}`);
+              Utility.debuggingLog(`Utility.score(), Object.keys(label)=${Object.keys(label)}`);
+              Utility.debuggingLog(`Utility.score(), label.name=${label_name}`);
+              Utility.debuggingLog(`Utility.score(), label.label_type=${label_type}`);
+              Utility.debuggingLog(`Utility.score(), JSON.stringify(span)=${JSON.stringify(span)}`);
+              Utility.debuggingLog(`Utility.score(), Object.keys(span)=${Object.keys(span)}`);
+              Utility.debuggingLog(`Utility.score(), label.span.offset=${offset}`);
+              Utility.debuggingLog(`Utility.score(), label.span.length=${length}`);
+            }
+          }
+        }
+      }
+    }
+    return scoreStructureArray;
+  }
 
   public static generateUtteranceStatisticsAndHtmlTable(
     utterancesLabelsMap: { [id: string]: string[] }): {
@@ -236,10 +541,6 @@ export class Utility {
     indentCumulative: string = '  ',
     indent: string = '  '): string {
     const outputLines: string[] = [];
-    if (Utility.isEmptyStringArrays(outputEvaluationReportDataArrays)) {
-      Utility.debuggingThrow(
-        'outputEvaluationReportDataArrays is empty');
-    }
     if (!Utility.isEmptyString(tableDescription)) {
       outputLines.push(indentCumulative + `<p><strong>${tableDescription}</strong></p>`);
     }
@@ -256,18 +557,20 @@ export class Utility {
       }
       outputLines.push(indentCumulative + indent + '<tr>');
     }
-    let index: number = 0;
-    for (const outputEvaluationReportDataArray of outputEvaluationReportDataArrays) {
-      outputLines.push(indentCumulative + indent + '<tr>');
-      outputLines.push(indentCumulative + indent + indent + '<td>');
-      outputLines.push(indentCumulative + indent + indent + index++);
-      outputLines.push(indentCumulative + indent + indent + '</td>');
-      for (const dataEntry of outputEvaluationReportDataArray) {
+    if (!Utility.isEmptyStringArrays(outputEvaluationReportDataArrays)) {
+      let index: number = 0;
+      for (const outputEvaluationReportDataArray of outputEvaluationReportDataArrays) {
+        outputLines.push(indentCumulative + indent + '<tr>');
         outputLines.push(indentCumulative + indent + indent + '<td>');
-        outputLines.push(indentCumulative + indent + indent + dataEntry);
+        outputLines.push(indentCumulative + indent + indent + index++);
         outputLines.push(indentCumulative + indent + indent + '</td>');
+        for (const dataEntry of outputEvaluationReportDataArray) {
+          outputLines.push(indentCumulative + indent + indent + '<td>');
+          outputLines.push(indentCumulative + indent + indent + dataEntry);
+          outputLines.push(indentCumulative + indent + indent + '</td>');
+        }
+        outputLines.push(indentCumulative + indent + '</tr>');
       }
-      outputLines.push(indentCumulative + indent + '</tr>');
     }
     outputLines.push(indentCumulative + '</table>');
     const outputContent: string = outputLines.join('\n');
