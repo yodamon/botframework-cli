@@ -5,15 +5,82 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {Span} from './span';
+import {Example} from './example';
 import {Label} from './label';
+import {OrchestratorHelper} from './orchestratorhelper';
 import {Result} from './result';
 import {ScoreStructure} from './score-structure';
+import {Span} from './span';
 
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
+
+  public static generateUtteranceStatisticsAndHtmlTable(
+    utterancesLabelsMap: { [id: string]: string[] }): {
+        'utteranceStatistics': string[][];
+        'utteranceStatisticsHtml': string;
+      } {
+    const utteranceStatisticsMap: {[id: number]: number} = Object.entries(utterancesLabelsMap).map(
+      (x: [string, string[]]) => [1, x[1].length]).reduce(
+      (accumulant: {[id: number]: number}, entry: number[]) => {
+        const count: number = entry[0];
+        const key: number = entry[1];
+        if (key in accumulant) {
+          accumulant[key] += count;
+        } else {
+          accumulant[key] = count;
+        }
+        return accumulant;
+      }, {});
+    const utteranceStatistics: any[][] = [...Object.entries(utteranceStatisticsMap)].sort(
+      (n1: [string, number], n2: [string, number]) => {
+        if (n1[1] > n2[1]) {
+          return -1;
+        }
+        if (n1[1] < n2[1]) {
+          return 1;
+        }
+        return 0;
+      });
+    const utteranceStatisticsHtml: string = Utility.convertDataArraysToHtmlTable(
+      'Utterance statistics',
+      utteranceStatistics,
+      ['# Multi-Labels', 'Utterance Count']);
+    return {utteranceStatistics, utteranceStatisticsHtml};
+  }
+
+  public static generateLabelStatisticsAndHtmlTable(
+    utterancesLabelsMap: { [id: string]: string[] },
+    labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};}): {
+        'labelStatistics': string[][];
+        'labelStatisticsHtml': string;
+      } {
+    // ---- NOTE ---- generate label statistics.
+    const labelsUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utterancesLabelsMap);
+    const labelStatistics: string[][] = Object.entries(labelsUtterancesMap).sort(
+      (n1: [string, string[]], n2: [string, string[]]) => {
+        if (n1[0] > n2[0]) {
+          return 1;
+        }
+        if (n1[0] < n2[0]) {
+          return -1;
+        }
+        return 0;
+      }).map(
+      (x: [string, string[]], index: number) => [index.toString(), x[0], labelArrayAndMap.stringMap[x[0]].toString(), x[1].length.toString()]);
+    const labelsStatisticTotal: number = Object.entries(labelsUtterancesMap).reduce(
+      (accumulant: number, x: [string, string[]]) => accumulant + x[1].length, 0);
+    labelStatistics.push(['Total', '', '', labelsStatisticTotal.toString()]);
+    const labelStatisticsHtml: string = Utility.convertDataArraysToHtmlTable(
+      'Intent statistics',
+      labelStatistics,
+      ['No', 'Intent', 'Intent Index', 'Utterance Count']);
+    return {labelStatistics, labelStatisticsHtml};
+  }
 
   // eslint-disable-next-line max-params
   public static selectedScoreStructureToHtmlTable(
@@ -328,7 +395,47 @@ export class Utility {
     return input;
   }
 
-  public static scoreResultsToArray(results: any, labelIndexMap: {[id: string]: number}, digits: number = 10000): Result[] {
+  public static examplesToUtteranceLabelMaps(
+    examples: any,
+    utterancesLabelsMap: { [id: string]: string[] },
+    utterancesDuplicateLabelsMap: Map<string, Set<string>>): void {
+    const exampleStructureArray: Example[] = Utility.examplesToArray(examples);
+    for (const example of exampleStructureArray) {
+      const utterance: string = example.text;
+      const labels: Label[] = example.labels;
+      for (const label of labels) {
+        OrchestratorHelper.addNewLabelUtterance(
+          utterance,
+          label.name,
+          '',
+          utterancesLabelsMap,
+          utterancesDuplicateLabelsMap);
+      }
+    }
+  }
+
+  public static examplesToArray(examples: any): Example[] {
+    const exampleStructureArray: Example[] = [];
+    for (const example of examples) {
+      const labels: Label[] = [];
+      for (const example_label of example.labels) {
+        const label: string = example_label.name;
+        const label_type: number = example_label.label_type;
+        const label_span: any = example_label.span;
+        const label_span_offset: number = label_span.offset;
+        const label_span_length: number = label_span.length;
+        const labelStructure: Label = new Label(label_type, label, new Span(label_span_offset, label_span_length));
+        labels.push(labelStructure);
+      }
+      const exampleStructure: Example = new Example(example.text, labels);
+      exampleStructureArray.push(exampleStructure);
+    }
+    return exampleStructureArray;
+  }
+
+  public static scoreResultsToArray(
+    results: any,
+    labelIndexMap: {[id: string]: number}, digits: number = 10000): Result[] {
     const scoreResultArray: Result[] = [];
     for (const result of results) {
       if (result) {
@@ -367,7 +474,8 @@ export class Utility {
       'stringArray': string[];
       'stringMap': {[id: string]: number};} {
     const stringSet: Set<string> = new Set(inputStringArray);
-    const stringArray: string[] = [...stringSet.values()];
+    let stringArray: string[] = [...stringSet.values()];
+    stringArray = Utility.sortStringArray(stringArray);
     const stringMap: {[id: string]: number} =
       Utility.buildStringIdNumberValueDictionaryFromUniqueStringArray(stringArray);
     return {stringArray, stringMap};
@@ -383,10 +491,24 @@ export class Utility {
         stringSet.add(elementString);
       }
     }
-    const stringArray: string[] = [...stringSet.values()];
+    let stringArray: string[] = [...stringSet.values()];
+    stringArray = Utility.sortStringArray(stringArray);
     const stringMap: {[id: string]: number} =
       Utility.buildStringIdNumberValueDictionaryFromUniqueStringArray(stringArray);
     return {stringArray, stringMap};
+  }
+
+  public static sortStringArray(inputStringArray: string[]): string[] {
+    return inputStringArray.sort(
+      (n1: string, n2: string) => {
+        if (n1 > n2) {
+          return 1;
+        }
+        if (n1 < n2) {
+          return -1;
+        }
+        return 0;
+      });
   }
 
   public static convertStringKeyGenericSetNativeMapToDictionary<T>(
@@ -501,7 +623,10 @@ export class Utility {
     message: any): void {
     const dateTimeString: string = (new Date()).toISOString();
     const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${message}`;
-    throw new Error(Utility.jsonstringify(logMessage));
+    const error: Error = new Error(Utility.jsonstringify(logMessage));
+    const stackTrace: string = error.stack as string;
+    Utility.debuggingLog(stackTrace);
+    throw error;
   }
 
   public static moveFile(file: string, targetDir: string) {

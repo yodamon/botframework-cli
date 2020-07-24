@@ -27,8 +27,10 @@ export class LabelResolver {
     if (nlrPath) {
       Utility.debuggingLog('LabelResolver.loadNlrAsync(): Loading NLR..');
       if (await LabelResolver.Orchestrator.load(nlrPath) === false) {
-        throw new Error('Loading NLR failed!');
+        throw new Error(`Failed calling LabelResolver.Orchestrator.load("${nlrPath}")!`);
       }
+    } else if (await LabelResolver.Orchestrator.load() === false) {
+      throw new Error('Failed calling LabelResolver.Orchestrator.load()!');
     }
   }
 
@@ -46,9 +48,9 @@ export class LabelResolver {
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): nlrPath=${nlrPath}`);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): typeof(snapshot)=${typeof snapshot}`);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): snapshot.byteLength=${snapshot.byteLength}`);
-    Utility.debuggingLog('LabelResolver.createWithSnapshotAsync(): Creating labeler..');
+    Utility.debuggingLog('LabelResolver.createWithSnapshotAsync(): Creating labeler...');
     LabelResolver.LabelResolver = await LabelResolver.Orchestrator.createLabelResolver(snapshot);
-    Utility.debuggingLog('LabelResolver.createWithSnapshotAsync(): Done creating labeler..');
+    Utility.debuggingLog('LabelResolver.createWithSnapshotAsync(): Done creating labeler...');
     return LabelResolver.LabelResolver;
   }
 
@@ -64,8 +66,7 @@ export class LabelResolver {
           } else {
             Utility.debuggingLog(`LabelResolver.addExamples(): Failed adding { label: ${label}, text: ${utterance}}`);
           }
-        }
-        catch (error) {
+        } catch (error) {
           Utility.debuggingLog(`LabelResolver.addExamples(): Failed adding { label: ${label}, text: ${utterance}}\n${error}`);
         }
       }

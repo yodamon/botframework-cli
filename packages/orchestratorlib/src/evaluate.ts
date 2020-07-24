@@ -4,55 +4,149 @@
  */
 
 import * as path from 'path';
-import {Utility} from './utility';
+
+import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
+
+import {LabelType} from './label-type';
+import {Result} from './result';
+import {ScoreStructure}  from './score-structure';
+
 import {LabelResolver} from './labelresolver';
-// import {OrchestratorHelper} from './orchestratorhelper';
+import {OrchestratorHelper} from './orchestratorhelper';
+
+import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
+import {Utility} from './utility';
 
 export class OrchestratorEvaluate {
   public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = '') {
-    if (!inputPath || inputPath.length === 0) {
-      throw new Error('Please provide path to input file/folder');
+    if (Utility.isEmptyString(inputPath)) {
+      Utility.debuggingThrow('Please provide path to input file/folder');
     }
-    if (!outputPath || outputPath.length === 0) {
-      throw new Error('Please provide output path');
+    if (Utility.isEmptyString(outputPath)) {
+      Utility.debuggingThrow('Please provide an output directory');
     }
-    nlrPath = path.resolve(nlrPath);
+    if (nlrPath) {
+      nlrPath = path.resolve(nlrPath);
+    } else {
+      nlrPath = '';
+    }
+    const trainingFile: string = path.join(inputPath, 'orchestrator.blu');
+    if (!Utility.exists(trainingFile)) {
+      Utility.debuggingThrow(`training set file does not exist, trainingFile=${trainingFile}`);
+    }
+    const trainingSetScoreOutputFile: string = path.join(outputPath, 'orchestrator_training_set_scores.txt');
+    const trainingSetSummaryOutputFile: string = path.join(outputPath, 'orchestrator_training_set_summary.html');
 
-    const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, path.join(inputPath, 'orchestrator.blu'));
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), ready to call LabelResolver.createWithSnapshotAsync()');
+    const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, trainingFile);
     Utility.debuggingLog('OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync()');
 
+    // ---- NOTE ---- load the evaluation summary template.
+    let evaluationSummaryTemplate: string = EvaluationSummaryTemplateHtml.html;
+
+    // ---- NOTE ---- retrieve labels, and create a label-index map.
+    const labels: string[] = labelResolver.getLabels(LabelType.Intent);
+    if (Utility.toPrintDetailedDebuggingLogToConsole) {
+      // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
+      // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+    }
+    const labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(
+        labels);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
+
+    // ---- NOTE ---- retrieve examples, process the training set, retrieve labels, and create a label-index map.
+    const utterancesLabelsMap: { [id: string]: string[] } = {};
+    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
     const examples: any = labelResolver.getExamples();
-    const example: any = examples[0];
-    const example_name: string = example.name;
-    const labels: any = example.labels;
-    const label: any = labels[0];
-    const label_name: string = label.name;
-    const label_type: any = label.label_type;
-    const span: any = label.span;
-    const offset: number = span.offset;
-    const length: number = span.length;
-    // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(examples)=${JSON.stringify(examples)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(example)=${JSON.stringify(example)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(example)=${Object.keys(example)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), example_name=${example_name}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(labels)=${Object.keys(labels)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(label)=${JSON.stringify(label)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(label)=${Object.keys(label)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.name=${label_name}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.label_type=${label_type}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(span)=${JSON.stringify(span)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(span)=${Object.keys(span)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.offset=${offset}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.length=${length}`);
-    // for (const key in examples) {
-    //   Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.key=${examples.key}`);
-    // }
+    Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
+    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.length=${examples.length}`);
 
-    // var snapshotJson = JSON.stringify(snapshot);
-    // Utility.debuggingLog(snapshotJson);
+    // ---- NOTE ---- generate label statistics.
+    const labelStatisticsAndHtmlTable: {
+      'labelStatistics': string[][];
+      'labelStatisticsHtml': string;
+    } = Utility.generateLabelStatisticsAndHtmlTable(
+      utterancesLabelsMap,
+      labelArrayAndMap);
+    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
+    // ---- NOTE ---- generate utterance statistics
+    const utteranceStatisticsAndHtmlTable: {
+      'utteranceStatistics': string[][];
+      'utteranceStatisticsHtml': string;
+    } = Utility.generateUtteranceStatisticsAndHtmlTable(
+      utterancesLabelsMap);
+    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
+    // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
+    const intentsUtterancesStatisticsHtml: string =
+    labelStatisticsAndHtmlTable.labelStatisticsHtml + utteranceStatisticsAndHtmlTable.utteranceStatisticsHtml;
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{INTENTUTTERANCESTATISTICS}', intentsUtterancesStatisticsHtml);
+    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {INTENTUTTERANCESTATISTICS} content');
 
-    // OrchestratorHelper.writeToFile(path.join(outputPath, 'orchestrator_blu.json'), snapshotJson);
+    // ---- NOTE ---- generate duplicate report.
+    const utterancesMultiLabelArrays: [string, string][] = Object.entries(utterancesLabelsMap).filter(
+      (x: [string, string[]]) => x[1].length > 1).map((x: [string, string[]]) => [x[0], x[1].join(',')]);
+    const utterancesMultiLabelArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Multi-label utterances and their intents',
+      utterancesMultiLabelArrays,
+      ['Utterance', 'Intents']);
+    // ---- NOTE ---- generate duplicate report.
+    const utterancesDuplicateLabelsHtml: string = Utility.convertMapSetToIndexedHtmlTable(
+      'Duplicate utterance and intent pairs',
+      utterancesDuplicateLabelsMap,
+      ['Utterance', 'Intent']);
+    // ---- NOTE ---- create the evaluation DUPLICATES summary from template.
+    const duplicateStatisticsHtml: string =
+      utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
+    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {DUPLICATES} content');
+
+    if (Utility.toPrintDetailedDebuggingLogToConsole) {
+      const examples: any = labelResolver.getExamples();
+      const example: any = examples[0];
+      const example_text: string = example.text;
+      const labels: any = example.labels;
+      const label: any = labels[0];
+      const label_name: string = label.name;
+      const label_type: any = label.label_type;
+      const span: any = label.span;
+      const offset: number = span.offset;
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.length=${examples.length}`);
+      const length: number = span.length;
+      // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(examples)=${JSON.stringify(examples)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(example)=${JSON.stringify(example)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(example)=${Object.keys(example)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), example_text=${example_text}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(labels)=${Object.keys(labels)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(label)=${JSON.stringify(label)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(label)=${Object.keys(label)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.name=${label_name}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.label_type=${label_type}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(span)=${JSON.stringify(span)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), Object.keys(span)=${Object.keys(span)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.offset=${offset}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.length=${length}`);
+    }
+
+    // ---- NOTE ---- produce the evaluation summary file.
+    Utility.dumpFile(trainingSetSummaryOutputFile, evaluationSummaryTemplate);
+
+    // ---- NOTE ---- debugging ouput.
+    if (Utility.toPrintDetailedDebuggingLogToConsole) {
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
+      const labels: any = labelResolver.getLabels();
+      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+    }
+
+    // ---- NOTE ---- the end
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), the end');
   }
 
   // protected debug: boolean = false;
