@@ -1,5 +1,5 @@
 #
-# Build Botframework-CLI-orchestrator on Windows agent
+# Build Botframework-CLI orchestrator branch on Windows agent
 #
 
 # "name" here defines the build number format. Build number is accessed via $(Build.BuildNumber)
@@ -10,33 +10,25 @@ pool:
 
 jobs:
   - job: CLI
-    variables:
-      buildVersion: '4.9.0-preview.$(Build.BuildId)'
-      _version: ${{coalesce(variables.version, variables.buildVersion)}}
-
+  
     steps:
+    - bash: |
+        short_hash=`git rev-parse --short=7 HEAD`  ## At least 7 digits, more if needed for uniqueness
+        echo "Full git hash:  $(Build.SourceVersion)"
+        echo "Short git hash: $short_hash"
+        echo "##vso[task.setvariable variable=short_hash]$short_hash"  ## Store variable for subsequent steps
+      workingDirectory: $(Build.SourcesDirectory)
+      displayName: Set Build Version
+
+    - powershell: |
+        $date = (Get-Date).ToString("yyyyMMdd")
+        echo "##vso[task.setvariable variable=buildDate]$date"  ## Store variable for subsequent steps
+
     - task: colinsalmcorner.colinsalmcorner-buildtasks.tag-build-task.tagBuildOrRelease@0
       displayName: 'Tag Build with version number'
       inputs:
-        tags: 'Version=$(_version)'
+        tags: 'Version=4.10.0-dev.$(buildDate).$(short_hash)'
       continueOnError: true
-      condition: and(succeeded(), eq(variables['System.PullRequest.IsFork'], 'False'))
-
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 1 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
-
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 2 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
 
     - task: NodeTool@0
       displayName: 'Use Node 12.x'
@@ -44,95 +36,39 @@ jobs:
         versionSpec: 12.x
 
     - task: Npm@1
-      displayName: 'Install rush'
+      displayName: 'npm install --global @microsoft/rush'
       inputs:
         command: custom
         verbose: false
         customCommand: 'install --global @microsoft/rush'
 
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 3 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
-
     - script: 'rush update'
       displayName: 'rush update'
 
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 4 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
-
     - script: 'rush build -p 2'
-      displayName: 'rush build'
+      displayName: 'rush build -p 2'
 
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 5 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
-
-    - script: 'rush test -p 2 -v'
+    - script: 'rush test'
       displayName: 'rush test'
-      continueOnError: true
-      enabled: false
-      
-    - script: 'rush posttest'
-      displayName: 'rush posttest'
-      continueOnError: true
-      enabled: false
 
-    - script: 'node ./common/scripts/version-and-pack.js --version $(_version)'
+    - script: 'node ./common/scripts/version-and-pack.js --version 4.10.0-dev.$(buildDate).$(short_hash)'
       displayName: 'Version and Pack'
-      continueOnError: true
 
     - task: CopyFiles@2
-      displayName: 'Copy Files to: $(Build.ArtifactStagingDirectory)'
+      displayName: 'Copy packages to: $(Build.ArtifactStagingDirectory)/drop'
       inputs:
         SourceFolder: ./.output
         Contents: '**/*.tgz'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/drop'
         flattenFolders: true
-
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace 6 except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
-      continueOnError: true
-      condition: succeededOrFailed()
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: drop'
       inputs:
-        artifactName: 'drop'
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/drop'
+        ArtifactName: drop
 
-    - task: ms.vss-governance-buildtask.governance-build-task-component-detection.ComponentGovernanceComponentDetection@0
-      displayName: 'Component Detection'
-      enabled: false
-
-    - script: 'rush report:coverage'
-      displayName: 'rush report:coverage'
-      enabled: false
-
-    - powershell: |
-       pushd ..
-       Get-ChildItem -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}
-      displayName: 'Dir workspace except node-modules (takes 3 minutes)'
-      errorActionPreference: continue
+    - powershell: 'Get-ChildItem .. -ErrorAction Continue -Recurse -Force | Where {$_.FullName -notlike "*node_modules*"}'
+      displayName: 'Dir workspace except node_modules'
       continueOnError: true
       condition: succeededOrFailed()
-
-    - script: 'dir .. -s'
-      displayName: 'Dir workspace'
-      continueOnError: true
-      condition: succeededOrFailed()
-      enabled: false
