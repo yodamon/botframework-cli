@@ -3,7 +3,7 @@ dependencies:
   '@azure/cognitiveservices-luis-authoring': 4.0.0-preview.1
   '@azure/cognitiveservices-luis-runtime': 5.0.0
   '@azure/ms-rest-azure-js': 2.0.1
-  '@microsoft/orchestrator-core': 0.1.36
+  '@microsoft/orchestrator-core': 0.1.43
   '@oclif/parser': 3.8.5
   '@rush-temp/bf-chatdown': 'file:projects/bf-chatdown.tgz'
   '@rush-temp/bf-cli-command': 'file:projects/bf-cli-command.tgz'
@@ -363,9 +363,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-nfA7vXxpalxYiFw0qgbaQchUN5Y=
-  /@microsoft/orchestrator-core/0.1.36:
+  /@microsoft/orchestrator-core/0.1.43:
     dependencies:
       bindings: 1.5.0
+      mocha: 8.0.1
       node-addon-api: 3.0.0
       node-gyp: 7.0.0
       node-pre-gyp: 0.15.0
@@ -373,7 +374,7 @@ packages:
     dev: false
     requiresBuild: true
     resolution:
-      integrity: sha1-+AhOUq6bO+4y3lUjzs0Nr7pJHSg=
+      integrity: sha1-PF8+IoyVEfWUgP94kbEI7E9f1Qc=
   /@microsoft/recognizers-text-data-types-timex-expression/1.3.0:
     dev: false
     engines:
@@ -1103,6 +1104,12 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha1-V9NbhoboUeLMBMQD8cACA5dqGBM=
+  /ansi-colors/4.1.1:
+    dev: false
+    engines:
+      node: '>=6'
+    resolution:
+      integrity: sha1-y7muJWv3UK8eqzRPIpqif+lLo0g=
   /ansi-escapes/3.2.0:
     dev: false
     engines:
@@ -1170,6 +1177,15 @@ packages:
     dev: false
     resolution:
       integrity: sha1-xCHYJpUjNWxCxVM2A67AQQtCOAY=
+  /anymatch/3.1.1:
+    dependencies:
+      normalize-path: 3.0.0
+      picomatch: 2.2.2
+    dev: false
+    engines:
+      node: '>= 8'
+    resolution:
+      integrity: sha1-xV7PAhheJGklk5kxDBc84xIzsUI=
   /append-transform/1.0.0:
     dependencies:
       default-require-extensions: 2.0.0
@@ -1272,6 +1288,17 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-qJS3XUvE9s1nnvMkSp/Y9Gri1Cg=
+  /array.prototype.map/1.0.2:
+    dependencies:
+      define-properties: 1.1.3
+      es-abstract: 1.17.6
+      es-array-method-boxes-properly: 1.0.0
+      is-string: 1.0.5
+    dev: false
+    engines:
+      node: '>= 0.4'
+    resolution:
+      integrity: sha1-mkFZ9BZFiiPpSDB43hEGsu9o+Ow=
   /arrify/1.0.1:
     dev: false
     engines:
@@ -1409,6 +1436,12 @@ packages:
     optional: true
     resolution:
       integrity: sha1-j9iL0WMsukocjD49cVnwi7lbS54=
+  /binary-extensions/2.1.0:
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha1-MPpAyef+B9vIlWeM0ocCTeokHdk=
   /binary/0.3.0:
     dependencies:
       buffers: 0.1.1
@@ -1697,6 +1730,22 @@ packages:
     dev: false
     resolution:
       integrity: sha1-V00xLt2Iu13YkS6Sht1sCu1KrII=
+  /chokidar/3.3.1:
+    dependencies:
+      anymatch: 3.1.1
+      braces: 3.0.2
+      glob-parent: 5.1.1
+      is-binary-path: 2.1.0
+      is-glob: 4.0.1
+      normalize-path: 3.0.0
+      readdirp: 3.3.0
+    dev: false
+    engines:
+      node: '>= 8.10.0'
+    optionalDependencies:
+      fsevents: 2.1.3
+    resolution:
+      integrity: sha1-yE5bPRjZpNd1WP70ZrG/FrvrNFA=
   /chownr/1.1.4:
     dev: false
     resolution:
@@ -2397,6 +2446,22 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha1-kUIHFweFeyysx7iey2cDFsPi1So=
+  /es-array-method-boxes-properly/1.0.0:
+    dev: false
+    resolution:
+      integrity: sha1-hz8+hEGN5O4Zxb51KZCy5EcY0J4=
+  /es-get-iterator/1.1.0:
+    dependencies:
+      es-abstract: 1.17.6
+      has-symbols: 1.0.1
+      is-arguments: 1.0.4
+      is-map: 2.0.1
+      is-set: 2.0.1
+      is-string: 1.0.5
+      isarray: 2.0.5
+    dev: false
+    resolution:
+      integrity: sha1-u5itnW1jsxqs3I+J1dDuV7y1tMg=
   /es-to-primitive/1.2.1:
     dependencies:
       is-callable: 1.2.0
@@ -3177,6 +3242,15 @@ packages:
     dev: false
     resolution:
       integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=
+  /fsevents/2.1.3:
+    dev: false
+    engines:
+      node: ^8.16.0 || ^10.6.0 || >=11.0.0
+    optional: true
+    os:
+      - darwin
+    resolution:
+      integrity: sha1-+3OHA66NL5/pAMM4Nt3r7ouX8j4=
   /fstream/1.0.12:
     dependencies:
       graceful-fs: 4.2.4
@@ -3799,6 +3873,14 @@ packages:
     dev: false
     resolution:
       integrity: sha1-d8mYQFJ6qOyxqLppe4BkWnqSap0=
+  /is-binary-path/2.1.0:
+    dependencies:
+      binary-extensions: 2.1.0
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha1-6h9/O4DwZCNug0cPhsCcJU+0Wwk=
   /is-buffer/1.1.6:
     dev: false
     resolution:
@@ -3926,6 +4008,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-dWfb6fL14kZ7x3q4PEopSCQHpdw=
+  /is-map/2.0.1:
+    dev: false
+    resolution:
+      integrity: sha1-Ug2vxDB7uOvDO4E95c58lADWRKE=
   /is-number/3.0.0:
     dependencies:
       kind-of: 3.2.2
@@ -3984,6 +4070,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-13hIi9CkZmo76KFIK58rqv7eqLQ=
+  /is-set/2.0.1:
+    dev: false
+    resolution:
+      integrity: sha1-0WBK/asXJJhtMAkVdfVJRdp+X0M=
   /is-stream/1.1.0:
     dev: false
     engines:
@@ -3996,6 +4086,12 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha1-venDJoDW+uBBKdasnZIc54FfeOM=
+  /is-string/1.0.5:
+    dev: false
+    engines:
+      node: '>= 0.4'
+    resolution:
+      integrity: sha1-QEk+0ZjvP/R3uMf5L2ROyCpc06Y=
   /is-symbol/1.0.3:
     dependencies:
       has-symbols: 1.0.1
@@ -4036,6 +4132,10 @@ packages:
     dev: false
     resolution:
       integrity: sha1-u5NdSFgsuhaMBoNJV6VKPgcSTxE=
+  /isarray/2.0.5:
+    dev: false
+    resolution:
+      integrity: sha1-ivHkwSISRMxiRZ+vOJQNTmRKVyM=
   /isexe/2.0.0:
     dev: false
     resolution:
@@ -4193,6 +4293,17 @@ packages:
       node: '>= 4'
     resolution:
       integrity: sha1-sn9PSfPNqj6kSgpbfzRi5u3DnWc=
+  /iterate-iterator/1.0.1:
+    dev: false
+    resolution:
+      integrity: sha1-FpOnaMHd15yWkFFFlFPwgv6C6fY=
+  /iterate-value/1.0.2:
+    dependencies:
+      es-get-iterator: 1.1.0
+      iterate-iterator: 1.0.1
+    dev: false
+    resolution:
+      integrity: sha1-k1EVvTfQBqUgRlNevI0H6ckzf1c=
   /js-tokens/4.0.0:
     dev: false
     resolution:
@@ -4534,6 +4645,14 @@ packages:
       node: '>=4'
     resolution:
       integrity: sha1-V0Dhxdbw39pK2TI7UzIQfva0xAo=
+  /log-symbols/3.0.0:
+    dependencies:
+      chalk: 2.4.2
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha1-86CFFqXeqJMzan3uFNGKHP2rd8Q=
   /lolex/4.2.0:
     dev: false
     resolution:
@@ -4852,6 +4971,39 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-5khDIYHYuZOTQQISZkRQpMHjGRI=
+  /mocha/8.0.1:
+    dependencies:
+      ansi-colors: 4.1.1
+      browser-stdout: 1.3.1
+      chokidar: 3.3.1
+      debug: 3.2.6
+      diff: 4.0.2
+      escape-string-regexp: 1.0.5
+      find-up: 4.1.0
+      glob: 7.1.6
+      growl: 1.10.5
+      he: 1.2.0
+      js-yaml: 3.13.1
+      log-symbols: 3.0.0
+      minimatch: 3.0.4
+      ms: 2.1.2
+      object.assign: 4.1.0
+      promise.allsettled: 1.0.2
+      serialize-javascript: 3.0.0
+      strip-json-comments: 3.0.1
+      supports-color: 7.1.0
+      which: 2.0.2
+      wide-align: 1.1.3
+      workerpool: 6.0.0
+      yargs: 13.3.2
+      yargs-parser: 13.1.2
+      yargs-unparser: 1.6.0
+    dev: false
+    engines:
+      node: '>= 10.12.0'
+    hasBin: true
+    resolution:
+      integrity: sha1-/gHwUwNi3ycaqPmVEER7w4uI2O0=
   /mock-stdin/1.0.0:
     dev: false
     resolution:
@@ -5058,6 +5210,12 @@ packages:
     dev: false
     resolution:
       integrity: sha1-5m2xg4sgDB38IzIl0SyzZSDiNKg=
+  /normalize-path/3.0.0:
+    dev: false
+    engines:
+      node: '>=0.10.0'
+    resolution:
+      integrity: sha1-Dc1p/yOhybEf0JeDFmRKA4ghamU=
   /normalize-url/2.0.1:
     dependencies:
       prepend-http: 2.0.0
@@ -5651,6 +5809,18 @@ packages:
       node: '>=0.4.0'
     resolution:
       integrity: sha1-foz42PW48jnBvGi+tOt4Vn1XLvg=
+  /promise.allsettled/1.0.2:
+    dependencies:
+      array.prototype.map: 1.0.2
+      define-properties: 1.1.3
+      es-abstract: 1.17.6
+      function-bind: 1.1.1
+      iterate-value: 1.0.2
+    dev: false
+    engines:
+      node: '>= 0.4'
+    resolution:
+      integrity: sha1-1m94+7YA6D6GPYk+mLPUN2qcR8k=
   /propagate/2.0.1:
     dev: false
     engines:
@@ -5807,6 +5977,14 @@ packages:
       node: '>= 6'
     resolution:
       integrity: sha1-M3u9o63AcGvT4CRCaihtS0sskZg=
+  /readdirp/3.3.0:
+    dependencies:
+      picomatch: 2.2.2
+    dev: false
+    engines:
+      node: '>=8.10.0'
+    resolution:
+      integrity: sha1-mERY0ToeQuLp9YQbEp4WLzaa/xc=
   /readline-sync/1.4.10:
     dev: false
     engines:
@@ -6132,6 +6310,10 @@ packages:
     hasBin: true
     resolution:
       integrity: sha1-YElisFK4HtB4aq6EOJ/7pw/9OTg=
+  /serialize-javascript/3.0.0:
+    dev: false
+    resolution:
+      integrity: sha1-SS5Imi13t7gErTkaX12XhwlSVI4=
   /set-blocking/2.0.0:
     dev: false
     resolution:
@@ -6559,6 +6741,12 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-PFMZQukIwml8DsNEhYwobHygpgo=
+  /strip-json-comments/3.0.1:
+    dev: false
+    engines:
+      node: '>=8'
+    resolution:
+      integrity: sha1-hXE5dakfuHvxswXMp3OV5A0qZKc=
   /supports-color/5.4.0:
     dependencies:
       has-flag: 3.0.0
@@ -7396,6 +7584,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-YQY29rH3A4kb00dxzLF/uTtHB5w=
+  /workerpool/6.0.0:
+    dev: false
+    resolution:
+      integrity: sha1-harWf6GiyO+ThqG0NTmQD2HQPVg=
   /wrap-ansi/4.0.0:
     dependencies:
       ansi-styles: 3.2.1
@@ -7956,7 +8148,7 @@ packages:
     version: 0.0.0
   'file:projects/bf-orchestrator.tgz':
     dependencies:
-      '@microsoft/orchestrator-core': 0.1.36
+      '@microsoft/orchestrator-core': 0.1.43
       '@oclif/test': 1.2.6
       '@types/chai': 4.2.11
       '@types/fs-extra': 8.1.1
@@ -7982,7 +8174,7 @@ packages:
     dev: false
     name: '@rush-temp/bf-orchestrator'
     resolution:
-      integrity: sha512-QSOedcW+x05AUkl8kOvoerC/V6oZ1zUQG5n+F0kmgVIHqThB1d9SPXj1brTHPaLsTKk58loIMEJ+GvsxwGdiLw==
+      integrity: sha512-+GKLjqd1DX0npoouhP+VytJYZ31d46sdHGRixlM4R4dAKCSAlI+oIijw0QfWnC3BUrJKnD0kkJC1ViwIcIoc/w==
       tarball: 'file:projects/bf-orchestrator.tgz'
     version: 0.0.0
   'file:projects/bf-qnamaker.tgz':
@@ -8077,7 +8269,7 @@ specifiers:
   '@azure/cognitiveservices-luis-authoring': 4.0.0-preview.1
   '@azure/cognitiveservices-luis-runtime': 5.0.0
   '@azure/ms-rest-azure-js': 2.0.1
-  '@microsoft/orchestrator-core': ^0.1.36
+  '@microsoft/orchestrator-core': ^0.1.43
   '@oclif/parser': ~3.8.4
   '@rush-temp/bf-chatdown': 'file:./projects/bf-chatdown.tgz'
   '@rush-temp/bf-cli-command': 'file:./projects/bf-cli-command.tgz'

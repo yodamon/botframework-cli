@@ -26,10 +26,10 @@ export class LabelResolver {
 
     if (nlrPath) {
       Utility.debuggingLog('LabelResolver.loadNlrAsync(): Loading NLR..');
-      if (await LabelResolver.Orchestrator.load(nlrPath) === false) {
+      if (await LabelResolver.Orchestrator.loadAsync(nlrPath) === false) {
         throw new Error(`Failed calling LabelResolver.Orchestrator.load("${nlrPath}")!`);
       }
-    } else if (await LabelResolver.Orchestrator.load() === false) {
+    } else if (LabelResolver.Orchestrator.load() === false) {
       throw new Error('Failed calling LabelResolver.Orchestrator.load()!');
     }
   }
