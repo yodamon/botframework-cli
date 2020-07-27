@@ -13,28 +13,28 @@ import {OrchestratorPredict} from './predict';
 import {OrchestratorTest} from './test';
 
 export class Orchestrator {
-  public static async createAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false) {
+  public static async createAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false): Promise<void> {
     await OrchestratorCreate.runAsync(nlrPath, inputPath, outputPath, hierarchical);
   }
 
   // eslint-disable-next-line max-params
-  public static async addAsync(nlrPath: string, inputPath: string, outputPath: string, snapshotPath: string, labelPrefix: string = '') {
+  public static async addAsync(nlrPath: string, inputPath: string, outputPath: string, snapshotPath: string, labelPrefix: string = ''): Promise<void> {
     await OrchestratorAdd.runAsync(nlrPath, inputPath, outputPath, snapshotPath, labelPrefix);
   }
 
-  public static async buildAsync(nlrPath: string, inputPath: string, outputPath: string) {
+  public static async buildAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
     await OrchestratorBuild.runAsync(nlrPath, inputPath, outputPath);
   }
 
-  public static async evaluateAsync(inputPath: string, outputPath: string, nlrPath: string = '') {
+  public static async evaluateAsync(inputPath: string, outputPath: string, nlrPath: string = ''): Promise<void> {
     await OrchestratorEvaluate.runAsync(inputPath, outputPath, nlrPath);
   }
 
-  public static async fineTuneAsync(nlrPath: string, inputPath: string, outputPath: string) {
+  public static async fineTuneAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
     await OrchestratorFineTune.runAsync(nlrPath, inputPath, outputPath);
   }
 
-  public static async nlrGetAsync(nlrPath: string, versionId: string, onFinish: any = null) {
+  public static async nlrGetAsync(nlrPath: string, versionId: string, onFinish: any = null): Promise<void> {
     await OrchestratorNlr.getAsync(nlrPath, versionId, onFinish);
   }
 
@@ -42,11 +42,11 @@ export class Orchestrator {
     return OrchestratorNlr.listAsync();
   }
 
-  public static async predictAsync(nlrPath: string, inputPath: string, outputPath: string) {
-    await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath);
+  public static async predictAsync(nlrPath: string, labelPath: string, outputPath: string): Promise<void> {
+    await OrchestratorPredict.runAsync(nlrPath, labelPath, outputPath);
   }
 
-  public static async testAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string) {
+  public static async testAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string): Promise<void> {
     await OrchestratorTest.runAsync(nlrPath, inputPath, testPath, outputPath);
   }
 }

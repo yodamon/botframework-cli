@@ -16,10 +16,10 @@ export default class OrchestratorTest extends Command {
     $ bf orchestrator:evaluate --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator example file will be created from. Default to current working directory.'}),
-    test: flags.string({char: 't', description: 'The path to test label file from where orchestrator example file will be created from.'}),
-    out: flags.string({char: 'o', description: 'Path where generated orchestrator example file will be placed. Default to current working directory.'}),
-    model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
+    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator examples will be loaded from.'}),
+    test: flags.string({char: 't', description: 'The path to test label file from where orchestrator examples will be created from.'}),
+    out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
+    model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }
@@ -27,9 +27,9 @@ export default class OrchestratorTest extends Command {
   async run(): Promise<number> {
     const {flags}: flags.Output = this.parse(OrchestratorTest);
 
-    const input: string = flags.in;
-    const test: string = flags.test;
-    const output: string = flags.out || __dirname;
+    const inputPath: string = flags.in;
+    const testPath: string = flags.test;
+    const outputPath: string = flags.out;
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
@@ -37,13 +37,13 @@ export default class OrchestratorTest extends Command {
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    Utility.debuggingLog(`OrchestratorTest.run(): input=${input}`);
-    Utility.debuggingLog(`OrchestratorTest.run(): test=${test}`);
-    Utility.debuggingLog(`OrchestratorTest.run(): output=${output}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): inputPath=${inputPath}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): testPath=${testPath}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): outputPath=${outputPath}`);
     Utility.debuggingLog(`OrchestratorTest.run(): nlrPath=${nlrPath}`);
 
     try {
-      await Orchestrator.testAsync(nlrPath, input, test, output);
+      await Orchestrator.testAsync(nlrPath, inputPath, testPath, outputPath);
     } catch (error) {
       throw (new CLIError(error));
     }

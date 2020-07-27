@@ -36,8 +36,9 @@ export class LabelResolver {
 
   public static async createAsync(nlrPath: string) {
     await LabelResolver.loadNlrAsync(nlrPath);
-    Utility.debuggingLog('LabelResolver.createAsync(): Creating labeler..');
+    Utility.debuggingLog('LabelResolver.createAsync(): Creating labeler...');
     LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
+    Utility.debuggingLog('LabelResolver.createAsync(): Done creating labeler...');
     return LabelResolver.LabelResolver;
   }
 

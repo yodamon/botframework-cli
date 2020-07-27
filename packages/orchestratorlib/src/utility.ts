@@ -6,9 +6,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
-import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
-import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
+import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
 
 import {Example} from './example';
 import {Label} from './label';
@@ -18,10 +18,369 @@ import {Result} from './result';
 import {ScoreStructure} from './score-structure';
 import {Span} from './span';
 
+import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
+
 export class Utility {
   public static toPrintDebuggingLogToConsole: boolean = true;
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
+
+  // eslint-disable-next-line max-params
+  public static processUtteranceMultiLabelTsv(
+    lines: string[],
+    utterancesLabelsMap: { [id: string]: string[] },
+    utterancesLabelsPredictedMap: { [id: string]: string[] },
+    utterancesDuplicateLabelsMap: Map<string, Set<string>>,
+    utterancesDuplicateLabelsPredictedMap: Map<string, Set<string>>,
+    utteranceIndex: number = 2,
+    labelsIndex: number = 0,
+    labelsPredictedIndex: number = 1): boolean {
+    if (utteranceIndex < 0) {
+      Utility.debuggingThrow(`utteranceIndex|${utteranceIndex}| < 0`);
+    }
+    lines.forEach((line: string) => {
+      const items: string[] = line.split('\t');
+      if (utteranceIndex >= items.length) {
+        Utility.debuggingThrow(`utteranceIndex|${utteranceIndex}| >= items.length|${items.length}|`);
+      }
+      let utterance: string = items[utteranceIndex] ? items[utteranceIndex] : '';
+      let labels: string = '';
+      if ((labelsIndex >= 0) && (labelsIndex < items.length)) {
+        labels = items[labelsIndex] ? items[labelsIndex] : '';
+      }
+      let labelsPredicted: string = '';
+      if ((labelsPredictedIndex >= 0) && (labelsPredictedIndex < items.length)) {
+        labelsPredicted = items[labelsPredictedIndex] ? items[labelsPredictedIndex] : '';
+      }
+      labels = labels.trim();
+      utterance = utterance.trim();
+      labelsPredicted = labelsPredicted.trim();
+      const labelArray: string[] = labels.split(',');
+      for (const label of labelArray) {
+        Utility.addToMultiLabelUtteranceStructure(
+          utterance,
+          label.trim(),
+          utterancesLabelsMap,
+          utterancesDuplicateLabelsMap);
+      }
+      const labelPredictedArray: string[] = labelsPredicted.split(',');
+      for (const labelPredicted of labelPredictedArray) {
+        Utility.addToMultiLabelUtteranceStructure(
+          utterance,
+          labelPredicted.trim(),
+          utterancesLabelsPredictedMap,
+          utterancesDuplicateLabelsPredictedMap);
+      }
+    });
+    return true;
+  }
+
+  public static addToMultiLabelUtteranceStructure(
+    utterance: string,
+    label: string,
+    utterancesLabelsMap: { [id: string]: string[] },
+    utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
+    const existingLabels: string[] = utterancesLabelsMap[utterance];
+    if (existingLabels) {
+      if (!Utility.addIfNewLabel(label, existingLabels)) {
+        Utility.insertStringPairToStringIdStringSetNativeMap(
+          utterance,
+          label,
+          utterancesDuplicateLabelsMap);
+      }
+    } else {
+      utterancesLabelsMap[utterance] = [label];
+    }
+  }
+
+  public static addIfNewLabel(newLabel: string, labels: string[]): boolean {
+    for (const label of labels) {
+      if (label === newLabel) {
+        return false;
+      }
+    }
+    labels.push(newLabel);
+    return true;
+  }
+
+  // eslint-disable-next-line max-params
+  public static generateEvaluationReport(
+    labelResolver: any,
+    trainingSetLabels: string[],
+    utterancesLabelsMap: { [id: string]: string[] },
+    utterancesDuplicateLabelsMap: Map<string, Set<string>>,
+    labelsOutputFilename: string,
+    evaluationSetScoreOutputFilename: string,
+    evaluationSetSummaryOutputFilename: string): {
+      'evaluationReportLabelUtteranceStatistics': {
+        'evaluationSummaryTemplate': string;
+        'labelArrayAndMap': {
+          'stringArray': string[];
+          'stringMap': {[id: string]: number};};
+        'labelStatisticsAndHtmlTable': {
+          'labelStatistics': string[][];
+          'labelStatisticsHtml': string;};
+        'utteranceStatisticsAndHtmlTable': {
+          'utteranceStatistics': [string, number][];
+          'utteranceStatisticsHtml': string;};
+        'utterancesMultiLabelArrays': [string, string][];
+        'utterancesMultiLabelArraysHtml': string;
+        'utterancesDuplicateLabelsHtml': string; };
+      'evaluationReportAnalyses': {
+        'evaluationSummaryTemplate': string;
+        'ambiguousAnalysis': {
+          'scoringAmbiguousOutputLines': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;};
+        'misclassifiedAnalysis': {
+          'scoringMisclassifiedOutputLines': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;};
+        'lowConfidenceAnalysis': {
+          'scoringLowConfidenceOutputLines': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;};
+        'confusionMatrixAnalysis': {
+          'confusionMatrix': MultiLabelConfusionMatrix;
+          'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+          'scoringConfusionMatrixOutputLines': string[][];
+          'confusionMatrixMetricsHtml': string;
+          'confusionMatrixAverageMetricsHtml': string;}; };
+    } {
+    // ---- NOTE ---- generate evaluation report before calling the score() function.
+    const evaluationReportLabelUtteranceStatistics: {
+      'evaluationSummaryTemplate': string;
+      'labelArrayAndMap': {
+        'stringArray': string[];
+        'stringMap': {[id: string]: number};};
+      'labelStatisticsAndHtmlTable': {
+        'labelStatistics': string[][];
+        'labelStatisticsHtml': string;};
+      'utteranceStatisticsAndHtmlTable': {
+        'utteranceStatistics': [string, number][];
+        'utteranceStatisticsHtml': string;};
+      'utterancesMultiLabelArrays': [string, string][];
+      'utterancesMultiLabelArraysHtml': string;
+      'utterancesDuplicateLabelsHtml': string;
+    } = Utility.generateEvaluationReportLabelUtteranceStatistics(
+      trainingSetLabels,
+      utterancesLabelsMap,
+      utterancesDuplicateLabelsMap);
+
+    // ---- NOTE ---- output the labels by their index order to a file.
+    Utility.storeDataArraysToTsvFile(
+      labelsOutputFilename,
+      evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringArray.map((x: string) => [x]));
+
+    // ---- NOTE ---- collect utterance prediction and scores.
+    const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utterancesLabelsMap);
+    const scoreStructureArray: ScoreStructure[] = Utility.score(
+      labelResolver,
+      utteranceLabelsPairArray,
+      evaluationReportLabelUtteranceStatistics.labelArrayAndMap);
+
+    // ---- NOTE ---- generate evaluation report after calling the score() function.
+    const evaluationReportAnalyses: {
+      'evaluationSummaryTemplate': string;
+      'ambiguousAnalysis': {
+        'scoringAmbiguousOutputLines': string[][];
+        'scoringAmbiguousUtterancesArraysHtml': string;};
+      'misclassifiedAnalysis': {
+        'scoringMisclassifiedOutputLines': string[][];
+        'scoringMisclassifiedUtterancesArraysHtml': string;};
+      'lowConfidenceAnalysis': {
+        'scoringLowConfidenceOutputLines': string[][];
+        'scoringLowConfidenceUtterancesArraysHtml': string;};
+      'confusionMatrixAnalysis': {
+        'confusionMatrix': MultiLabelConfusionMatrix;
+        'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+        'scoringConfusionMatrixOutputLines': string[][];
+        'confusionMatrixMetricsHtml': string;
+        'confusionMatrixAverageMetricsHtml': string;};
+    } = Utility.generateEvaluationReportAnalyses(
+      evaluationReportLabelUtteranceStatistics.evaluationSummaryTemplate,
+      evaluationReportLabelUtteranceStatistics.labelArrayAndMap,
+      scoreStructureArray);
+
+    // ---- NOTE ---- produce a score TSV file.
+    const scoreOutputLines: string[][] = Utility.generateScoreOutputLines(
+      scoreStructureArray);
+    Utility.storeDataArraysToTsvFile(
+      evaluationSetScoreOutputFilename,
+      scoreOutputLines);
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finishing calling Utility.storeDataArraysToTsvFile');
+
+    // ---- NOTE ---- produce the evaluation summary file.
+    Utility.dumpFile(
+      evaluationSetSummaryOutputFilename,
+      evaluationReportAnalyses.evaluationSummaryTemplate);
+
+    // ---- NOTE ---- debugging ouput.
+    if (Utility.toPrintDetailedDebuggingLogToConsole) {
+      Utility.debuggingLog(`Utility.generateEvaluationReport(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringArray)}`);
+      Utility.debuggingLog(`Utility.generateEvaluationReport(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringMap)}`);
+      const labels: any = labelResolver.getLabels();
+      Utility.debuggingLog(`Utility.generateEvaluationReport(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+    }
+
+    // ---- NOTE ---- return
+    return {
+      evaluationReportLabelUtteranceStatistics,
+      evaluationReportAnalyses};
+  }
+
+  public static generateEvaluationReportLabelUtteranceStatistics(
+    trainingSetLabels: string[],
+    utterancesLabelsMap: { [id: string]: string[] },
+    utterancesDuplicateLabelsMap: Map<string, Set<string>>): {
+      'evaluationSummaryTemplate': string;
+      'labelArrayAndMap': {
+        'stringArray': string[];
+        'stringMap': {[id: string]: number};};
+      'labelStatisticsAndHtmlTable': {
+        'labelStatistics': string[][];
+        'labelStatisticsHtml': string;};
+      'utteranceStatisticsAndHtmlTable': {
+        'utteranceStatistics': [string, number][];
+        'utteranceStatisticsHtml': string;};
+      'utterancesMultiLabelArrays': [string, string][];
+      'utterancesMultiLabelArraysHtml': string;
+      'utterancesDuplicateLabelsHtml': string;
+    } {
+    // ---- NOTE ---- create a label-index map.
+    const labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(
+        trainingSetLabels);
+    Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
+    Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
+    if (Utility.isEmptyStringArray(labelArrayAndMap.stringArray)) {
+      Utility.debuggingThrow('there is no label, something wrong?');
+    }
+
+    // ---- NOTE ---- load the evaluation summary template.
+    let evaluationSummaryTemplate: string = EvaluationSummaryTemplateHtml.html;
+
+    // ---- NOTE ---- generate label statistics.
+    const labelStatisticsAndHtmlTable: {
+      'labelStatistics': string[][];
+      'labelStatisticsHtml': string;
+    } = Utility.generateLabelStatisticsAndHtmlTable(
+      utterancesLabelsMap,
+      labelArrayAndMap);
+    Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
+    // ---- NOTE ---- generate utterance statistics
+    const utteranceStatisticsAndHtmlTable: {
+      'utteranceStatistics': [string, number][];
+      'utteranceStatisticsHtml': string;
+    } = Utility.generateUtteranceStatisticsAndHtmlTable(
+      utterancesLabelsMap);
+    Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
+    // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
+    const intentsUtterancesStatisticsHtml: string =
+      labelStatisticsAndHtmlTable.labelStatisticsHtml + utteranceStatisticsAndHtmlTable.utteranceStatisticsHtml;
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{INTENTUTTERANCESTATISTICS}', intentsUtterancesStatisticsHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finished generating {INTENTUTTERANCESTATISTICS} content');
+
+    // ---- NOTE ---- generate duplicate report.
+    const utterancesMultiLabelArrays: [string, string][] = Object.entries(utterancesLabelsMap).filter(
+      (x: [string, string[]]) => x[1].length > 1).map((x: [string, string[]]) => [x[0], x[1].join(',')]);
+    const utterancesMultiLabelArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Multi-label utterances and their intents',
+      utterancesMultiLabelArrays,
+      ['Utterance', 'Intents']);
+    // ---- NOTE ---- generate duplicate report.
+    const utterancesDuplicateLabelsHtml: string = Utility.convertMapSetToIndexedHtmlTable(
+      'Duplicate utterance and intent pairs',
+      utterancesDuplicateLabelsMap,
+      ['Utterance', 'Intent']);
+    // ---- NOTE ---- create the evaluation DUPLICATES summary from template.
+    const duplicateStatisticsHtml: string =
+      utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finished generating {DUPLICATES} content');
+
+    // ---- NOTE ---- return
+    return {
+      evaluationSummaryTemplate,
+      labelArrayAndMap,
+      labelStatisticsAndHtmlTable,
+      utteranceStatisticsAndHtmlTable,
+      utterancesMultiLabelArrays,
+      utterancesMultiLabelArraysHtml,
+      utterancesDuplicateLabelsHtml};
+  }
+
+  public static generateEvaluationReportAnalyses(
+    evaluationSummaryTemplate: string,
+    labelArrayAndMap: {
+      'stringArray': string[];
+      'stringMap': {[id: string]: number};},
+    scoreStructureArray: ScoreStructure[]): {
+      'evaluationSummaryTemplate': string;
+      'ambiguousAnalysis': {
+        'scoringAmbiguousOutputLines': string[][];
+        'scoringAmbiguousUtterancesArraysHtml': string;};
+      'misclassifiedAnalysis': {
+        'scoringMisclassifiedOutputLines': string[][];
+        'scoringMisclassifiedUtterancesArraysHtml': string;};
+      'lowConfidenceAnalysis': {
+        'scoringLowConfidenceOutputLines': string[][];
+        'scoringLowConfidenceUtterancesArraysHtml': string;};
+      'confusionMatrixAnalysis': {
+        'confusionMatrix': MultiLabelConfusionMatrix;
+        'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+        'scoringConfusionMatrixOutputLines': string[][];
+        'confusionMatrixMetricsHtml': string;
+        'confusionMatrixAverageMetricsHtml': string;};
+    } {
+    // ---- NOTE ---- generate ambiguous HTML.
+    const ambiguousAnalysis: {
+      'scoringAmbiguousOutputLines': string[][];
+      'scoringAmbiguousUtterancesArraysHtml': string;
+    } = Utility.generateAmbiguousStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', ambiguousAnalysis.scoringAmbiguousUtterancesArraysHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {AMBIGUOUS} content');
+
+    // ---- NOTE ---- generate misclassified HTML.
+    const misclassifiedAnalysis: {
+      'scoringMisclassifiedOutputLines': string[][];
+      'scoringMisclassifiedUtterancesArraysHtml': string;
+    } = Utility.generateMisclassifiedStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', misclassifiedAnalysis.scoringMisclassifiedUtterancesArraysHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {MISCLASSIFICATION} content');
+
+    // ---- NOTE ---- generate low-confidence HTML.
+    const lowConfidenceAnalysis: {
+      'scoringLowConfidenceOutputLines': string[][];
+      'scoringLowConfidenceUtterancesArraysHtml': string;
+    } = Utility.generateLowConfidenceStatisticsAndHtmlTable(
+      scoreStructureArray);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', lowConfidenceAnalysis.scoringLowConfidenceUtterancesArraysHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {LOWCONFIDENCE} content');
+
+    // ---- NOTE ---- produce confusion matrix result.
+    const confusionMatrixAnalysis: {
+      'confusionMatrix': MultiLabelConfusionMatrix;
+      'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+      'scoringConfusionMatrixOutputLines': string[][];
+      'confusionMatrixMetricsHtml': string;
+      'confusionMatrixAverageMetricsHtml': string;
+    } = Utility.generateConfusionMatrixMetricsAndHtmlTable(
+      scoreStructureArray,
+      labelArrayAndMap);
+    evaluationSummaryTemplate = evaluationSummaryTemplate.replace(
+      '{MODELEVALUATION}',
+      confusionMatrixAnalysis.confusionMatrixMetricsHtml + confusionMatrixAnalysis.confusionMatrixAverageMetricsHtml);
+    Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {MODELEVALUATION} content');
+
+    // ---- NOTE ---- return
+    return {
+      evaluationSummaryTemplate,
+      ambiguousAnalysis,
+      misclassifiedAnalysis,
+      lowConfidenceAnalysis,
+      confusionMatrixAnalysis};
+  }
 
   public static generateScoreOutputLines(
     scoreStructureArray: ScoreStructure[]): string[][] {
@@ -51,10 +410,12 @@ export class Utility {
       'stringMap': {[id: string]: number};}): {
       'confusionMatrix': MultiLabelConfusionMatrix;
       'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
-      'scoreOutputLinesConfusionMatrix': string[][];
-      'confusionMatrixHtml': string;
+      'scoringConfusionMatrixOutputLines': string[][];
+      'confusionMatrixMetricsHtml': string;
+      'confusionMatrixAverageMetricsHtml': string;
     } {
-    const scoreOutputLinesConfusionMatrix: string[][] = [];
+    // -----------------------------------------------------------------------
+    const scoringConfusionMatrixOutputLines: string[][] = [];
     const confusionMatrix: MultiLabelConfusionMatrix = new MultiLabelConfusionMatrix(
       labelArrayAndMap.stringArray,
       labelArrayAndMap.stringMap);
@@ -79,8 +440,9 @@ export class Utility {
       const falsePositives: number = binaryConfusionMatrices[i].getFalsePositives();
       const trueNegatives: number = binaryConfusionMatrices[i].getTrueNegatives();
       const falseNegatives: number = binaryConfusionMatrices[i].getFalseNegatives();
+      const support: number = binaryConfusionMatrices[i].getSupport();
       const total: number = binaryConfusionMatrices[i].getTotal();
-      const scoreOutputLineConfusionMatrix: any[] = [
+      const scoringConfusionMatrixOutputLine: any[] = [
         label,
         precision,
         recall,
@@ -90,46 +452,135 @@ export class Utility {
         falsePositives,
         trueNegatives,
         falseNegatives,
+        support,
         total,
       ];
-      scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrix);
+      scoringConfusionMatrixOutputLines.push(scoringConfusionMatrixOutputLine);
       Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTotal()         =${binaryConfusionMatrices[i].getTotal()}`);
       Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTruePositives() =${binaryConfusionMatrices[i].getTruePositives()}`);
       Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getFalsePositives()=${binaryConfusionMatrices[i].getFalsePositives()}`);
       Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getTrueNegatives() =${binaryConfusionMatrices[i].getTrueNegatives()}`);
       Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), binaryConfusionMatrices[${i}].getFalseNegatives()=${binaryConfusionMatrices[i].getFalseNegatives()}`);
     }
+    const confusionMatrixMetricsHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Confusion matrix metrics',
+      scoringConfusionMatrixOutputLines,
+      ['Intent', 'Precision', 'Recall', 'F1', 'Accuracy', '#TruePositives', '#FalsePositives', '#TrueNegatives', '#FalseNegatives', 'Support', 'Total']);
+    // -----------------------------------------------------------------------
+    const scoringConfusionMatrixAverageOutputLines: string[][] = [];
     const microAverageMetrics: {
       'averagePrecisionRecallF1Accuracy': number;
       'truePositives': number;
+      'falsePositives': number;
+      'falseNegatives': number;
       'total': number;
     } = confusionMatrix.getMicroAverageMetrics();
-    const scoreOutputLineConfusionMatrixMicroAverage: any[] = [
+    const scoringConfusionMatrixOutputLineMicroAverage: any[] = [
       'Micro-Average',
-      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
-      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
-      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
-      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy),
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy), // ---- NOTE ---- in multi-label, there is no negative, so calculation of precision is equal to that of recall.
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy), // ---- NOTE ---- in multi-label, there is no negative, so calculation of precision is equal to that of recall.
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy), // ---- NOTE ---- in multi-label, there is no negative, so calculation of precision is equal to that of recall.
+      Utility.round(microAverageMetrics.averagePrecisionRecallF1Accuracy), // ---- NOTE ---- in multi-label, there is no negative, so calculation of precision is equal to that of recall.
       microAverageMetrics.truePositives,
+      'N/A', // ---- NOTE ---- in multi-label, there is no negative, so calculation of precision is equal to that of recall.
       'N/A',
-      'N/A',
+      microAverageMetrics.falseNegatives,
       'N/A',
       microAverageMetrics.total,
     ];
-    scoreOutputLinesConfusionMatrix.push(scoreOutputLineConfusionMatrixMicroAverage);
-    const confusionMatrixHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
-      'Confusion matrix metrics',
-      scoreOutputLinesConfusionMatrix,
-      ['Intent', 'Precision', 'Recall', 'F1', 'Accuracy', '#TruePositives', '#FalsePositives', '#TrueNegatives', '#FalseNegatives', 'Total']);
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineMicroAverage);
+    const macroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineMacroAverage: any[] = [
+      'Macro-Average',
+      Utility.round(macroAverageMetrics.averagePrecision),
+      Utility.round(macroAverageMetrics.averageRecall),
+      Utility.round(macroAverageMetrics.averageF1Score),
+      Utility.round(macroAverageMetrics.averageAccuracy),
+      Utility.round(macroAverageMetrics.averageTruePositives),
+      Utility.round(macroAverageMetrics.averageFalsePositives),
+      Utility.round(macroAverageMetrics.averageTrueNegatives),
+      Utility.round(macroAverageMetrics.averageFalseNegatives),
+      Utility.round(macroAverageMetrics.averageSupport),
+      macroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineMacroAverage);
+    const weightedMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getWeightedMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineWeightedMacroAverage: any[] = [
+      'Weighted Macro-Average',
+      Utility.round(weightedMacroAverageMetrics.averagePrecision),
+      Utility.round(weightedMacroAverageMetrics.averageRecall),
+      Utility.round(weightedMacroAverageMetrics.averageF1Score),
+      Utility.round(weightedMacroAverageMetrics.averageAccuracy),
+      'N/A',
+      'N/A',
+      'N/A',
+      'N/A',
+      'N/A',
+      weightedMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineWeightedMacroAverage);
+    const subsetMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = multiLabelConfusionMatrixSubset.getMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineSubsetMacroAverage: any[] = [
+      'Multi-Label Subset Average',
+      Utility.round(subsetMacroAverageMetrics.averagePrecision),
+      Utility.round(subsetMacroAverageMetrics.averageRecall),
+      Utility.round(subsetMacroAverageMetrics.averageF1Score),
+      Utility.round(subsetMacroAverageMetrics.averageAccuracy),
+      Utility.round(subsetMacroAverageMetrics.averageTruePositives),
+      Utility.round(subsetMacroAverageMetrics.averageFalsePositives),
+      Utility.round(subsetMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(subsetMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(subsetMacroAverageMetrics.averageSupport),
+      subsetMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSubsetMacroAverage);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getMicroAverageMetrics())=${JSON.stringify(confusionMatrix.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getMacroAverageMetrics())=${JSON.stringify(confusionMatrix.getMacroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getWeightedMacroAverageMetrics())=${JSON.stringify(confusionMatrix.getWeightedMacroAverageMetrics())}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())=${JSON.stringify(multiLabelConfusionMatrixSubset.getMicroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(multiLabelConfusionMatrixSubset.getMacroAverageMetrics())=${JSON.stringify(multiLabelConfusionMatrixSubset.getMacroAverageMetrics())}`);
+    Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(multiLabelConfusionMatrixSubset.getWeightedMacroAverageMetrics())=${JSON.stringify(multiLabelConfusionMatrixSubset.getWeightedMacroAverageMetrics())}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()         =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTotal()}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTruePositives()}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalsePositives()}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives() =${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getTrueNegatives()}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()=${multiLabelConfusionMatrixSubset.getBinaryConfusionMatrix().getFalseNegatives()}`);
     Utility.debuggingLog('Utility.generateConfusionMatrixMetricsAndHtmlTable(), finished generating {MODELEVALUATION} content');
-    return {confusionMatrix, multiLabelConfusionMatrixSubset, scoreOutputLinesConfusionMatrix, confusionMatrixHtml};
+    const confusionMatrixAverageMetricsHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
+      'Average confusion matrix metrics',
+      scoringConfusionMatrixAverageOutputLines,
+      ['Type', 'Precision', 'Recall', 'F1', 'Accuracy', '#TruePositives', '#FalsePositives', '#TrueNegatives', '#FalseNegatives', 'Support', 'Total']);
+    // -----------------------------------------------------------------------
+    return {confusionMatrix, multiLabelConfusionMatrixSubset, scoringConfusionMatrixOutputLines, confusionMatrixMetricsHtml, confusionMatrixAverageMetricsHtml};
   }
 
   public static generateLowConfidenceStatisticsAndHtmlTable(
@@ -324,7 +775,7 @@ export class Utility {
 
   public static generateUtteranceStatisticsAndHtmlTable(
     utterancesLabelsMap: { [id: string]: string[] }): {
-        'utteranceStatistics': string[][];
+        'utteranceStatistics': [string, number][];
         'utteranceStatisticsHtml': string;
       } {
     const utteranceStatisticsMap: {[id: number]: number} = Object.entries(utterancesLabelsMap).map(
@@ -339,7 +790,7 @@ export class Utility {
         }
         return accumulant;
       }, {});
-    const utteranceStatistics: any[][] = [...Object.entries(utteranceStatisticsMap)].sort(
+    const utteranceStatistics: [string, number][] = [...Object.entries(utteranceStatisticsMap)].sort(
       (n1: [string, number], n2: [string, number]) => {
         if (n1[1] > n2[1]) {
           return -1;
@@ -349,6 +800,9 @@ export class Utility {
         }
         return 0;
       });
+    const utteranceCount: number = utteranceStatistics.reduce(
+      (accumulant: number, entry: [string, number]) => accumulant + entry[1], 0);
+    utteranceStatistics.push(['Total', utteranceCount]);
     const utteranceStatisticsHtml: string = Utility.convertDataArraysToHtmlTable(
       'Utterance statistics',
       utteranceStatistics,
@@ -366,6 +820,8 @@ export class Utility {
       } {
     // ---- NOTE ---- generate label statistics.
     const labelsUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utterancesLabelsMap);
+    const labelsStatisticTotal: number = Object.entries(labelsUtterancesMap).reduce(
+      (accumulant: number, x: [string, string[]]) => accumulant + x[1].length, 0);
     const labelStatistics: string[][] = Object.entries(labelsUtterancesMap).sort(
       (n1: [string, string[]], n2: [string, string[]]) => {
         if (n1[0] > n2[0]) {
@@ -376,14 +832,12 @@ export class Utility {
         }
         return 0;
       }).map(
-      (x: [string, string[]], index: number) => [index.toString(), x[0], labelArrayAndMap.stringMap[x[0]].toString(), x[1].length.toString()]);
-    const labelsStatisticTotal: number = Object.entries(labelsUtterancesMap).reduce(
-      (accumulant: number, x: [string, string[]]) => accumulant + x[1].length, 0);
-    labelStatistics.push(['Total', '', '', labelsStatisticTotal.toString()]);
+      (x: [string, string[]], index: number) => [index.toString(), x[0], labelArrayAndMap.stringMap[x[0]].toString(), x[1].length.toString(), Utility.round(x[1].length / labelsStatisticTotal).toString()]);
+    labelStatistics.push(['Total', 'N/A', 'N/A', labelsStatisticTotal.toString(), 'N/A']);
     const labelStatisticsHtml: string = Utility.convertDataArraysToHtmlTable(
       'Intent statistics',
       labelStatistics,
-      ['No', 'Intent', 'Intent Index', 'Utterance Count']);
+      ['No', 'Intent', 'Intent Index', 'Utterance Count', 'Utterance Prevalence']);
     return {labelStatistics, labelStatisticsHtml};
   }
 
@@ -412,7 +866,8 @@ export class Utility {
     tableDescription: string = '',
     selectedOutputDataArraryHeaders: string[] = [],
     outputDataColumnWidthSettings: string[] = []): string {
-    const labelsSelectedArrays: any[][] = indexes.map((x: number) => [scoreResultArray[x].label.name, scoreResultArray[x].score, scoreResultArray[x].closest_text]);
+    const labelsSelectedArrays: any[][] = indexes.map(
+      (x: number) => [scoreResultArray[x].label.name, scoreResultArray[x].score, scoreResultArray[x].closest_text]);
     const selectedScoreStructureHtmlTable: string = Utility.convertDataArraysToHtmlTable(
       tableDescription,
       labelsSelectedArrays,
@@ -497,10 +952,6 @@ export class Utility {
     indentCumulative: string = '  ',
     indent: string = '  '): string {
     const outputLines: string[] = [];
-    if (Utility.isEmptyStringArrays(outputEvaluationReportDataArrays)) {
-      Utility.debuggingThrow(
-        'outputEvaluationReportDataArrays is empty');
-    }
     if (!Utility.isEmptyString(tableDescription)) {
       outputLines.push(indentCumulative + `<p><strong>${tableDescription}</strong></p>`);
     }
@@ -519,14 +970,16 @@ export class Utility {
       }
       outputLines.push(indentCumulative + indent + '<tr>');
     }
-    for (const outputEvaluationReportDataArray of outputEvaluationReportDataArrays) {
-      outputLines.push(indentCumulative + indent + '<tr>');
-      for (const dataEntry of outputEvaluationReportDataArray) {
-        outputLines.push(indentCumulative + indent + indent + '<td>');
-        outputLines.push(indentCumulative + indent + indent + dataEntry);
-        outputLines.push(indentCumulative + indent + indent + '</td>');
+    if (!Utility.isEmptyStringArrays(outputEvaluationReportDataArrays)) {
+      for (const outputEvaluationReportDataArray of outputEvaluationReportDataArrays) {
+        outputLines.push(indentCumulative + indent + '<tr>');
+        for (const dataEntry of outputEvaluationReportDataArray) {
+          outputLines.push(indentCumulative + indent + indent + '<td>');
+          outputLines.push(indentCumulative + indent + indent + dataEntry);
+          outputLines.push(indentCumulative + indent + indent + '</td>');
+        }
+        outputLines.push(indentCumulative + indent + '</tr>');
       }
-      outputLines.push(indentCumulative + indent + '</tr>');
     }
     outputLines.push(indentCumulative + '</table>');
     const outputContent: string = outputLines.join('\n');
@@ -585,10 +1038,6 @@ export class Utility {
     indentCumulative: string = '  ',
     indent: string = '  '): string {
     const outputLines: string[] = [];
-    if (outputEvaluationMapSet === null) {
-      Utility.debuggingThrow(
-        'outputEvaluationMapSet is empty');
-    }
     if (!Utility.isEmptyString(tableDescription)) {
       outputLines.push(indentCumulative + `<p><strong>${tableDescription}</strong></p>`);
     }
@@ -605,21 +1054,23 @@ export class Utility {
       }
       outputLines.push(indentCumulative + indent + '<tr>');
     }
-    let index: number = 0;
-    for (const outputEvaluationMapSetEntry of outputEvaluationMapSet) {
-      const key: any = outputEvaluationMapSetEntry[0];
-      for (const valueSetEntry of outputEvaluationMapSetEntry[1]) {
-        outputLines.push(indentCumulative + indent + '<tr>');
-        outputLines.push(indentCumulative + indent + indent + '<td>');
-        outputLines.push(indentCumulative + indent + indent + index++);
-        outputLines.push(indentCumulative + indent + indent + '</td>');
-        outputLines.push(indentCumulative + indent + indent + '<td>');
-        outputLines.push(indentCumulative + indent + indent + key);
-        outputLines.push(indentCumulative + indent + indent + '</td>');
-        outputLines.push(indentCumulative + indent + indent + '<td>');
-        outputLines.push(indentCumulative + indent + indent + valueSetEntry);
-        outputLines.push(indentCumulative + indent + indent + '</td>');
-        outputLines.push(indentCumulative + indent + '</tr>');
+    if (Utility.isEmptyAnyKeyGenericSetMap(outputEvaluationMapSet)) {
+      let index: number = 0;
+      for (const outputEvaluationMapSetEntry of outputEvaluationMapSet) {
+        const key: any = outputEvaluationMapSetEntry[0];
+        for (const valueSetEntry of outputEvaluationMapSetEntry[1]) {
+          outputLines.push(indentCumulative + indent + '<tr>');
+          outputLines.push(indentCumulative + indent + indent + '<td>');
+          outputLines.push(indentCumulative + indent + indent + index++);
+          outputLines.push(indentCumulative + indent + indent + '</td>');
+          outputLines.push(indentCumulative + indent + indent + '<td>');
+          outputLines.push(indentCumulative + indent + indent + key);
+          outputLines.push(indentCumulative + indent + indent + '</td>');
+          outputLines.push(indentCumulative + indent + indent + '<td>');
+          outputLines.push(indentCumulative + indent + indent + valueSetEntry);
+          outputLines.push(indentCumulative + indent + indent + '</td>');
+          outputLines.push(indentCumulative + indent + '</tr>');
+        }
       }
     }
     outputLines.push(indentCumulative + '</table>');
@@ -665,6 +1116,12 @@ export class Utility {
       }
     }
     return {indexMax, max};
+  }
+
+  public static isEmptyAnyKeyGenericSetMap(
+    anyKeyGenericSetMap: Map<any, Set<any>>): boolean {
+    return !(anyKeyGenericSetMap &&
+      [...anyKeyGenericSetMap].length > 0);
   }
 
   public static isEmptyNumberArrays(inputArrays: number[][]): boolean {
@@ -893,6 +1350,7 @@ export class Utility {
     // Utility.debuggingLog(
     //     `Utility.dumpFile(): filename=${filename}`);
     try {
+      fs.mkdirSync(path.dirname(filename), {recursive: true});
       fs.writeFileSync(filename, content, encoding);
     } catch (error) {
       // ---- NOTE ---- An error occurred

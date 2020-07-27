@@ -16,9 +16,9 @@ export default class OrchestratorEvaluate extends Command {
     $ bf orchestrator:evaluate --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator example file will be created from. Default to current working directory.'}),
-    out: flags.string({char: 'o', description: 'Path where generated orchestrator example file will be placed. Default to current working directory.'}),
-    model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
+    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator examples will be created from.'}),
+    out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
+    model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }
@@ -26,8 +26,8 @@ export default class OrchestratorEvaluate extends Command {
   async run(): Promise<number> {
     const {flags}: flags.Output = this.parse(OrchestratorEvaluate);
 
-    const input: string = flags.in || __dirname;
-    const output: string = flags.out || __dirname;
+    const inputPath: string = flags.in;
+    const outputPath: string = flags.out;
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
@@ -35,12 +35,12 @@ export default class OrchestratorEvaluate extends Command {
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): input=${input}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.run(): output=${output}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): inputPath=${inputPath}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): outputPath=${outputPath}`);
     Utility.debuggingLog(`OrchestratorEvaluate.run(): nlrPath=${nlrPath}`);
 
     try {
-      await Orchestrator.evaluateAsync(input, output, nlrPath);
+      await Orchestrator.evaluateAsync(inputPath, outputPath, nlrPath);
     } catch (error) {
       throw (new CLIError(error));
     }
