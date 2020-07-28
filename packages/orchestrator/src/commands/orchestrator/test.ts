@@ -8,7 +8,7 @@ import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
 import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorTest extends Command {
-  static description: string = 'Run orchestrator test evaluation using given test file';
+  static description: string = 'Test utterance/label samples from an input file and create an evaluation report';
 
   static examples: Array<string> = [`
     $ bf orchestrator:evaluate 
@@ -16,7 +16,7 @@ export default class OrchestratorTest extends Command {
     $ bf orchestrator:evaluate --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'The path to source .blu file from where orchestrator examples will be loaded from.'}),
+    in: flags.string({char: 'i', description: 'Path to source .blu file from where Orchestrator examples will be created from.'}),
     test: flags.string({char: 't', description: 'The path to test label file from where orchestrator examples will be created from.'}),
     out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
     model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),

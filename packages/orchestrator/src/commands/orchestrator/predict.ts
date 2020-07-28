@@ -8,7 +8,7 @@ import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
 import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorPredict extends Command {
-  static description: string = 'Returns score of given utterance using previously created orchestrator examples';
+  static description: string = 'Real-time interaction with Orchestrator model and analysis. Can return score of given utterance using previously created orchestrator examples';
 
   static examples: Array<string> = [`
     $ bf orchestrator:predict 
@@ -16,7 +16,7 @@ export default class OrchestratorPredict extends Command {
     $ bf orchestrator:predict --label ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    label: flags.string({char: 'l', description: 'The path to label file from where orchestrator examples will be created from.'}),
+    label: flags.string({char: 'l', description: 'Path to a label file from where Orchestrator examples will be created from.'}),
     out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
     model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),
     debug: flags.boolean({char: 'd'}),
