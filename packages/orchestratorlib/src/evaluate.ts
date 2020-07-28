@@ -5,11 +5,11 @@
 
 import * as path from 'path';
 
-// import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
-// import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
 
 import {LabelType} from './label-type';
-// import {ScoreStructure}  from './score-structure';
+import {ScoreStructure}  from './score-structure';
 
 import {LabelResolver} from './labelresolver';
 
@@ -88,39 +88,44 @@ export class OrchestratorEvaluate {
     }
 
     // ---- NOTE ---- integrated step to produce analysis reports.
-    // const evaluationOutput: {
-    //   'evaluationReportLabelUtteranceStatistics': {
-    //     'evaluationSummaryTemplate': string;
-    //     'labelArrayAndMap': {
-    //       'stringArray': string[];
-    //       'stringMap': {[id: string]: number};};
-    //     'labelStatisticsAndHtmlTable': {
-    //       'labelStatistics': string[][];
-    //       'labelStatisticsHtml': string;};
-    //     'utteranceStatisticsAndHtmlTable': {
-    //       'utteranceStatistics': [string, number][];
-    //       'utteranceStatisticsHtml': string;};
-    //     'utterancesMultiLabelArrays': [string, string][];
-    //     'utterancesMultiLabelArraysHtml': string;
-    //     'utterancesDuplicateLabelsHtml': string; };
-    //   'evaluationReportAnalyses': {
-    //     'evaluationSummaryTemplate': string;
-    //     'ambiguousAnalysis': {
-    //       'scoringAmbiguousOutputLines': string[][];
-    //       'scoringAmbiguousUtterancesArraysHtml': string;};
-    //     'misclassifiedAnalysis': {
-    //       'scoringMisclassifiedOutputLines': string[][];
-    //       'scoringMisclassifiedUtterancesArraysHtml': string;};
-    //     'lowConfidenceAnalysis': {
-    //       'scoringLowConfidenceOutputLines': string[][];
-    //       'scoringLowConfidenceUtterancesArraysHtml': string;};
-    //     'confusionMatrixAnalysis': {
-    //       'confusionMatrix': MultiLabelConfusionMatrix;
-    //       'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
-    //       'scoringConfusionMatrixOutputLines': string[][];
-    //       'confusionMatrixMetricsHtml': string;
-    //       'confusionMatrixAverageMetricsHtml': string;}; };
-    // } =
+    const evaluationOutput: {
+      'evaluationReportLabelUtteranceStatistics': {
+        'evaluationSummaryTemplate': string;
+        'labelArrayAndMap': {
+          'stringArray': string[];
+          'stringMap': {[id: string]: number};};
+        'labelStatisticsAndHtmlTable': {
+          'labelUtterancesMap': { [id: string]: string[] };
+          'labelUtterancesTotal': number;
+          'labelStatistics': string[][];
+          'labelStatisticsHtml': string;};
+        'utteranceStatisticsAndHtmlTable': {
+          'utteranceStatisticsMap': {[id: number]: number};
+          'utteranceStatistics': [string, number][];
+          'utteranceCount': number;
+          'utteranceStatisticsHtml': string;};
+        'utterancesMultiLabelArrays': [string, string][];
+        'utterancesMultiLabelArraysHtml': string;
+        'utterancesDuplicateLabelsHtml': string; };
+      'evaluationReportAnalyses': {
+        'evaluationSummaryTemplate': string;
+        'ambiguousAnalysis': {
+          'scoringAmbiguousOutputLines': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;};
+        'misclassifiedAnalysis': {
+          'scoringMisclassifiedOutputLines': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;};
+        'lowConfidenceAnalysis': {
+          'scoringLowConfidenceOutputLines': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;};
+        'confusionMatrixAnalysis': {
+          'confusionMatrix': MultiLabelConfusionMatrix;
+          'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+          'scoringConfusionMatrixOutputLines': string[][];
+          'confusionMatrixMetricsHtml': string;
+          'confusionMatrixAverageMetricsHtml': string;}; };
+        'scoreStructureArray': ScoreStructure[];
+    } =
     Utility.generateEvaluationReport(
       labelResolver,
       labels,
@@ -129,86 +134,11 @@ export class OrchestratorEvaluate {
       labelsOutputFilename,
       trainingSetScoreOutputFile,
       trainingSetSummaryOutputFile);
-
-    /*
-    // ---- NOTE ---- generate evaluation report before calling the score() function.
-    const evaluationReportLabelUtteranceStatistics: {
-      'evaluationSummaryTemplate': string;
-      'labelArrayAndMap': {
-        'stringArray': string[];
-        'stringMap': {[id: string]: number};};
-      'labelStatisticsAndHtmlTable': {
-        'labelStatistics': string[][];
-        'labelStatisticsHtml': string;};
-      'utteranceStatisticsAndHtmlTable': {
-        'utteranceStatistics': [string, number][];
-        'utteranceStatisticsHtml': string;};
-      'utterancesMultiLabelArrays': [string, string][];
-      'utterancesMultiLabelArraysHtml': string;
-      'utterancesDuplicateLabelsHtml': string;
-    } = Utility.generateEvaluationReportLabelUtteranceStatistics(
-      labels,
-      utterancesLabelsMap,
-      utterancesDuplicateLabelsMap);
-
-    // ---- NOTE ---- output the labels by their index order to a file.
-    Utility.storeDataArraysToTsvFile(
-      labelsOutputFilename,
-      evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringArray.map((x: string) => [x]));
-
-    // ---- NOTE ---- collect utterance prediction and scores.
-    const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utterancesLabelsMap);
-    const scoreStructureArray: ScoreStructure[] = Utility.score(
-      labelResolver,
-      utteranceLabelsPairArray,
-      evaluationReportLabelUtteranceStatistics.labelArrayAndMap);
-
-    // ---- NOTE ---- generate evaluation report after calling the score() function.
-    const evaluationReportAnalyses: {
-      'evaluationSummaryTemplate': string;
-      'ambiguousAnalysis': {
-        'scoringAmbiguousOutputLines': string[][];
-        'scoringAmbiguousUtterancesArraysHtml': string;};
-      'misclassifiedAnalysis': {
-        'scoringMisclassifiedOutputLines': string[][];
-        'scoringMisclassifiedUtterancesArraysHtml': string;};
-      'lowConfidenceAnalysis': {
-        'scoringLowConfidenceOutputLines': string[][];
-        'scoringLowConfidenceUtterancesArraysHtml': string;};
-      'confusionMatrixAnalysis': {
-        'confusionMatrix': MultiLabelConfusionMatrix;
-        'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
-        'scoringConfusionMatrixOutputLines': string[][];
-        'confusionMatrixMetricsHtml': string;
-        'confusionMatrixAverageMetricsHtml': string;};
-    } = Utility.generateEvaluationReportAnalyses(
-      evaluationReportLabelUtteranceStatistics.evaluationSummaryTemplate,
-      evaluationReportLabelUtteranceStatistics.labelArrayAndMap,
-      scoreStructureArray);
-
-    // ---- NOTE ---- produce a score TSV file.
-    const scoreOutputLines: string[][] = Utility.generateScoreOutputLines(
-      scoreStructureArray);
-    Utility.storeDataArraysToTsvFile(
-      trainingSetScoreOutputFile,
-      scoreOutputLines);
-    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), finishing calling Utility.storeDataArraysToTsvFile');
-
-    // ---- NOTE ---- produce the evaluation summary file.
-    Utility.dumpFile(
-      trainingSetSummaryOutputFile,
-      evaluationReportAnalyses.evaluationSummaryTemplate);
-
-    // ---- NOTE ---- debugging ouput.
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringArray)}`);
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringMap)}`);
-      const labels: any = labelResolver.getLabels();
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+      Utility.debuggingLog(`evaluationOutput=${Utility.jsonstringify(evaluationOutput)}`);
     }
-    */
 
-    // ---- NOTE ---- the end
-    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), the end');
+    // ---- NOTE ---- THE END
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), THE END');
   }
 }

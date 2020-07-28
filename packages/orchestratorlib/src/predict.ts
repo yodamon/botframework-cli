@@ -7,26 +7,27 @@ import * as path from 'path';
 
 import * as readline from 'readline';
 
-// import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
-// import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
 
 // import {ScoreStructure}  from './score-structure';
 
 import {LabelResolver} from './labelresolver';
 // import {OrchestratorHelper} from './orchestratorhelper';
 
-// import {Example} from './example';
+import {Example} from './example';
 // import {Label} from './label';
 import {LabelType} from './label-type';
 // import {OrchestratorHelper} from './orchestratorhelper';
 // import {Result} from './result';
-// import {ScoreStructure} from './score-structure';
+import {ScoreStructure} from './score-structure';
 // import {Span} from './span';
 
 import {Utility} from './utility';
 
 /* eslint-disable no-console */
 export class OrchestratorPredict {
+  // eslint-disable-next-line complexity
   public static async runAsync(nlrPath: string, labelPath: string, outputPath: string): Promise<number> {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(labelPath)) {
@@ -69,10 +70,10 @@ export class OrchestratorPredict {
       });
     };
     const commandprefix: string = 'Please enter a command, "h" for help > ';
-    const intentLabelPrefix: string = 'Please enter an intent label > ';
+    const intentLabelPrefix: string = 'Please enter an intent label (can be an index to retrieve from label-index map) > ';
     const utterancePrefix: string = 'Please enter an utterance > ';
     let command: string = '';
-    let currentIntentLabel: string = '';
+    let currentIntentLabels: string[] = [];
     let currentUtterance: string = '';
     let currentLabelArrayAndMap: {
       'stringArray': string[];
@@ -81,45 +82,104 @@ export class OrchestratorPredict {
     while (true) {
       // eslint-disable-next-line no-await-in-loop
       command = await question(commandprefix);
-      Utility.debuggingLog(`The command you entered "${command}"`);
+      command = command.trim();
+      Utility.debuggingLog(`The command you entered is "${command}"`);
       if (command === 'q') {
         break;
       }
       switch (command) {
       case 'h':
-        console.log('  Commands: "h", "q", "u", "i", "s", "p", "v", "a", "r"');
-        console.log('    h - print help message');
-        console.log('    q - quit');
-        console.log('    u - enter an utterance for analysis');
-        console.log('    i - enter an intent label for analysis');
-        console.log('    s - show current utterance, intent label, and label-index map');
-        console.log('    p - make a prediction on the current utterance label');
-        console.log(`    v - execute validation and save analyses to ${predictingSetSummaryOutputFilename}`);
-        console.log('    a - add the current utterance and intent label to the model examples');
-        console.log('    r - remove the current utterance and intent label from the model examples');
+        console.log('  Commands: "h", "q", "u", "cu", "i", "ci", "s", "se", "p", "v", "a", "r"');
+        console.log('    h  - print help message');
+        console.log('    q  - quit');
+        console.log('    u  - enter an utterance');
+        console.log('    cu - clear the current utterance');
+        console.log('    i  - type and add an intent label');
+        console.log('    ci - clear the current intent labels');
+        console.log('    s  - show current utterance, intent labels, and label-index map');
+        console.log('    se - show example label-utterance statistics');
+        console.log('    p  - make a prediction on the current utterance');
+        console.log(`    v  - execute validation and save analyses to "${predictingSetSummaryOutputFilename}"`);
+        console.log('    a  - add the current utterance and intent labels to the model examples');
+        console.log('    r  - remove the current utterance and intent label from the model examples');
         break;
       case 'u':
         // eslint-disable-next-line no-await-in-loop
         currentUtterance = await question(utterancePrefix);
         break;
-      case 'i':
+      case 'cu':
         // eslint-disable-next-line no-await-in-loop
-        currentIntentLabel = await question(intentLabelPrefix);
+        currentUtterance = '';
+        break;
+      case 'i': {
+        // eslint-disable-next-line no-await-in-loop
+        let label: string = await question(intentLabelPrefix);
+        label = label.trim();
+        if (!Utility.isEmptyString(label)) {
+          if (Number.isInteger(Number(label))) {
+            const labelIndex: number = Number(label);
+            const labels: string[] = labelResolver.getLabels(LabelType.Intent);
+            currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
+              labels);
+            const labelArray: string[] = currentLabelArrayAndMap.stringArray;
+            // eslint-disable-next-line max-depth
+            if ((labelIndex < 0) || (labelIndex >= labelArray.length)) {
+              console.log(`  The label index "${labelIndex}" you entered is not in range`);
+              console.log(`  Current label-index map: "${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}"`);
+              break;
+            }
+            currentIntentLabels.push(labelArray[labelIndex]);
+          } else {
+            currentIntentLabels.push(label);
+          }
+        } }
+        break;
+      case 'ci':
+        // eslint-disable-next-line no-await-in-loop
+        currentIntentLabels = [];
         break;
       case 's': {
         console.log(`  Current utterance: "${currentUtterance}"`);
-        console.log(`  Current intent label: "${currentIntentLabel}"`);
+        console.log(`  Current intent labels: "${currentIntentLabels}"`);
         const labels: string[] = labelResolver.getLabels(LabelType.Intent);
         currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
           labels);
         console.log(`  Current label-index map: "${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}"`); }
+        break;
+      case 'se': {
+        const utterancesLabelsMap: { [id: string]: string[] } = {};
+        const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+        const examples: any = labelResolver.getExamples();
+        if (examples.length <= 0) {
+          console.log('  There is no example');
+          break;
+        }
+        const labels: string[] = labelResolver.getLabels(LabelType.Intent);
+        currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
+          labels);
+        Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
+        const labelStatisticsAndHtmlTable: {
+          'labelUtterancesMap': { [id: string]: string[] };
+          'labelUtterancesTotal': number;
+          'labelStatistics': string[][];
+          'labelStatisticsHtml': string;
+        } = Utility.generateLabelStatisticsAndHtmlTable(
+          utterancesLabelsMap,
+          currentLabelArrayAndMap);
+        const labelUtteranceCount: { [id: string]: number } = {};
+        Object.entries(labelStatisticsAndHtmlTable.labelUtterancesMap).forEach(
+          (x: [string, string[]]) => {
+            labelUtteranceCount[x[0]] = x[1].length;
+          });
+        console.log(`  Per-label #examples:\n${Utility.jsonstringify(labelUtteranceCount)}`);
+        console.log(`  Total #examples:${labelStatisticsAndHtmlTable.labelUtterancesTotal}`); }
         break;
       case 'p': {
         const scoreResults: any = labelResolver.score(currentUtterance, LabelType.Intent);
         if (!scoreResults) {
           continue;
         }
-        console.log(`prediction=\n${Utility.jsonstringify(scoreResults)}`); }
+        console.log(`  Prediction:\n${Utility.jsonstringify(scoreResults)}`); }
         break;
       case 'v': {
         const labels: string[] = labelResolver.getLabels(LabelType.Intent);
@@ -132,39 +192,44 @@ export class OrchestratorPredict {
         }
         Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
         // ---- NOTE ---- integrated step to produce analysis reports.
-        // const evaluationOutput: {
-        //   'evaluationReportLabelUtteranceStatistics': {
-        //     'evaluationSummaryTemplate': string;
-        //     'labelArrayAndMap': {
-        //       'stringArray': string[];
-        //       'stringMap': {[id: string]: number};};
-        //     'labelStatisticsAndHtmlTable': {
-        //       'labelStatistics': string[][];
-        //       'labelStatisticsHtml': string;};
-        //     'utteranceStatisticsAndHtmlTable': {
-        //       'utteranceStatistics': [string, number][];
-        //       'utteranceStatisticsHtml': string;};
-        //     'utterancesMultiLabelArrays': [string, string][];
-        //     'utterancesMultiLabelArraysHtml': string;
-        //     'utterancesDuplicateLabelsHtml': string; };
-        //   'evaluationReportAnalyses': {
-        //     'evaluationSummaryTemplate': string;
-        //     'ambiguousAnalysis': {
-        //       'scoringAmbiguousOutputLines': string[][];
-        //       'scoringAmbiguousUtterancesArraysHtml': string;};
-        //     'misclassifiedAnalysis': {
-        //       'scoringMisclassifiedOutputLines': string[][];
-        //       'scoringMisclassifiedUtterancesArraysHtml': string;};
-        //     'lowConfidenceAnalysis': {
-        //       'scoringLowConfidenceOutputLines': string[][];
-        //       'scoringLowConfidenceUtterancesArraysHtml': string;};
-        //     'confusionMatrixAnalysis': {
-        //       'confusionMatrix': MultiLabelConfusionMatrix;
-        //       'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
-        //       'scoringConfusionMatrixOutputLines': string[][];
-        //       'confusionMatrixMetricsHtml': string;
-        //       'confusionMatrixAverageMetricsHtml': string;}; };
-        // } =
+        const evaluationOutput: {
+          'evaluationReportLabelUtteranceStatistics': {
+            'evaluationSummaryTemplate': string;
+            'labelArrayAndMap': {
+              'stringArray': string[];
+              'stringMap': {[id: string]: number};};
+            'labelStatisticsAndHtmlTable': {
+              'labelUtterancesMap': { [id: string]: string[] };
+              'labelUtterancesTotal': number;
+              'labelStatistics': string[][];
+              'labelStatisticsHtml': string;};
+            'utteranceStatisticsAndHtmlTable': {
+              'utteranceStatisticsMap': {[id: number]: number};
+              'utteranceStatistics': [string, number][];
+              'utteranceCount': number;
+              'utteranceStatisticsHtml': string;};
+            'utterancesMultiLabelArrays': [string, string][];
+            'utterancesMultiLabelArraysHtml': string;
+            'utterancesDuplicateLabelsHtml': string; };
+          'evaluationReportAnalyses': {
+            'evaluationSummaryTemplate': string;
+            'ambiguousAnalysis': {
+              'scoringAmbiguousOutputLines': string[][];
+              'scoringAmbiguousUtterancesArraysHtml': string;};
+            'misclassifiedAnalysis': {
+              'scoringMisclassifiedOutputLines': string[][];
+              'scoringMisclassifiedUtterancesArraysHtml': string;};
+            'lowConfidenceAnalysis': {
+              'scoringLowConfidenceOutputLines': string[][];
+              'scoringLowConfidenceUtterancesArraysHtml': string;};
+            'confusionMatrixAnalysis': {
+              'confusionMatrix': MultiLabelConfusionMatrix;
+              'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+              'scoringConfusionMatrixOutputLines': string[][];
+              'confusionMatrixMetricsHtml': string;
+              'confusionMatrixAverageMetricsHtml': string;}; };
+          'scoreStructureArray': ScoreStructure[];
+        } =
         Utility.generateEvaluationReport(
           labelResolver,
           labels,
@@ -172,9 +237,37 @@ export class OrchestratorPredict {
           utterancesDuplicateLabelsMap,
           labelsOutputFilename,
           predictingSetScoreOutputFilename,
-          predictingSetSummaryOutputFilename); }
+          predictingSetSummaryOutputFilename);
+        if (Utility.toPrintDetailedDebuggingLogToConsole) {
+          Utility.debuggingLog(`evaluationOutput=${Utility.jsonstringify(evaluationOutput)}`);
+        } }
+        break;
+      case 'a': {
+        const example: Example = Example.newIntentExample(
+          currentUtterance,
+          currentIntentLabels);
+        const exampleObejct: any = example.toObject();
+        Utility.debuggingLog(`exampleObejct=${Utility.jsonstringify(exampleObejct)}`);
+        const rv: any = labelResolver.addExample(exampleObejct);
+        Utility.debuggingLog(`rv=${rv}`);
+        if (!rv) {
+          console.log('  Example was not added!');
+        } }
+        break;
+      case 'r': {
+        const example: Example = Example.newIntentExample(
+          currentUtterance,
+          currentIntentLabels);
+        const exampleObejct: any = example.toObject();
+        Utility.debuggingLog(`exampleObejct=${Utility.jsonstringify(exampleObejct)}`);
+        const rv: any = labelResolver.removeExample(exampleObejct);
+        Utility.debuggingLog(`rv=${rv}`);
+        if (!rv) {
+          console.log('  Example was not removed!');
+        } }
         break;
       default:
+        console.log(`  The command you entered ${command} is not recognized!`);
         break;
       }
     }

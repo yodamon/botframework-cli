@@ -118,10 +118,14 @@ export class Utility {
           'stringArray': string[];
           'stringMap': {[id: string]: number};};
         'labelStatisticsAndHtmlTable': {
+          'labelUtterancesMap': { [id: string]: string[] };
+          'labelUtterancesTotal': number;
           'labelStatistics': string[][];
           'labelStatisticsHtml': string;};
         'utteranceStatisticsAndHtmlTable': {
+          'utteranceStatisticsMap': {[id: number]: number};
           'utteranceStatistics': [string, number][];
+          'utteranceCount': number;
           'utteranceStatisticsHtml': string;};
         'utterancesMultiLabelArrays': [string, string][];
         'utterancesMultiLabelArraysHtml': string;
@@ -143,18 +147,24 @@ export class Utility {
           'scoringConfusionMatrixOutputLines': string[][];
           'confusionMatrixMetricsHtml': string;
           'confusionMatrixAverageMetricsHtml': string;}; };
+      'scoreStructureArray': ScoreStructure[];
     } {
     // ---- NOTE ---- generate evaluation report before calling the score() function.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.generateEvaluationReportLabelUtteranceStatistics()');
     const evaluationReportLabelUtteranceStatistics: {
       'evaluationSummaryTemplate': string;
       'labelArrayAndMap': {
         'stringArray': string[];
         'stringMap': {[id: string]: number};};
       'labelStatisticsAndHtmlTable': {
+        'labelUtterancesMap': { [id: string]: string[] };
+        'labelUtterancesTotal': number;
         'labelStatistics': string[][];
         'labelStatisticsHtml': string;};
       'utteranceStatisticsAndHtmlTable': {
+        'utteranceStatisticsMap': {[id: number]: number};
         'utteranceStatistics': [string, number][];
+        'utteranceCount': number;
         'utteranceStatisticsHtml': string;};
       'utterancesMultiLabelArrays': [string, string][];
       'utterancesMultiLabelArraysHtml': string;
@@ -163,20 +173,26 @@ export class Utility {
       trainingSetLabels,
       utterancesLabelsMap,
       utterancesDuplicateLabelsMap);
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.generateEvaluationReportLabelUtteranceStatistics()');
 
     // ---- NOTE ---- output the labels by their index order to a file.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.storeDataArraysToTsvFile()');
     Utility.storeDataArraysToTsvFile(
       labelsOutputFilename,
       evaluationReportLabelUtteranceStatistics.labelArrayAndMap.stringArray.map((x: string) => [x]));
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.storeDataArraysToTsvFile()');
 
     // ---- NOTE ---- collect utterance prediction and scores.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.score()');
     const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utterancesLabelsMap);
     const scoreStructureArray: ScoreStructure[] = Utility.score(
       labelResolver,
       utteranceLabelsPairArray,
       evaluationReportLabelUtteranceStatistics.labelArrayAndMap);
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.score()');
 
     // ---- NOTE ---- generate evaluation report after calling the score() function.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.generateEvaluationReportAnalyses()');
     const evaluationReportAnalyses: {
       'evaluationSummaryTemplate': string;
       'ambiguousAnalysis': {
@@ -198,8 +214,10 @@ export class Utility {
       evaluationReportLabelUtteranceStatistics.evaluationSummaryTemplate,
       evaluationReportLabelUtteranceStatistics.labelArrayAndMap,
       scoreStructureArray);
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.generateEvaluationReportAnalyses()');
 
     // ---- NOTE ---- produce a score TSV file.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.storeDataArraysToTsvFile()');
     const scoreOutputLines: string[][] = Utility.generateScoreOutputLines(
       scoreStructureArray);
     Utility.storeDataArraysToTsvFile(
@@ -208,9 +226,11 @@ export class Utility {
     Utility.debuggingLog('Utility.generateEvaluationReport(), finishing calling Utility.storeDataArraysToTsvFile');
 
     // ---- NOTE ---- produce the evaluation summary file.
+    Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.dumpFile()');
     Utility.dumpFile(
       evaluationSetSummaryOutputFilename,
       evaluationReportAnalyses.evaluationSummaryTemplate);
+    Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.dumpFile()');
 
     // ---- NOTE ---- debugging ouput.
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
@@ -223,7 +243,8 @@ export class Utility {
     // ---- NOTE ---- return
     return {
       evaluationReportLabelUtteranceStatistics,
-      evaluationReportAnalyses};
+      evaluationReportAnalyses,
+      scoreStructureArray};
   }
 
   public static generateEvaluationReportLabelUtteranceStatistics(
@@ -235,10 +256,14 @@ export class Utility {
         'stringArray': string[];
         'stringMap': {[id: string]: number};};
       'labelStatisticsAndHtmlTable': {
+        'labelUtterancesMap': { [id: string]: string[] };
+        'labelUtterancesTotal': number;
         'labelStatistics': string[][];
         'labelStatisticsHtml': string;};
       'utteranceStatisticsAndHtmlTable': {
+        'utteranceStatisticsMap': {[id: number]: number};
         'utteranceStatistics': [string, number][];
+        'utteranceCount': number;
         'utteranceStatisticsHtml': string;};
       'utterancesMultiLabelArrays': [string, string][];
       'utterancesMultiLabelArraysHtml': string;
@@ -260,6 +285,8 @@ export class Utility {
 
     // ---- NOTE ---- generate label statistics.
     const labelStatisticsAndHtmlTable: {
+      'labelUtterancesMap': { [id: string]: string[] };
+      'labelUtterancesTotal': number;
       'labelStatistics': string[][];
       'labelStatisticsHtml': string;
     } = Utility.generateLabelStatisticsAndHtmlTable(
@@ -268,10 +295,11 @@ export class Utility {
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
     // ---- NOTE ---- generate utterance statistics
     const utteranceStatisticsAndHtmlTable: {
+      'utteranceStatisticsMap': {[id: number]: number};
       'utteranceStatistics': [string, number][];
-      'utteranceStatisticsHtml': string;
-    } = Utility.generateUtteranceStatisticsAndHtmlTable(
-      utterancesLabelsMap);
+      'utteranceCount': number;
+      'utteranceStatisticsHtml': string; } = Utility.generateUtteranceStatisticsAndHtmlTable(
+        utterancesLabelsMap);
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
     // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
     const intentsUtterancesStatisticsHtml: string =
@@ -775,9 +803,10 @@ export class Utility {
 
   public static generateUtteranceStatisticsAndHtmlTable(
     utterancesLabelsMap: { [id: string]: string[] }): {
-        'utteranceStatistics': [string, number][];
-        'utteranceStatisticsHtml': string;
-      } {
+      'utteranceStatisticsMap': {[id: number]: number};
+      'utteranceStatistics': [string, number][];
+      'utteranceCount': number;
+      'utteranceStatisticsHtml': string; } {
     const utteranceStatisticsMap: {[id: number]: number} = Object.entries(utterancesLabelsMap).map(
       (x: [string, string[]]) => [1, x[1].length]).reduce(
       (accumulant: {[id: number]: number}, entry: number[]) => {
@@ -807,7 +836,7 @@ export class Utility {
       'Utterance statistics',
       utteranceStatistics,
       ['# Multi-Labels', 'Utterance Count']);
-    return {utteranceStatistics, utteranceStatisticsHtml};
+    return {utteranceStatisticsMap, utteranceStatistics, utteranceCount, utteranceStatisticsHtml};
   }
 
   public static generateLabelStatisticsAndHtmlTable(
@@ -815,14 +844,16 @@ export class Utility {
     labelArrayAndMap: {
       'stringArray': string[];
       'stringMap': {[id: string]: number};}): {
+        'labelUtterancesMap': { [id: string]: string[] };
+        'labelUtterancesTotal': number;
         'labelStatistics': string[][];
         'labelStatisticsHtml': string;
       } {
     // ---- NOTE ---- generate label statistics.
-    const labelsUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utterancesLabelsMap);
-    const labelsStatisticTotal: number = Object.entries(labelsUtterancesMap).reduce(
+    const labelUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utterancesLabelsMap);
+    const labelUtterancesTotal: number = Object.entries(labelUtterancesMap).reduce(
       (accumulant: number, x: [string, string[]]) => accumulant + x[1].length, 0);
-    const labelStatistics: string[][] = Object.entries(labelsUtterancesMap).sort(
+    const labelStatistics: string[][] = Object.entries(labelUtterancesMap).sort(
       (n1: [string, string[]], n2: [string, string[]]) => {
         if (n1[0] > n2[0]) {
           return 1;
@@ -832,13 +863,13 @@ export class Utility {
         }
         return 0;
       }).map(
-      (x: [string, string[]], index: number) => [index.toString(), x[0], labelArrayAndMap.stringMap[x[0]].toString(), x[1].length.toString(), Utility.round(x[1].length / labelsStatisticTotal).toString()]);
-    labelStatistics.push(['Total', 'N/A', 'N/A', labelsStatisticTotal.toString(), 'N/A']);
+      (x: [string, string[]], index: number) => [index.toString(), x[0], labelArrayAndMap.stringMap[x[0]].toString(), x[1].length.toString(), Utility.round(x[1].length / labelUtterancesTotal).toString()]);
+    labelStatistics.push(['Total', 'N/A', 'N/A', labelUtterancesTotal.toString(), 'N/A']);
     const labelStatisticsHtml: string = Utility.convertDataArraysToHtmlTable(
       'Intent statistics',
       labelStatistics,
       ['No', 'Intent', 'Intent Index', 'Utterance Count', 'Utterance Prevalence']);
-    return {labelStatistics, labelStatisticsHtml};
+    return {labelUtterancesMap, labelUtterancesTotal, labelStatistics, labelStatisticsHtml};
   }
 
   // eslint-disable-next-line max-params
