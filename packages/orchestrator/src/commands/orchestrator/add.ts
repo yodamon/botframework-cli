@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator} from '@microsoft/bf-orchestrator';
+import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 import {OrchestratorSettings} from '../../utils/settings';
 
 export default class OrchestratorAdd extends Command {
@@ -36,6 +36,8 @@ export default class OrchestratorAdd extends Command {
     const output: string = flags.out;
     const snapshot: string = path.resolve(flags.snapshot || path.join(__dirname, 'orchestrator.blu'));
     const labelPrefix: string = flags.prefix || '';
+
+    Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     try {
       OrchestratorSettings.init(__dirname, flags.model, output, __dirname);

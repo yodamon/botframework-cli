@@ -22,8 +22,9 @@ export class Orchestrator {
     await OrchestratorAdd.runAsync(nlrPath, inputPath, outputPath, snapshotPath, labelPrefix);
   }
 
-  public static async buildAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
-    await OrchestratorBuild.runAsync(nlrPath, inputPath, outputPath);
+  // eslint-disable-next-line max-params
+  public static async buildAsync(nlrPath: string, inputPath: string, outputPath: string, isDialog: boolean, luConfigPath: string = ''): Promise<void> {
+    await OrchestratorBuild.runAsync(nlrPath, inputPath, outputPath, isDialog, luConfigPath);
   }
 
   public static async evaluateAsync(inputPath: string, outputPath: string, nlrPath: string = ''): Promise<void> {

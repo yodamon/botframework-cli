@@ -32,6 +32,8 @@ export class LabelResolver {
     } else if (LabelResolver.Orchestrator.load() === false) {
       throw new Error('Failed calling LabelResolver.Orchestrator.load()!');
     }
+
+    return LabelResolver.Orchestrator;
   }
 
   public static async createAsync(nlrPath: string) {
