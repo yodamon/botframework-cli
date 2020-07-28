@@ -57,13 +57,16 @@ export class LabelResolver {
     return LabelResolver.LabelResolver;
   }
 
-  public static addExamples(utterancesLabelsMap: {[id: string]: string[]}) {
+  public static addExamples(utterancesLabelsMap: {[id: string]: string[]}, labelResolver: any = null) {
+    if (labelResolver === null) {
+      labelResolver = LabelResolver.LabelResolver;
+    }
     // eslint-disable-next-line guard-for-in
     for (const utterance in utterancesLabelsMap) {
       const labels: string[] = utterancesLabelsMap[utterance];
       for (const label of labels) {
         try {
-          const success: any = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
+          const success: any = labelResolver.addExample({label: label, text: utterance});
           if (success) {
             Utility.debuggingLog(`LabelResolver.addExamples(): Added { label: ${label}, text: ${utterance}}`);
           } else {

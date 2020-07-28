@@ -30,9 +30,9 @@ export class OrchestratorHelper {
     return ReadText.readSync(filePath);
   }
 
-  public static writeToFile(filePath: string, content: string): string {
+  public static writeToFile(filePath: string, content: string, options: any = {encoding: 'utf8', flag: 'w'}): string {
     fs.mkdirSync(path.dirname(filePath), {recursive: true});
-    fs.writeFileSync(filePath, content);
+    fs.writeFileSync(filePath, content, options);
     return filePath;
   }
 

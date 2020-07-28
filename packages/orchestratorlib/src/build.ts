@@ -36,6 +36,10 @@ export class OrchestratorBuild {
       nlrPath = path.resolve(nlrPath);
       outputPath = path.resolve(outputPath);
 
+      if (!OrchestratorHelper.isDirectory(outputPath)) {
+        outputPath = path.dirname(outputPath);
+      }
+
       const orchestrator: any = await LabelResolver.loadNlrAsync(nlrPath);
       Utility.debuggingLog('Loaded nlr');
 
@@ -55,15 +59,15 @@ export class OrchestratorBuild {
   }
 
   private static async processLuFile(luFile: string) {
-    const utterancesLabelsMap: { [id: string]: string[] } = {};
-    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
     const labelResolver: any = OrchestratorBuild.Orchestrator.createLabelResolver();
     Utility.debuggingLog('Created label resolver');
 
-    await OrchestratorHelper.processFile(luFile, path.basename(luFile), utterancesLabelsMap, utterancesDuplicateLabelsMap, false);
-    const snapshot: any = labelResolver.createSnapshot();
+    const result: any = (await OrchestratorHelper.getUtteranceLabelsMap(luFile, false)).utterancesLabelsMap;
+    Utility.debuggingLog(`Processed ${luFile}`);
 
-    const snapshotFile: any = path.join(OrchestratorBuild.OutputPath, path.basename(luFile, '.lu'));
+    LabelResolver.addExamples(result, labelResolver);
+    const snapshot: any = labelResolver.createSnapshot();
+    const snapshotFile: any = path.join(OrchestratorBuild.OutputPath, path.basename(luFile, '.lu') + '.blu');
     OrchestratorHelper.writeToFile(snapshotFile, snapshot);
     Utility.debuggingLog(`Snapshot written to ${snapshotFile}`);
   }
