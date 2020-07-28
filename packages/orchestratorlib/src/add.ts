@@ -4,7 +4,6 @@
  */
 
 import * as path from 'path';
-import {Utility} from './utility';
 import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 

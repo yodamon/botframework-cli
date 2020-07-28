@@ -11,6 +11,15 @@ export class Span {
     this.length = length;
   }
 
+  public toObject(): {
+    'offset': number;
+    'length': number; } {
+    return {
+      offset: this.offset,
+      length: this.length,
+    };
+  }
+
   public offset: number;
 
   public length: number;
