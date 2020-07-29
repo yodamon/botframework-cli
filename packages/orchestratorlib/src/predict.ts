@@ -69,12 +69,18 @@ export class OrchestratorPredict {
         });
       });
     };
-    const commandprefix: string = 'Please enter a command, "h" for help > ';
-    const intentLabelPrefix: string = 'Please enter an intent label (can be an index to retrieve from label-index map) > ';
-    const utterancePrefix: string = 'Please enter an utterance > ';
+    const commandprefix: string =
+      'Please enter a command, "h" for help > ';
+    const questionForCurrentIntentLabel: string =
+      'Please enter a "current" intent label (can be an integer index to retrieve from label-index map) > ';
+    const questionForNewIntentLabel: string =
+      'Please enter a "new" intent label (can be an integer index to retrieve from label-index map) > ';
+    const utterancePrefix: string =
+      'Please enter an utterance > ';
     let command: string = '';
-    let currentIntentLabels: string[] = [];
     let currentUtterance: string = '';
+    let currentIntentLabels: string[] = [];
+    let newIntentLabels: string[] = [];
     let currentLabelArrayAndMap: {
       'stringArray': string[];
       'stringMap': {[id: string]: number};};
@@ -90,18 +96,20 @@ export class OrchestratorPredict {
       switch (command) {
       case 'h':
         console.log('  Commands: "h", "q", "u", "cu", "i", "ci", "s", "se", "p", "v", "a", "r"');
-        console.log('    h  - print help message');
-        console.log('    q  - quit');
-        console.log('    u  - enter an utterance');
-        console.log('    cu - clear the current utterance');
-        console.log('    i  - type and add an intent label');
-        console.log('    ci - clear the current intent labels');
-        console.log('    s  - show current utterance, intent labels, and label-index map');
-        console.log('    se - show example label-utterance statistics');
-        console.log('    p  - make a prediction on the current utterance');
-        console.log(`    v  - execute validation and save analyses to "${predictingSetSummaryOutputFilename}"`);
-        console.log('    a  - add the current utterance and intent labels to the model examples');
-        console.log('    r  - remove the current utterance and intent label from the model examples');
+        console.log('    h   - print help message');
+        console.log('    q   - quit');
+        console.log('    u   - enter an utterance and save it to the "current" utterance cache');
+        console.log('    cu  - clear the "current" utterance cache');
+        console.log('    i   - type and add to the "current" intent label array cache');
+        console.log('    ci  - clear the "current" intent label array cache');
+        console.log('    ni  - type and add to the "new" intent label array cache');
+        console.log('    cni - clear the "new" intent label array cache');
+        console.log('    s   - show the utterance, intent label array caches, and label-index map');
+        console.log('    se  - show example label-utterance statistics');
+        console.log('    p   - make a prediction on the current utterance');
+        console.log(`    v   - execute validation and save analyses to "${predictingSetSummaryOutputFilename}"`);
+        console.log('    a   - add the current utterance and intent labels to the model examples');
+        console.log('    r   - remove the current utterance and intent label from the model examples');
         break;
       case 'u':
         // eslint-disable-next-line no-await-in-loop
@@ -113,38 +121,44 @@ export class OrchestratorPredict {
         break;
       case 'i': {
         // eslint-disable-next-line no-await-in-loop
-        let label: string = await question(intentLabelPrefix);
+        let label: string = await question(questionForCurrentIntentLabel);
         label = label.trim();
-        if (!Utility.isEmptyString(label)) {
-          if (Number.isInteger(Number(label))) {
-            const labelIndex: number = Number(label);
-            const labels: string[] = labelResolver.getLabels(LabelType.Intent);
-            currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
-              labels);
-            const labelArray: string[] = currentLabelArrayAndMap.stringArray;
-            // eslint-disable-next-line max-depth
-            if ((labelIndex < 0) || (labelIndex >= labelArray.length)) {
-              console.log(`  The label index "${labelIndex}" you entered is not in range`);
-              console.log(`  Current label-index map: "${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}"`);
-              break;
-            }
-            currentIntentLabels.push(labelArray[labelIndex]);
-          } else {
-            currentIntentLabels.push(label);
-          }
+        const errorMessage: string = Utility.parseLabelEntry(
+          labelResolver,
+          label,
+          currentIntentLabels);
+        if (Utility.isEmptyString(errorMessage)) {
+          console.log(errorMessage);
         } }
         break;
       case 'ci':
-        // eslint-disable-next-line no-await-in-loop
         currentIntentLabels = [];
         break;
+      case 'ni': {
+        // eslint-disable-next-line no-await-in-loop
+        let label: string = await question(questionForNewIntentLabel);
+        label = label.trim();
+        const errorMessage: string = Utility.parseLabelEntry(
+          labelResolver,
+          label,
+          newIntentLabels);
+        if (Utility.isEmptyString(errorMessage)) {
+          console.log(errorMessage);
+        } }
+        break;
+      case 'cni':
+        newIntentLabels = [];
+        break;
       case 's': {
-        console.log(`  Current utterance: "${currentUtterance}"`);
-        console.log(`  Current intent labels: "${currentIntentLabels}"`);
+        console.log(`  Current utterance:                  "${currentUtterance}"`);
+        console.log(`  "Current" intent label array cache: "${currentIntentLabels}"`);
+        console.log(`  "New" intent label array cache:     "${currentIntentLabels}"`);
+        const labelResolverConfig: any = Utility.getLabelResolverSettings(labelResolver);
+        console.log(`  Orchestrator configuration:         ${labelResolverConfig}`);
         const labels: string[] = labelResolver.getLabels(LabelType.Intent);
         currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
           labels);
-        console.log(`  Current label-index map: "${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}"`); }
+        console.log(`  Current label-index map: ${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}`); }
         break;
       case 'se': {
         const utterancesLabelsMap: { [id: string]: string[] } = {};
@@ -171,10 +185,11 @@ export class OrchestratorPredict {
           (x: [string, string[]]) => {
             labelUtteranceCount[x[0]] = x[1].length;
           });
-        console.log(`  Per-label #examples:\n${Utility.jsonstringify(labelUtteranceCount)}`);
+        console.log(`  Per-label #examples: ${Utility.jsonstringify(labelUtteranceCount)}`);
         console.log(`  Total #examples:${labelStatisticsAndHtmlTable.labelUtterancesTotal}`); }
         break;
       case 'p': {
+        Utility.resetLabelResolverSettingIgnoreSameExample(labelResolver, false);
         const scoreResults: any = labelResolver.score(currentUtterance, LabelType.Intent);
         if (!scoreResults) {
           continue;
@@ -191,6 +206,7 @@ export class OrchestratorPredict {
           break;
         }
         Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
+        Utility.resetLabelResolverSettingIgnoreSameExample(labelResolver, true);
         // ---- NOTE ---- integrated step to produce analysis reports.
         const evaluationOutput: {
           'evaluationReportLabelUtteranceStatistics': {

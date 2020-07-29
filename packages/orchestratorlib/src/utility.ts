@@ -93,6 +93,23 @@ export class Utility {
     }
   }
 
+  public static resetLabelResolverSettingIgnoreSameExample(
+    labelResolver: any,
+    ignoreSameExample: boolean = true): any {
+    const ignoreSameExampleObject: {
+      ignore_same_example: boolean;
+    } = {
+      ignore_same_example: ignoreSameExample,
+    };
+    labelResolver.setRuntimeParams(Utility.jsonstringify(ignoreSameExampleObject), false);
+    return Utility.getLabelResolverSettings(labelResolver);
+  }
+
+  public static getLabelResolverSettings(labelResolver: any): any {
+    const labelResolverConfig: any = labelResolver.getConfigJson();
+    return labelResolverConfig;
+  }
+
   public static addIfNewLabel(newLabel: string, labels: string[]): boolean {
     for (const label of labels) {
       if (label === newLabel) {
@@ -101,6 +118,35 @@ export class Utility {
     }
     labels.push(newLabel);
     return true;
+  }
+
+  public static parseLabelEntry(
+    labelResolver: any,
+    label: string,
+    intentLabelArray: string[]): string {
+    label = label.trim();
+    if (!Utility.isEmptyString(label)) {
+      if (Number.isInteger(Number(label))) {
+        const labelIndex: number = Number(label);
+        const labels: string[] = labelResolver.getLabels(LabelType.Intent);
+        const currentLabelArrayAndMap: {
+          'stringArray': string[];
+          'stringMap': {[id: string]: number};} =
+          Utility.buildStringIdNumberValueDictionaryFromStringArray(
+            labels);
+        const labelArray: string[] = currentLabelArrayAndMap.stringArray;
+        // eslint-disable-next-line max-depth
+        if ((labelIndex < 0) || (labelIndex >= labelArray.length)) {
+          const errorMessage: string =
+            `The label index "${labelIndex}" you entered is not in range, label-index map: ${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}`;
+          return errorMessage;
+        }
+        intentLabelArray.push(labelArray[labelIndex]);
+      } else {
+        intentLabelArray.push(label);
+      }
+    }
+    return '';
   }
 
   // eslint-disable-next-line max-params
