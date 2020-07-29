@@ -88,6 +88,7 @@ export class OrchestratorEvaluate {
     }
 
     // ---- NOTE ---- integrated step to produce analysis reports.
+    Utility.resetLabelResolverSettingIgnoreSameExample(labelResolver, true);
     const evaluationOutput: {
       'evaluationReportLabelUtteranceStatistics': {
         'evaluationSummaryTemplate': string;

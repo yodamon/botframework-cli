@@ -24,7 +24,7 @@ export class OrchestratorNlr {
       Utility.debuggingLog(`Nlr path: ${nlrPath}`);
 
       const versions: any = await OrchestratorNlr.getNlrVersionsAsync();
-      onProgress(`Downloading model...`)
+      onProgress('Downloading model...');
       if (!versions) {
         throw new Error('Failed getting nlr_versions.json');
       }
@@ -45,20 +45,19 @@ export class OrchestratorNlr {
         throw new Error(`Failed downloading model version ${versionId}`);
       });
       fileStream.on('finish', () => {
-        onProgress(`Model downloaded...`)
+        onProgress('Model downloaded...');
         Utility.debuggingLog(`Finished downloading model version ${versionId}`);
         const seven: any = new Zip();
-        onProgress(`Extracting...`)
-        seven.extractFull(modelZipPath, nlrPath)
-          .then(() => {
-            onProgress(`Cleaning up...`)
-            Utility.debuggingLog(`Finished extracting model version ${versionId}`);
-            OrchestratorNlr.moveFiles(modelFolder, nlrPath);
-            Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
-            OrchestratorNlr.deleteFolderRecursive(modelFolder);
-            Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
-            onFinish();
-          });
+        onProgress('Extracting...');
+        seven.extractFull(modelZipPath, nlrPath).then(() => {
+          onProgress('Cleaning up...');
+          Utility.debuggingLog(`Finished extracting model version ${versionId}`);
+          OrchestratorNlr.moveFiles(modelFolder, nlrPath);
+          Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
+          OrchestratorNlr.deleteFolderRecursive(modelFolder);
+          Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
+          onFinish();
+        });
       });
     } catch (error) {
       throw new Error(error);
@@ -83,22 +82,20 @@ export class OrchestratorNlr {
     }
   }
 
-  private static defaultHandler()
-  {
-
+  private static defaultHandler() {
   }
 
-  private static deleteFolderRecursive (path:string) {
-    if( fs.existsSync(path) ) {
-      fs.readdirSync(path).forEach(function(file,index){
-        var curPath = path + "/" + file;
-        if(fs.lstatSync(curPath).isDirectory()) { // recurse
+  private static deleteFolderRecursive(inputPath: string) {
+    if (fs.existsSync(inputPath)) {
+      fs.readdirSync(inputPath).forEach(function (file: string) {
+        const curPath: string = path.join(inputPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) { // recurse
           OrchestratorNlr.deleteFolderRecursive(curPath);
         } else { // delete file
           fs.unlinkSync(curPath);
         }
       });
-      fs.rmdirSync(path);
+      fs.rmdirSync(inputPath);
     }
-  };
+  }
 }
