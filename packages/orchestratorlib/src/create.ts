@@ -28,7 +28,20 @@ export class OrchestratorCreate {
     LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical)).utteranceLabelsMap);
 
     const snapshot: any = labelResolver.createSnapshot();
-    OrchestratorHelper.writeToFile(outputPath, snapshot);
+
+    let outPath = OrchestratorCreate.getOutputPath(outputPath, inputPath)
+    OrchestratorHelper.writeToFile(outPath, snapshot);
     Utility.debuggingLog(`Snapshot written to ${outputPath}`);
+  }
+
+  private static getOutputPath(out: string, base: string)
+  {
+    let retValue = out;
+    if (!out.endsWith(`.blu`)) {
+      const srcBaseFileName = path.basename(base);
+      const dstBaseFileName = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
+      retValue = path.join(out, `${dstBaseFileName}.blu`);
+    }
+    return retValue;
   }
 }

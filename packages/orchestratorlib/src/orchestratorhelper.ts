@@ -31,8 +31,8 @@ export class OrchestratorHelper {
   }
 
   public static writeToFile(filePath: string, content: string, options: any = {encoding: 'utf8', flag: 'w'}): string {
-    fs.mkdirSync(path.dirname(filePath), {recursive: true});
     fs.writeFileSync(filePath, content, options);
+    console.log(`Successfully wrote to file ${filePath}`);
     return filePath;
   }
 
