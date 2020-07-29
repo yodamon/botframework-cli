@@ -82,7 +82,8 @@ export class OrchestratorNlr {
     }
   }
 
-  private static defaultHandler() {
+  private static defaultHandler(status: string) {
+    Utility.debuggingLog(status);
   }
 
   private static deleteFolderRecursive(inputPath: string) {
