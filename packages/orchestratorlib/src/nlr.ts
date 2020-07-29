@@ -36,7 +36,6 @@ export class OrchestratorNlr {
 
       const url: string = modelInfo.modelUri;
       const fileName: string = url.substring(url.lastIndexOf('/') + 1);
-      const modelFolder: string = path.join(nlrPath, path.basename(fileName, '.7z'));
       const res: any = await fetch(url);
       const modelZipPath: string = path.join(nlrPath, fileName);
       const fileStream: any = fs.createWriteStream(modelZipPath);
@@ -52,10 +51,8 @@ export class OrchestratorNlr {
         seven.extractFull(modelZipPath, nlrPath).then(() => {
           onProgress('Cleaning up...');
           Utility.debuggingLog(`Finished extracting model version ${versionId}`);
-          OrchestratorNlr.moveFiles(modelFolder, nlrPath);
-          Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
-          OrchestratorNlr.deleteFolderRecursive(modelFolder);
-          Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
+          fs.unlinkSync(modelZipPath);
+          Utility.debuggingLog(`Cleaned up .7z file: ${modelZipPath}`);
           onFinish();
         });
       });
@@ -72,14 +69,6 @@ export class OrchestratorNlr {
   public static async listAsync(): Promise<string> {
     const json: any = await OrchestratorNlr.getNlrVersionsAsync();
     return JSON.stringify(json, null, 2);
-  }
-
-  private static moveFiles(sourceDir: string, targetDir: string) {
-    const items: string[] = fs.readdirSync(sourceDir);
-    for (const item of items) {
-      const currentItemPath: string = path.join(sourceDir, item);
-      Utility.moveFile(currentItemPath, targetDir);
-    }
   }
 
   private static defaultHandler(status: string) {

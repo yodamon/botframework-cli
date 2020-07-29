@@ -11,7 +11,11 @@
             //"preLaunchTask": "${defaultBuildTask}",
             "program": "${workspaceFolder}/packages/orchestrator/bin/run",
             "args": [
-                "orchestrator:create",
+                "orchestrator:nlr:get",
+                //"--out",
+                //"c:\\todelete\\",
+                //"--versionId",
+                //"1.0.0-pretrained.20200729.microsoft.dte.en.onnx"
                 // "--debug",
                 // "--in",
                 // "resources/data/Columnar/Email.txt",
