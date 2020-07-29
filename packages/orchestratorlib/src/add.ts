@@ -37,7 +37,7 @@ export class OrchestratorAdd {
     if (ext === '.blu') {
       labelResolver.addSnapshot(new TextEncoder().encode(OrchestratorHelper.readFile(inputPath)), labelPrefix);
     } else {
-      LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath)).utterancesLabelsMap);
+      LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath)).utteranceLabelsMap);
     }
 
     OrchestratorHelper.writeToFile(outputPath, labelResolver.createSnapshot());

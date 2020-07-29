@@ -56,19 +56,20 @@ export class OrchestratorTest {
         (accumulant: string[], entry: string[]) => accumulant.concat(entry), []);
 
     // ---- NOTE ---- process the testing set.
-    const utterancesLabelsMap: { [id: string]: string[] } = {};
-    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
-    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utterancesLabelsMap, utterancesDuplicateLabelsMap, false);
+    const utteranceLabelsMap: { [id: string]: string[] } = {};
+    const utteranceLabelDuplicateMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utteranceLabelsMap, utteranceLabelDuplicateMap, false);
     Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()');
-    // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utterancesLabelsMap)=${JSON.stringify(utterancesLabelsMap)}`);
-    // ---- Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utterancesDuplicateLabelsMap))=${JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utterancesDuplicateLabelsMap))}`);
-    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of unique utterances=${Object.keys(utterancesLabelsMap).length}`);
-    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of duplicate utterance/label pairs=${utterancesDuplicateLabelsMap.size}`);
-    if (Object.entries(utterancesLabelsMap).length <= 0) {
+    // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utteranceLabelsMap)=${JSON.stringify(utteranceLabelsMap)}`);
+    // ---- Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utteranceLabelDuplicateMap))=${JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utteranceLabelDuplicateMap))}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of unique utterances=${Object.keys(utteranceLabelsMap).length}`);
+    Utility.debuggingLog(`OrchestratorTest.runAsync(), number of duplicate utterance/label pairs=${utteranceLabelDuplicateMap.size}`);
+    if (Object.entries(utteranceLabelsMap).length <= 0) {
       Utility.debuggingThrow('there is no example, something wrong?');
     }
 
     // ---- NOTE ---- integrated step to produce analysis reports.
+    Utility.resetLabelResolverSettingIgnoreSameExample(labelResolver, false);
     const evaluationOutput: {
       'evaluationReportLabelUtteranceStatistics': {
         'evaluationSummaryTemplate': string;
@@ -87,18 +88,21 @@ export class OrchestratorTest {
           'utteranceStatisticsHtml': string;};
         'utterancesMultiLabelArrays': [string, string][];
         'utterancesMultiLabelArraysHtml': string;
-        'utterancesDuplicateLabelsHtml': string; };
+        'utteranceLabelDuplicateHtml': string; };
       'evaluationReportAnalyses': {
         'evaluationSummaryTemplate': string;
         'ambiguousAnalysis': {
-          'scoringAmbiguousOutputLines': string[][];
-          'scoringAmbiguousUtterancesArraysHtml': string;};
+          'scoringAmbiguousUtterancesArrays': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;
+          'scoringAmbiguousUtteranceSimpleArrays': string[][];};
         'misclassifiedAnalysis': {
-          'scoringMisclassifiedOutputLines': string[][];
-          'scoringMisclassifiedUtterancesArraysHtml': string;};
+          'scoringMisclassifiedUtterancesArrays': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;
+          'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
         'lowConfidenceAnalysis': {
-          'scoringLowConfidenceOutputLines': string[][];
-          'scoringLowConfidenceUtterancesArraysHtml': string;};
+          'scoringLowConfidenceUtterancesArrays': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;
+          'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
         'confusionMatrixAnalysis': {
           'confusionMatrix': MultiLabelConfusionMatrix;
           'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
@@ -110,8 +114,8 @@ export class OrchestratorTest {
     Utility.generateEvaluationReport(
       labelResolver,
       trainingSetLabels,
-      utterancesLabelsMap,
-      utterancesDuplicateLabelsMap,
+      utteranceLabelsMap,
+      utteranceLabelDuplicateMap,
       labelsOutputFilename,
       testingSetScoreOutputFile,
       testingSetSummaryOutputFile);
