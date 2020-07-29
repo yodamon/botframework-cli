@@ -1232,10 +1232,10 @@ export class Utility {
 
     public static processUtteranceMultiLabelTsv(
         lines: string[],
-        utterancesLabelsMap: { [id: string]: string[] },
+        utteranceLabelsMap: { [id: string]: string[] },
         utterancesLabelsPredictedMap: { [id: string]: string[] },
-        utterancesDuplicateLabelsMap: Map<string, Set<string>>,
-        utterancesDuplicateLabelsPredictedMap: Map<string, Set<string>>,
+        utteranceLabelDuplicateMap: Map<string, Set<string>>,
+        utteranceLabelDuplicatePredictedMap: Map<string, Set<string>>,
         utteranceIndex: number = 2,
         labelsIndex: number = 0,
         labelsPredictedIndex: number = 1): boolean {
@@ -1264,8 +1264,8 @@ export class Utility {
                 Utility.addToMultiLabelUtteranceStructure(
                     utterance,
                     label.trim(),
-                    utterancesLabelsMap,
-                    utterancesDuplicateLabelsMap);
+                    utteranceLabelsMap,
+                    utteranceLabelDuplicateMap);
             }
             const labelPredictedArray: string[] = labelsPredicted.split(",");
             for (const labelPredicted of labelPredictedArray) {
@@ -1273,7 +1273,7 @@ export class Utility {
                     utterance,
                     labelPredicted.trim(),
                     utterancesLabelsPredictedMap,
-                    utterancesDuplicateLabelsPredictedMap);
+                    utteranceLabelDuplicatePredictedMap);
             }
         });
         return true;
@@ -1281,18 +1281,18 @@ export class Utility {
     public static addToMultiLabelUtteranceStructure(
         utterance: string,
         label: string,
-        utterancesLabelsMap: { [id: string]: string[] },
-        utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
-        const existingLabels: string[] = utterancesLabelsMap[utterance];
+        utteranceLabelsMap: { [id: string]: string[] },
+        utteranceLabelDuplicateMap: Map<string, Set<string>>) {
+        const existingLabels: string[] = utteranceLabelsMap[utterance];
         if (existingLabels) {
             if (!Utility.addIfNewLabel(label, existingLabels)) {
                 DictionaryMapUtility.insertStringPairToStringIdStringSetNativeMap(
                     utterance,
                     label,
-                    utterancesDuplicateLabelsMap);
+                    utteranceLabelDuplicateMap);
             }
         } else {
-            utterancesLabelsMap[utterance] = [label];
+            utteranceLabelsMap[utterance] = [label];
         }
     }
     public static addIfNewLabel(newLabel: string, labels: string[]): boolean {

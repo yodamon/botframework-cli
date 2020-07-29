@@ -51,13 +51,13 @@ export class OrchestratorEvaluate {
     }
 
     // ---- NOTE ---- retrieve examples, process the training set, retrieve labels, and create a label-index map.
-    const utterancesLabelsMap: { [id: string]: string[] } = {};
-    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+    const utteranceLabelsMap: { [id: string]: string[] } = {};
+    const utteranceLabelDuplicateMap: Map<string, Set<string>> = new Map<string, Set<string>>();
     const examples: any = labelResolver.getExamples();
     if (examples.length <= 0) {
       Utility.debuggingThrow('there is no example, something wrong?');
     }
-    Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
+    Utility.examplesToUtteranceLabelMaps(examples, utteranceLabelsMap, utteranceLabelDuplicateMap);
     Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.length=${examples.length}`);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       const examples: any = labelResolver.getExamples();
@@ -106,18 +106,21 @@ export class OrchestratorEvaluate {
           'utteranceStatisticsHtml': string;};
         'utterancesMultiLabelArrays': [string, string][];
         'utterancesMultiLabelArraysHtml': string;
-        'utterancesDuplicateLabelsHtml': string; };
+        'utteranceLabelDuplicateHtml': string; };
       'evaluationReportAnalyses': {
         'evaluationSummaryTemplate': string;
         'ambiguousAnalysis': {
-          'scoringAmbiguousOutputLines': string[][];
-          'scoringAmbiguousUtterancesArraysHtml': string;};
+          'scoringAmbiguousUtterancesArrays': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;
+          'scoringAmbiguousUtteranceSimpleArrays': string[][];};
         'misclassifiedAnalysis': {
-          'scoringMisclassifiedOutputLines': string[][];
-          'scoringMisclassifiedUtterancesArraysHtml': string;};
+          'scoringMisclassifiedUtterancesArrays': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;
+          'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
         'lowConfidenceAnalysis': {
-          'scoringLowConfidenceOutputLines': string[][];
-          'scoringLowConfidenceUtterancesArraysHtml': string;};
+          'scoringLowConfidenceUtterancesArrays': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;
+          'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
         'confusionMatrixAnalysis': {
           'confusionMatrix': MultiLabelConfusionMatrix;
           'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
@@ -129,8 +132,8 @@ export class OrchestratorEvaluate {
     Utility.generateEvaluationReport(
       labelResolver,
       labels,
-      utterancesLabelsMap,
-      utterancesDuplicateLabelsMap,
+      utteranceLabelsMap,
+      utteranceLabelDuplicateMap,
       labelsOutputFilename,
       trainingSetScoreOutputFile,
       trainingSetSummaryOutputFile);

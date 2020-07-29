@@ -62,7 +62,7 @@ export class OrchestratorBuild {
     const labelResolver: any = OrchestratorBuild.Orchestrator.createLabelResolver();
     Utility.debuggingLog('Created label resolver');
 
-    const result: any = (await OrchestratorHelper.getUtteranceLabelsMap(luFile, false)).utterancesLabelsMap;
+    const result: any = (await OrchestratorHelper.getUtteranceLabelsMap(luFile, false)).utteranceLabelsMap;
     Utility.debuggingLog(`Processed ${luFile}`);
 
     LabelResolver.addExamples(result, labelResolver);

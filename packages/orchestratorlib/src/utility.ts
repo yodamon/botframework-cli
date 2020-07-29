@@ -28,10 +28,10 @@ export class Utility {
   // eslint-disable-next-line max-params
   public static processUtteranceMultiLabelTsv(
     lines: string[],
-    utterancesLabelsMap: { [id: string]: string[] },
+    utteranceLabelsMap: { [id: string]: string[] },
     utterancesLabelsPredictedMap: { [id: string]: string[] },
-    utterancesDuplicateLabelsMap: Map<string, Set<string>>,
-    utterancesDuplicateLabelsPredictedMap: Map<string, Set<string>>,
+    utteranceLabelDuplicateMap: Map<string, Set<string>>,
+    utteranceLabelDuplicatePredictedMap: Map<string, Set<string>>,
     utteranceIndex: number = 2,
     labelsIndex: number = 0,
     labelsPredictedIndex: number = 1): boolean {
@@ -60,8 +60,8 @@ export class Utility {
         Utility.addToMultiLabelUtteranceStructure(
           utterance,
           label.trim(),
-          utterancesLabelsMap,
-          utterancesDuplicateLabelsMap);
+          utteranceLabelsMap,
+          utteranceLabelDuplicateMap);
       }
       const labelPredictedArray: string[] = labelsPredicted.split(',');
       for (const labelPredicted of labelPredictedArray) {
@@ -69,7 +69,7 @@ export class Utility {
           utterance,
           labelPredicted.trim(),
           utterancesLabelsPredictedMap,
-          utterancesDuplicateLabelsPredictedMap);
+          utteranceLabelDuplicatePredictedMap);
       }
     });
     return true;
@@ -78,18 +78,18 @@ export class Utility {
   public static addToMultiLabelUtteranceStructure(
     utterance: string,
     label: string,
-    utterancesLabelsMap: { [id: string]: string[] },
-    utterancesDuplicateLabelsMap: Map<string, Set<string>>) {
-    const existingLabels: string[] = utterancesLabelsMap[utterance];
+    utteranceLabelsMap: { [id: string]: string[] },
+    utteranceLabelDuplicateMap: Map<string, Set<string>>) {
+    const existingLabels: string[] = utteranceLabelsMap[utterance];
     if (existingLabels) {
       if (!Utility.addIfNewLabel(label, existingLabels)) {
         Utility.insertStringPairToStringIdStringSetNativeMap(
           utterance,
           label,
-          utterancesDuplicateLabelsMap);
+          utteranceLabelDuplicateMap);
       }
     } else {
-      utterancesLabelsMap[utterance] = [label];
+      utteranceLabelsMap[utterance] = [label];
     }
   }
 
@@ -149,12 +149,137 @@ export class Utility {
     return '';
   }
 
+  public static generateEmptyEvaluationReport(): {
+    'evaluationReportLabelUtteranceStatistics': {
+      'evaluationSummaryTemplate': string;
+      'labelArrayAndMap': {
+        'stringArray': string[];
+        'stringMap': {[id: string]: number};};
+      'labelStatisticsAndHtmlTable': {
+        'labelUtterancesMap': { [id: string]: string[] };
+        'labelUtterancesTotal': number;
+        'labelStatistics': string[][];
+        'labelStatisticsHtml': string;};
+      'utteranceStatisticsAndHtmlTable': {
+        'utteranceStatisticsMap': {[id: number]: number};
+        'utteranceStatistics': [string, number][];
+        'utteranceCount': number;
+        'utteranceStatisticsHtml': string;};
+      'utterancesMultiLabelArrays': [string, string][];
+      'utterancesMultiLabelArraysHtml': string;
+      'utteranceLabelDuplicateHtml': string; };
+    'evaluationReportAnalyses': {
+      'evaluationSummaryTemplate': string;
+      'ambiguousAnalysis': {
+        'scoringAmbiguousUtterancesArrays': string[][];
+        'scoringAmbiguousUtterancesArraysHtml': string;
+        'scoringAmbiguousUtteranceSimpleArrays': string[][];};
+      'misclassifiedAnalysis': {
+        'scoringMisclassifiedUtterancesArrays': string[][];
+        'scoringMisclassifiedUtterancesArraysHtml': string;
+        'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
+      'lowConfidenceAnalysis': {
+        'scoringLowConfidenceUtterancesArrays': string[][];
+        'scoringLowConfidenceUtterancesArraysHtml': string;
+        'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
+      'confusionMatrixAnalysis': {
+        'confusionMatrix': MultiLabelConfusionMatrix;
+        'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+        'scoringConfusionMatrixOutputLines': string[][];
+        'confusionMatrixMetricsHtml': string;
+        'confusionMatrixAverageMetricsHtml': string;}; };
+    'scoreStructureArray': ScoreStructure[];
+    } {
+    const evaluationOutput: {
+      'evaluationReportLabelUtteranceStatistics': {
+        'evaluationSummaryTemplate': string;
+        'labelArrayAndMap': {
+          'stringArray': string[];
+          'stringMap': {[id: string]: number};};
+        'labelStatisticsAndHtmlTable': {
+          'labelUtterancesMap': { [id: string]: string[] };
+          'labelUtterancesTotal': number;
+          'labelStatistics': string[][];
+          'labelStatisticsHtml': string;};
+        'utteranceStatisticsAndHtmlTable': {
+          'utteranceStatisticsMap': {[id: number]: number};
+          'utteranceStatistics': [string, number][];
+          'utteranceCount': number;
+          'utteranceStatisticsHtml': string;};
+        'utterancesMultiLabelArrays': [string, string][];
+        'utterancesMultiLabelArraysHtml': string;
+        'utteranceLabelDuplicateHtml': string; };
+      'evaluationReportAnalyses': {
+        'evaluationSummaryTemplate': string;
+        'ambiguousAnalysis': {
+          'scoringAmbiguousUtterancesArrays': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;
+          'scoringAmbiguousUtteranceSimpleArrays': string[][];};
+        'misclassifiedAnalysis': {
+          'scoringMisclassifiedUtterancesArrays': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;
+          'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
+        'lowConfidenceAnalysis': {
+          'scoringLowConfidenceUtterancesArrays': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;
+          'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
+        'confusionMatrixAnalysis': {
+          'confusionMatrix': MultiLabelConfusionMatrix;
+          'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+          'scoringConfusionMatrixOutputLines': string[][];
+          'confusionMatrixMetricsHtml': string;
+          'confusionMatrixAverageMetricsHtml': string;}; };
+      'scoreStructureArray': ScoreStructure[];
+    } = {
+      evaluationReportLabelUtteranceStatistics: {
+        evaluationSummaryTemplate: '',
+        labelArrayAndMap: {
+          stringArray: [],
+          stringMap: {}},
+        labelStatisticsAndHtmlTable: {
+          labelUtterancesMap: {},
+          labelUtterancesTotal: 0,
+          labelStatistics: [],
+          labelStatisticsHtml: ''},
+        utteranceStatisticsAndHtmlTable: {
+          utteranceStatisticsMap: {},
+          utteranceStatistics: [],
+          utteranceCount: 0,
+          utteranceStatisticsHtml: ''},
+        utterancesMultiLabelArrays: [],
+        utterancesMultiLabelArraysHtml: '',
+        utteranceLabelDuplicateHtml: ''},
+      evaluationReportAnalyses: {
+        evaluationSummaryTemplate: '',
+        ambiguousAnalysis: {
+          scoringAmbiguousUtterancesArrays: [],
+          scoringAmbiguousUtterancesArraysHtml: '',
+          scoringAmbiguousUtteranceSimpleArrays: []},
+        misclassifiedAnalysis: {
+          scoringMisclassifiedUtterancesArrays: [],
+          scoringMisclassifiedUtterancesArraysHtml: '',
+          scoringMisclassifiedUtterancesSimpleArrays: []},
+        lowConfidenceAnalysis: {
+          scoringLowConfidenceUtterancesArrays: [],
+          scoringLowConfidenceUtterancesArraysHtml: '',
+          scoringLowConfidenceUtterancesSimpleArrays: []},
+        confusionMatrixAnalysis: {
+          confusionMatrix: new MultiLabelConfusionMatrix([], {}),
+          multiLabelConfusionMatrixSubset: new MultiLabelConfusionMatrixSubset([], {}),
+          scoringConfusionMatrixOutputLines: [],
+          confusionMatrixMetricsHtml: '',
+          confusionMatrixAverageMetricsHtml: ''}},
+      scoreStructureArray: [],
+    };
+    return evaluationOutput;
+  }
+
   // eslint-disable-next-line max-params
   public static generateEvaluationReport(
     labelResolver: any,
     trainingSetLabels: string[],
-    utterancesLabelsMap: { [id: string]: string[] },
-    utterancesDuplicateLabelsMap: Map<string, Set<string>>,
+    utteranceLabelsMap: { [id: string]: string[] },
+    utteranceLabelDuplicateMap: Map<string, Set<string>>,
     labelsOutputFilename: string,
     evaluationSetScoreOutputFilename: string,
     evaluationSetSummaryOutputFilename: string): {
@@ -175,18 +300,21 @@ export class Utility {
           'utteranceStatisticsHtml': string;};
         'utterancesMultiLabelArrays': [string, string][];
         'utterancesMultiLabelArraysHtml': string;
-        'utterancesDuplicateLabelsHtml': string; };
+        'utteranceLabelDuplicateHtml': string; };
       'evaluationReportAnalyses': {
         'evaluationSummaryTemplate': string;
         'ambiguousAnalysis': {
-          'scoringAmbiguousOutputLines': string[][];
-          'scoringAmbiguousUtterancesArraysHtml': string;};
+          'scoringAmbiguousUtterancesArrays': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;
+          'scoringAmbiguousUtteranceSimpleArrays': string[][];};
         'misclassifiedAnalysis': {
-          'scoringMisclassifiedOutputLines': string[][];
-          'scoringMisclassifiedUtterancesArraysHtml': string;};
+          'scoringMisclassifiedUtterancesArrays': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;
+          'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
         'lowConfidenceAnalysis': {
-          'scoringLowConfidenceOutputLines': string[][];
-          'scoringLowConfidenceUtterancesArraysHtml': string;};
+          'scoringLowConfidenceUtterancesArrays': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;
+          'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
         'confusionMatrixAnalysis': {
           'confusionMatrix': MultiLabelConfusionMatrix;
           'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
@@ -214,11 +342,11 @@ export class Utility {
         'utteranceStatisticsHtml': string;};
       'utterancesMultiLabelArrays': [string, string][];
       'utterancesMultiLabelArraysHtml': string;
-      'utterancesDuplicateLabelsHtml': string;
+      'utteranceLabelDuplicateHtml': string;
     } = Utility.generateEvaluationReportLabelUtteranceStatistics(
       trainingSetLabels,
-      utterancesLabelsMap,
-      utterancesDuplicateLabelsMap);
+      utteranceLabelsMap,
+      utteranceLabelDuplicateMap);
     Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.generateEvaluationReportLabelUtteranceStatistics()');
 
     // ---- NOTE ---- output the labels by their index order to a file.
@@ -230,7 +358,7 @@ export class Utility {
 
     // ---- NOTE ---- collect utterance prediction and scores.
     Utility.debuggingLog('Utility.generateEvaluationReport(), ready to call Utility.score()');
-    const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utterancesLabelsMap);
+    const utteranceLabelsPairArray: [string, string[]][] = Object.entries(utteranceLabelsMap);
     const scoreStructureArray: ScoreStructure[] = Utility.score(
       labelResolver,
       utteranceLabelsPairArray,
@@ -242,14 +370,17 @@ export class Utility {
     const evaluationReportAnalyses: {
       'evaluationSummaryTemplate': string;
       'ambiguousAnalysis': {
-        'scoringAmbiguousOutputLines': string[][];
-        'scoringAmbiguousUtterancesArraysHtml': string;};
+        'scoringAmbiguousUtterancesArrays': string[][];
+        'scoringAmbiguousUtterancesArraysHtml': string;
+        'scoringAmbiguousUtteranceSimpleArrays': string[][];};
       'misclassifiedAnalysis': {
-        'scoringMisclassifiedOutputLines': string[][];
-        'scoringMisclassifiedUtterancesArraysHtml': string;};
+        'scoringMisclassifiedUtterancesArrays': string[][];
+        'scoringMisclassifiedUtterancesArraysHtml': string;
+        'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
       'lowConfidenceAnalysis': {
-        'scoringLowConfidenceOutputLines': string[][];
-        'scoringLowConfidenceUtterancesArraysHtml': string;};
+        'scoringLowConfidenceUtterancesArrays': string[][];
+        'scoringLowConfidenceUtterancesArraysHtml': string;
+        'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
       'confusionMatrixAnalysis': {
         'confusionMatrix': MultiLabelConfusionMatrix;
         'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
@@ -295,8 +426,8 @@ export class Utility {
 
   public static generateEvaluationReportLabelUtteranceStatistics(
     trainingSetLabels: string[],
-    utterancesLabelsMap: { [id: string]: string[] },
-    utterancesDuplicateLabelsMap: Map<string, Set<string>>): {
+    utteranceLabelsMap: { [id: string]: string[] },
+    utteranceLabelDuplicateMap: Map<string, Set<string>>): {
       'evaluationSummaryTemplate': string;
       'labelArrayAndMap': {
         'stringArray': string[];
@@ -313,7 +444,7 @@ export class Utility {
         'utteranceStatisticsHtml': string;};
       'utterancesMultiLabelArrays': [string, string][];
       'utterancesMultiLabelArraysHtml': string;
-      'utterancesDuplicateLabelsHtml': string;
+      'utteranceLabelDuplicateHtml': string;
     } {
     // ---- NOTE ---- create a label-index map.
     const labelArrayAndMap: {
@@ -336,7 +467,7 @@ export class Utility {
       'labelStatistics': string[][];
       'labelStatisticsHtml': string;
     } = Utility.generateLabelStatisticsAndHtmlTable(
-      utterancesLabelsMap,
+      utteranceLabelsMap,
       labelArrayAndMap);
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
     // ---- NOTE ---- generate utterance statistics
@@ -345,7 +476,7 @@ export class Utility {
       'utteranceStatistics': [string, number][];
       'utteranceCount': number;
       'utteranceStatisticsHtml': string; } = Utility.generateUtteranceStatisticsAndHtmlTable(
-        utterancesLabelsMap);
+        utteranceLabelsMap);
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
     // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
     const intentsUtterancesStatisticsHtml: string =
@@ -354,20 +485,20 @@ export class Utility {
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finished generating {INTENTUTTERANCESTATISTICS} content');
 
     // ---- NOTE ---- generate duplicate report.
-    const utterancesMultiLabelArrays: [string, string][] = Object.entries(utterancesLabelsMap).filter(
+    const utterancesMultiLabelArrays: [string, string][] = Object.entries(utteranceLabelsMap).filter(
       (x: [string, string[]]) => x[1].length > 1).map((x: [string, string[]]) => [x[0], x[1].join(',')]);
     const utterancesMultiLabelArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Multi-label utterances and their intents',
       utterancesMultiLabelArrays,
       ['Utterance', 'Intents']);
     // ---- NOTE ---- generate duplicate report.
-    const utterancesDuplicateLabelsHtml: string = Utility.convertMapSetToIndexedHtmlTable(
+    const utteranceLabelDuplicateHtml: string = Utility.convertMapSetToIndexedHtmlTable(
       'Duplicate utterance and intent pairs',
-      utterancesDuplicateLabelsMap,
+      utteranceLabelDuplicateMap,
       ['Utterance', 'Intent']);
     // ---- NOTE ---- create the evaluation DUPLICATES summary from template.
     const duplicateStatisticsHtml: string =
-      utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
+      utterancesMultiLabelArraysHtml + utteranceLabelDuplicateHtml;
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
     Utility.debuggingLog('Utility.generateEvaluationReportLabelUtteranceStatistics(), finished generating {DUPLICATES} content');
 
@@ -379,7 +510,7 @@ export class Utility {
       utteranceStatisticsAndHtmlTable,
       utterancesMultiLabelArrays,
       utterancesMultiLabelArraysHtml,
-      utterancesDuplicateLabelsHtml};
+      utteranceLabelDuplicateHtml};
   }
 
   public static generateEvaluationReportAnalyses(
@@ -390,14 +521,17 @@ export class Utility {
     scoreStructureArray: ScoreStructure[]): {
       'evaluationSummaryTemplate': string;
       'ambiguousAnalysis': {
-        'scoringAmbiguousOutputLines': string[][];
-        'scoringAmbiguousUtterancesArraysHtml': string;};
+        'scoringAmbiguousUtterancesArrays': string[][];
+        'scoringAmbiguousUtterancesArraysHtml': string;
+        'scoringAmbiguousUtteranceSimpleArrays': string[][];};
       'misclassifiedAnalysis': {
-        'scoringMisclassifiedOutputLines': string[][];
-        'scoringMisclassifiedUtterancesArraysHtml': string;};
+        'scoringMisclassifiedUtterancesArrays': string[][];
+        'scoringMisclassifiedUtterancesArraysHtml': string;
+        'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
       'lowConfidenceAnalysis': {
-        'scoringLowConfidenceOutputLines': string[][];
-        'scoringLowConfidenceUtterancesArraysHtml': string;};
+        'scoringLowConfidenceUtterancesArrays': string[][];
+        'scoringLowConfidenceUtterancesArraysHtml': string;
+        'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
       'confusionMatrixAnalysis': {
         'confusionMatrix': MultiLabelConfusionMatrix;
         'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
@@ -407,8 +541,9 @@ export class Utility {
     } {
     // ---- NOTE ---- generate ambiguous HTML.
     const ambiguousAnalysis: {
-      'scoringAmbiguousOutputLines': string[][];
+      'scoringAmbiguousUtterancesArrays': string[][];
       'scoringAmbiguousUtterancesArraysHtml': string;
+      'scoringAmbiguousUtteranceSimpleArrays': string[][];
     } = Utility.generateAmbiguousStatisticsAndHtmlTable(
       scoreStructureArray);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', ambiguousAnalysis.scoringAmbiguousUtterancesArraysHtml);
@@ -416,8 +551,9 @@ export class Utility {
 
     // ---- NOTE ---- generate misclassified HTML.
     const misclassifiedAnalysis: {
-      'scoringMisclassifiedOutputLines': string[][];
+      'scoringMisclassifiedUtterancesArrays': string[][];
       'scoringMisclassifiedUtterancesArraysHtml': string;
+      'scoringMisclassifiedUtterancesSimpleArrays': string[][];
     } = Utility.generateMisclassifiedStatisticsAndHtmlTable(
       scoreStructureArray);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{MISCLASSIFICATION}', misclassifiedAnalysis.scoringMisclassifiedUtterancesArraysHtml);
@@ -425,8 +561,9 @@ export class Utility {
 
     // ---- NOTE ---- generate low-confidence HTML.
     const lowConfidenceAnalysis: {
-      'scoringLowConfidenceOutputLines': string[][];
+      'scoringLowConfidenceUtterancesArrays': string[][];
       'scoringLowConfidenceUtterancesArraysHtml': string;
+      'scoringLowConfidenceUtterancesSimpleArrays': string[][];
     } = Utility.generateLowConfidenceStatisticsAndHtmlTable(
       scoreStructureArray);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', lowConfidenceAnalysis.scoringLowConfidenceUtterancesArraysHtml);
@@ -659,60 +796,81 @@ export class Utility {
 
   public static generateLowConfidenceStatisticsAndHtmlTable(
     scoreStructureArray: ScoreStructure[]): {
-      'scoringLowConfidenceOutputLines': string[][];
+      'scoringLowConfidenceUtterancesArrays': string[][];
       'scoringLowConfidenceUtterancesArraysHtml': string;
+      'scoringLowConfidenceUtterancesSimpleArrays': string[][];
     } {
-    const scoringLowConfidenceOutputLines: string[][] = [];
+    const scoringLowConfidenceUtterancesArrays: string[][] = [];
+    const scoringLowConfidenceUtterancesSimpleArrays: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
       if (scoreStructure) {
         const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
         const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
-        const scoreOutputLine: any[] = [
+        const scoringLowConfidenceUtterancesArray: any[] = [
           scoreStructure.utterance,
           labelsScoreStructureHtmlTable,
           labelsPredictedConcatenated,
         ];
-        scoringLowConfidenceOutputLines.push(scoreOutputLine);
+        scoringLowConfidenceUtterancesArrays.push(scoringLowConfidenceUtterancesArray);
+        const labelsConcatenated: string = scoreStructure.labelsConcatenated;
+        const scoringLowConfidenceUtterancesSimpleArray: any[] = [
+          scoreStructure.utterance,
+          labelsConcatenated,
+          labelsPredictedConcatenated,
+        ];
+        scoringLowConfidenceUtterancesSimpleArrays.push(scoringLowConfidenceUtterancesSimpleArray);
       }
     }
     const scoringLowConfidenceUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Low confidence utterances and their intents',
-      scoringLowConfidenceOutputLines,
+      scoringLowConfidenceUtterancesArrays,
       ['Utterance', 'Intents', 'Predictions']);
-    return {scoringLowConfidenceOutputLines, scoringLowConfidenceUtterancesArraysHtml};
+    return {scoringLowConfidenceUtterancesArrays, scoringLowConfidenceUtterancesArraysHtml, scoringLowConfidenceUtterancesSimpleArrays};
   }
 
   public static generateMisclassifiedStatisticsAndHtmlTable(
     scoreStructureArray: ScoreStructure[]): {
-      'scoringMisclassifiedOutputLines': string[][];
+      'scoringMisclassifiedUtterancesArrays': string[][];
       'scoringMisclassifiedUtterancesArraysHtml': string;
+      'scoringMisclassifiedUtterancesSimpleArrays': string[][];
     } {
-    const scoringMisclassifiedOutputLines: string[][] = [];
+    const scoringMisclassifiedUtterancesArrays: string[][] = [];
+    const scoringMisclassifiedUtterancesSimpleArrays: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => (x.labelsPredictedEvaluation === 1) || (x.labelsPredictedEvaluation === 2))) {
       if (scoreStructure) {
         const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
         const predictedScoreStructureHtmlTable: string = scoreStructure.predictedScoreStructureHtmlTable;
-        const scoreOutputLine: string[] = [
+        const scoringMisclassifiedUtterancesArray: string[] = [
           scoreStructure.utterance,
           labelsScoreStructureHtmlTable,
           predictedScoreStructureHtmlTable,
         ];
-        scoringMisclassifiedOutputLines.push(scoreOutputLine);
+        scoringMisclassifiedUtterancesArrays.push(scoringMisclassifiedUtterancesArray);
+        const labelsConcatenated: string = scoreStructure.labelsConcatenated;
+        const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
+        const scoringMisclassifiedUtterancesSimpleArray: string[] = [
+          scoreStructure.utterance,
+          labelsConcatenated,
+          labelsPredictedConcatenated,
+        ];
+        scoringMisclassifiedUtterancesSimpleArrays.push(scoringMisclassifiedUtterancesSimpleArray);
       }
     }
     const scoringMisclassifiedUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Misclassified utterances and their intents',
-      scoringMisclassifiedOutputLines,
+      scoringMisclassifiedUtterancesArrays,
       ['Utterance', 'Intents', 'Predictions']);
-    return {scoringMisclassifiedOutputLines, scoringMisclassifiedUtterancesArraysHtml};
+    return {scoringMisclassifiedUtterancesArrays, scoringMisclassifiedUtterancesArraysHtml, scoringMisclassifiedUtterancesSimpleArrays};
   }
 
   public static generateAmbiguousStatisticsAndHtmlTable(
     scoreStructureArray: ScoreStructure[]): {
-      'scoringAmbiguousOutputLines': string[][];
+      'scoringAmbiguousUtterancesArrays': string[][];
       'scoringAmbiguousUtterancesArraysHtml': string;
+      'scoringAmbiguousUtteranceSimpleArrays': string[][];
     } {
-    const scoringAmbiguousOutputLines: string[][] = [];
+    const scoringAmbiguousUtterancesArrays: string[][] = [];
+    const scoringAmbiguousUtteranceSimpleArrays: string[][] = [];
     for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)))) {
       if (scoreStructure) {
         const predictedScore: number = scoreStructure.labelsPredictedScore;
@@ -730,21 +888,28 @@ export class Utility {
             ['Label', 'Score', 'Closest Example'],
             ['30%', '10%', '60%'],
             scoreArrayAmbiguous.map((x: number[]) => x[0]));
-          const scoringAmbiguousOutputLine: any[] = [
+          const scoringAmbiguousUtterancesArray: string[] = [
             scoreStructure.utterance,
             labelsScoreStructureHtmlTable,
             labelsPredictedConcatenated,
             ambiguousScoreStructureHtmlTable,
           ];
-          scoringAmbiguousOutputLines.push(scoringAmbiguousOutputLine);
+          const labelsConcatenated: string = scoreStructure.labelsConcatenated;
+          scoringAmbiguousUtterancesArrays.push(scoringAmbiguousUtterancesArray);
+          const scoringAmbiguousUtterancesSimpleArray: string[] = [
+            scoreStructure.utterance,
+            labelsConcatenated,
+            labelsPredictedConcatenated,
+          ];
+          scoringAmbiguousUtteranceSimpleArrays.push(scoringAmbiguousUtterancesSimpleArray);
         }
       }
     }
     const scoringAmbiguousUtterancesArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
       'Ambiguous utterances and their intents',
-      scoringAmbiguousOutputLines,
+      scoringAmbiguousUtterancesArrays,
       ['Utterance', 'Intents', 'Predictions', 'Close Predictions']);
-    return {scoringAmbiguousOutputLines, scoringAmbiguousUtterancesArraysHtml};
+    return {scoringAmbiguousUtterancesArrays, scoringAmbiguousUtterancesArraysHtml, scoringAmbiguousUtteranceSimpleArrays};
   }
 
   public static score(
@@ -848,12 +1013,12 @@ export class Utility {
   }
 
   public static generateUtteranceStatisticsAndHtmlTable(
-    utterancesLabelsMap: { [id: string]: string[] }): {
+    utteranceLabelsMap: { [id: string]: string[] }): {
       'utteranceStatisticsMap': {[id: number]: number};
       'utteranceStatistics': [string, number][];
       'utteranceCount': number;
       'utteranceStatisticsHtml': string; } {
-    const utteranceStatisticsMap: {[id: number]: number} = Object.entries(utterancesLabelsMap).map(
+    const utteranceStatisticsMap: {[id: number]: number} = Object.entries(utteranceLabelsMap).map(
       (x: [string, string[]]) => [1, x[1].length]).reduce(
       (accumulant: {[id: number]: number}, entry: number[]) => {
         const count: number = entry[0];
@@ -886,7 +1051,7 @@ export class Utility {
   }
 
   public static generateLabelStatisticsAndHtmlTable(
-    utterancesLabelsMap: { [id: string]: string[] },
+    utteranceLabelsMap: { [id: string]: string[] },
     labelArrayAndMap: {
       'stringArray': string[];
       'stringMap': {[id: string]: number};}): {
@@ -896,7 +1061,7 @@ export class Utility {
         'labelStatisticsHtml': string;
       } {
     // ---- NOTE ---- generate label statistics.
-    const labelUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utterancesLabelsMap);
+    const labelUtterancesMap: { [id: string]: string[] } = Utility.reverseUniqueKeyedArray(utteranceLabelsMap);
     const labelUtterancesTotal: number = Object.entries(labelUtterancesMap).reduce(
       (accumulant: number, x: [string, string[]]) => accumulant + x[1].length, 0);
     const labelStatistics: string[][] = Object.entries(labelUtterancesMap).sort(
@@ -1234,8 +1399,8 @@ export class Utility {
 
   public static examplesToUtteranceLabelMaps(
     examples: any,
-    utterancesLabelsMap: { [id: string]: string[] },
-    utterancesDuplicateLabelsMap: Map<string, Set<string>>): void {
+    utteranceLabelsMap: { [id: string]: string[] },
+    utteranceLabelDuplicateMap: Map<string, Set<string>>): void {
     const exampleStructureArray: Example[] = Utility.examplesToArray(examples);
     for (const example of exampleStructureArray) {
       const utterance: string = example.text;
@@ -1245,8 +1410,8 @@ export class Utility {
           utterance,
           label.name,
           '',
-          utterancesLabelsMap,
-          utterancesDuplicateLabelsMap);
+          utteranceLabelsMap,
+          utteranceLabelDuplicateMap);
       }
     }
   }
