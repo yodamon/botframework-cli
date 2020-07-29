@@ -10,7 +10,7 @@ const Zip: any = require('node-7z-forall');
 const fetch: any = require('node-fetch');
 
 export class OrchestratorNlr {
-  public static async getAsync(nlrPath: string, versionId: string, onFinish: any = null) {
+  public static async getAsync(nlrPath: string, versionId: string, onProgress: any = OrchestratorNlr.defaultHandler, onFinish: any = OrchestratorNlr.defaultHandler) {
     try {
       if (nlrPath) {
         nlrPath = path.resolve(nlrPath);
@@ -24,6 +24,7 @@ export class OrchestratorNlr {
       Utility.debuggingLog(`Nlr path: ${nlrPath}`);
 
       const versions: any = await OrchestratorNlr.getNlrVersionsAsync();
+      onProgress(`Downloading model...`)
       if (!versions) {
         throw new Error('Failed getting nlr_versions.json');
       }
@@ -44,16 +45,20 @@ export class OrchestratorNlr {
         throw new Error(`Failed downloading model version ${versionId}`);
       });
       fileStream.on('finish', () => {
+        onProgress(`Model downloaded...`)
         Utility.debuggingLog(`Finished downloading model version ${versionId}`);
         const seven: any = new Zip();
-        seven.extractFull(modelZipPath, nlrPath).then(() => {
-          Utility.debuggingLog(`Finished extracting model version ${versionId}`);
-          OrchestratorNlr.moveFiles(modelFolder, nlrPath);
-          Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
-          fs.rmdirSync(modelFolder);
-          Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
-          onFinish();
-        });
+        onProgress(`Extracting...`)
+        seven.extractFull(modelZipPath, nlrPath)
+          .then(() => {
+            onProgress(`Cleaning up...`)
+            Utility.debuggingLog(`Finished extracting model version ${versionId}`);
+            OrchestratorNlr.moveFiles(modelFolder, nlrPath);
+            Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
+            OrchestratorNlr.deleteFolderRecursive(modelFolder);
+            Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
+            onFinish();
+          });
       });
     } catch (error) {
       throw new Error(error);
@@ -77,4 +82,23 @@ export class OrchestratorNlr {
       Utility.moveFile(currentItemPath, targetDir);
     }
   }
+
+  private static defaultHandler()
+  {
+
+  }
+
+  private static deleteFolderRecursive (path:string) {
+    if( fs.existsSync(path) ) {
+      fs.readdirSync(path).forEach(function(file,index){
+        var curPath = path + "/" + file;
+        if(fs.lstatSync(curPath).isDirectory()) { // recurse
+          OrchestratorNlr.deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  };
 }

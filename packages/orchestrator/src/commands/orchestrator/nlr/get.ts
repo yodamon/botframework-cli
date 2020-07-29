@@ -11,15 +11,16 @@ export default class OrchestratorNlrGet extends Command {
   static description: string = 'Gets Orchestrator model'
 
   static flags: flags.Input<any> = {
-    output: flags.string({char: 'o', description: 'Path to Orchestrator model.'}),
+    out: flags.string({char: 'o', description: 'Path to Orchestrator model.'}),
     versionId: flags.string({description: 'Model version to download.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h', description: 'Orchestrator nlr:get command help'}),
+    verbose: flags.boolean({char: 'v', description: 'Enable verbose logging', default: false})
   }
 
   async run() {
     const {flags}: flags.Output = this.parse(OrchestratorNlrGet);
-    const output: string = flags.output || __dirname;
+    const output: string = flags.out || __dirname;
     const versionId: any = flags.versionId;
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
@@ -28,8 +29,14 @@ export default class OrchestratorNlrGet extends Command {
       OrchestratorSettings.init(__dirname, output, '', __dirname);
       await Orchestrator.nlrGetAsync(
         OrchestratorSettings.ModelPath,
-        versionId, () => {
-          this.log(`Finish downloading model ${versionId} to ${output}`);
+        versionId,
+        (message) => {
+          if (flags.verbose) {
+            this.log(message);
+          }
+        },
+        () => {
+          this.log(`Model ${versionId} downloaded to ${output}`);
         });
     } catch (error) {
       throw (new CLIError(error));

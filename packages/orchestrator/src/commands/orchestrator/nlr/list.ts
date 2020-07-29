@@ -12,6 +12,7 @@ export default class OrchestratorNlrList extends Command {
 
   static flags: flags.Input<any> = {
     help: flags.help({char: 'h', description: 'Orchestrator nlr:list command help'}),
+    raw: flags.boolean({char: 'r', description: 'Raw output', default: false}),
   }
 
   async run() {
@@ -21,7 +22,20 @@ export default class OrchestratorNlrList extends Command {
 
     try {
       const json: string = await Orchestrator.nlrListAsync();
-      this.log(json);
+      if (!flags.raw) {
+        const nlrList = JSON.parse(json);
+        let output = `\n\nAvailable models:\n\n`;
+        Object.getOwnPropertyNames(nlrList.models).forEach(key => {
+          output += `\n${key}\n`;
+          output += `\t Version Id:   ${key}\n`;
+          output += `\t Release date: ${nlrList.models[key].releaseDate}\n`;
+          output += `\t Description:  ${nlrList.models[key].description}\n`;
+        })
+        this.log(output);
+      } else {
+        this.log(json);
+      }
+      
     } catch (error) {
       throw (new CLIError(error));
     }

@@ -1424,9 +1424,6 @@ export class Utility {
   public static moveFile(file: string, targetDir: string) {
     const f: string = path.basename(file);
     const dest: string = path.resolve(targetDir, f);
-
-    fs.rename(file, dest, (err: any) => {
-      if (err) throw err;
-    });
+    fs.renameSync(file, dest);
   }
 }
