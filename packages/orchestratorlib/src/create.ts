@@ -7,7 +7,6 @@ import * as path from 'path';
 import {Utility} from './utility';
 import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
-import { existsSync } from 'fs';
 
 export class OrchestratorCreate {
   public static async runAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false) {
@@ -37,25 +36,12 @@ export class OrchestratorCreate {
 
   private static getOutputPath(out: string, base: string)
   {
-    console.log(`Processing ${out} and ${base}`);
     let retValue = out;
-    if (existsSync(out)) {
-      console.log(`${out} exists...`)
-      // if (lstatSync(out).isDirectory()) {
-      //   console.log(`${out} isDirectory()...`)
-      //   // need to append file name
-      //   if (lstatSync(base).isDirectory()) {
-      //     console.log(`${base} isDirectory()...`)
-      //     retValue = path.join(out, `orchestrator.blu`);
-      //   } else {
-      //     console.log(`${base} is file name...`)
-      //     const srcBaseFileName = path.basename(base);
-      //     const dstBaseFileName = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
-      //     retValue = path.join(out, dstBaseFileName, '.blu');
-      //   }
-      // } 
+    if (!out.endsWith(`.blu`)) {
+      const srcBaseFileName = path.basename(base);
+      const dstBaseFileName = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
+      retValue = path.join(out, `${dstBaseFileName}.blu`);
     }
-    console.log(`returning ${retValue}....`);
     return retValue;
   }
 }
