@@ -34,7 +34,7 @@ export class OrchestratorNlr {
         throw new Error(`Model info for version ${versionId} not found`);
       }
 
-      const url: string = modelInfo.onnxModelUri;
+      const url: string = modelInfo.modelUri;
       const fileName: string = url.substring(url.lastIndexOf('/') + 1);
       const modelFolder: string = path.join(nlrPath, path.basename(fileName, '.7z'));
       const res: any = await fetch(url);
