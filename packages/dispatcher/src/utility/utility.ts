@@ -2089,13 +2089,28 @@ export class Utility {
         return JSON.stringify(jsonObject, null, indents);
     }
 
+    public static writeLineToConsoleStdout(outputContents: string) {
+        Utility.writeToConsoleStdout(`${outputContents}\n`);
+    }
+    public static writeLineToConsoleStderr(outputContents: string) {
+        Utility.writeToConsoleStderr(`${outputContents}\n`);
+    }
+
+    public static writeToConsoleStdout(outputContents: string) {
+        process.stdout.write(outputContents);
+    }
+    public static writeToConsoleStderr(outputContents: string) {
+        process.stderr.write(outputContents);
+    }
+
     public static debuggingLog(
         message: any): string {
         const dateTimeString: string = (new Date()).toISOString();
-        const logMessage: string = `[${dateTimeString}] LOG-MESSAGE: ${message}`;
+        const logMessage: string = `[${dateTimeString}] LOG-MESSAGE: ${Utility.jsonStringify(message)}`;
         if (Utility.toPrintDebuggingLogToConsole) {
-            // tslint:disable-next-line:no-console
-            console.log(logMessage);
+        // eslint-disable-next-line no-console
+        // tslint:disable-next-line: no-console
+        console.log(logMessage);
         }
         return logMessage;
     }
@@ -2103,8 +2118,11 @@ export class Utility {
     public static debuggingThrow(
         message: any): void {
         const dateTimeString: string = (new Date()).toISOString();
-        const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${message}`;
-        throw new Error(Utility.jsonStringify(logMessage));
+        const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${Utility.jsonStringify(message)}`;
+        const error: Error = new Error(logMessage);
+        const stackTrace: string = error.stack as string;
+        Utility.debuggingLog(stackTrace);
+        throw error;
     }
 
     public static almostEqual(first: number, second: number): boolean {

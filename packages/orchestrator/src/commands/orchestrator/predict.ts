@@ -12,13 +12,13 @@ export default class OrchestratorPredict extends Command {
 
   static examples: Array<string> = [`
     $ bf orchestrator:predict 
-    $ bf orchestrator:predict --label ./path/to/file/
-    $ bf orchestrator:predict --label ./path/to/file/ --out ./path/to/output/`]
+    $ bf orchestrator:predict --in ./path/to/file/
+    $ bf orchestrator:predict --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    label: flags.string({char: 'l', description: 'Path to a label file from where Orchestrator examples will be created from.'}),
-    out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
-    model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),
+    in: flags.string({char: 'l', description: 'Path to a previously created Orchestrator .blu file. Optional.'}),
+    out: flags.string({char: 'o', description: 'Directory where analysis files will be placed.'}),
+    model: flags.string({char: 'm', description: 'Directory or a config file hosting Orchestrator model files.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }
@@ -26,7 +26,7 @@ export default class OrchestratorPredict extends Command {
   async run(): Promise<number> {
     const {flags}: flags.Output = this.parse(OrchestratorPredict);
 
-    const labelPath: string = flags.label;
+    const inputPath: string = flags.in;
     const outputPath: string = flags.out;
     let nlrPath: string = flags.model;
     if (nlrPath) {
@@ -35,12 +35,12 @@ export default class OrchestratorPredict extends Command {
 
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    Utility.debuggingLog(`OrchestratorPredict.run(): labelPath=${labelPath}`);
+    Utility.debuggingLog(`OrchestratorPredict.run(): inputPath=${inputPath}`);
     Utility.debuggingLog(`OrchestratorPredict.run(): outputPath=${outputPath}`);
     Utility.debuggingLog(`OrchestratorPredict.run(): nlrPath=${nlrPath}`);
 
     try {
-      await Orchestrator.predictAsync(nlrPath, labelPath, outputPath);
+      await Orchestrator.predictAsync(nlrPath, inputPath, outputPath);
     } catch (error) {
       throw (new CLIError(error));
     }

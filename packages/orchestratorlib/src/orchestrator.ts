@@ -43,8 +43,8 @@ export class Orchestrator {
     return OrchestratorNlr.listAsync();
   }
 
-  public static async predictAsync(nlrPath: string, labelPath: string, outputPath: string): Promise<void> {
-    await OrchestratorPredict.runAsync(nlrPath, labelPath, outputPath);
+  public static async predictAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
+    await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath);
   }
 
   public static async testAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string): Promise<void> {

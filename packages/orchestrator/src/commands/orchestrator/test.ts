@@ -16,10 +16,10 @@ export default class OrchestratorTest extends Command {
     $ bf orchestrator:evaluate --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'Path to source .blu file from where Orchestrator examples will be created from.'}),
-    test: flags.string({char: 't', description: 'The path to test label file from where orchestrator examples will be created from.'}),
-    out: flags.string({char: 'o', description: 'Path to directory where analysis output files will be placed.'}),
-    model: flags.string({char: 'm', description: 'Path to directory hosting Orchestrator model.'}),
+    in: flags.string({char: 'i', description: 'Path to a previously created Orchestrator .blu file.'}),
+    test: flags.string({char: 't', description: 'Path to a test file.'}),
+    out: flags.string({char: 'o', description: 'Directory where analysis files will be placed.'}),
+    model: flags.string({char: 'm', description: 'Directory or a config file hosting Orchestrator model files.'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }

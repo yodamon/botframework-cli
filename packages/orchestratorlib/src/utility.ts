@@ -101,7 +101,7 @@ export class Utility {
     } = {
       ignore_same_example: ignoreSameExample,
     };
-    labelResolver.setRuntimeParams(Utility.jsonstringify(ignoreSameExampleObject), false);
+    labelResolver.setRuntimeParams(Utility.jsonStringify(ignoreSameExampleObject), false);
     return Utility.getLabelResolverSettings(labelResolver);
   }
 
@@ -138,7 +138,7 @@ export class Utility {
         // eslint-disable-next-line max-depth
         if ((labelIndex < 0) || (labelIndex >= labelArray.length)) {
           const errorMessage: string =
-            `The label index "${labelIndex}" you entered is not in range, label-index map: ${Utility.jsonstringify(currentLabelArrayAndMap.stringMap)}`;
+            `The label index "${labelIndex}" you entered is not in range, label-index map: ${Utility.jsonStringify(currentLabelArrayAndMap.stringMap)}`;
           return errorMessage;
         }
         intentLabelArray.push(labelArray[labelIndex]);
@@ -1564,8 +1564,16 @@ export class Utility {
       (accumulant: number,  value: [string, string[]]) => accumulant + value[1].length, 0);
   }
 
-  public static jsonstringify(input: any): string {
-    return JSON.stringify(input, null, 4);
+  public static jsonStringifyInLine(
+    value: any): string {
+    return Utility.jsonStringify(value, null, '');
+  }
+
+  public static jsonStringify(
+    value: any,
+    replacer: Array<number | string> | null = null,
+    space: string | number = 4): string {
+    return JSON.stringify(value, replacer, space);
   }
 
   public static loadFile(
@@ -1606,15 +1614,34 @@ export class Utility {
     return fs.existsSync(pathToFileSystemEntry);
   }
 
+  public static moveFile(filename: string, targetDir: string) {
+    const filebasename: string = path.basename(filename);
+    const destination: string = path.resolve(targetDir, filebasename);
+    fs.renameSync(filename, destination);
+  }
+
   public static writeToConsole(outputContents: string) {
     const output: string = JSON.stringify(outputContents, null, 2);
     process.stdout.write(`${output}\n`);
   }
 
+  public static writeToConsoleStderr(outputContents: string) {
+    const output: string = JSON.stringify(outputContents, null, 2);
+    process.stderr.write(`${output}\n`);
+  }
+
+  public static writeLineToConsole(outputContents: string) {
+    process.stdout.write(`${outputContents}\n`);
+  }
+
+  public static writeLineToConsoleStderr(outputContents: string) {
+    process.stderr.write(`${outputContents}\n`);
+  }
+
   public static debuggingLog(
     message: any): string {
     const dateTimeString: string = (new Date()).toISOString();
-    const logMessage: string = `[${dateTimeString}] LOG-MESSAGE: ${message}`;
+    const logMessage: string = `[${dateTimeString}] LOG-MESSAGE: ${Utility.jsonStringify(message)}`;
     if (Utility.toPrintDebuggingLogToConsole) {
       // eslint-disable-next-line no-console
       console.log(logMessage);
@@ -1625,16 +1652,10 @@ export class Utility {
   public static debuggingThrow(
     message: any): void {
     const dateTimeString: string = (new Date()).toISOString();
-    const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${message}`;
-    const error: Error = new Error(Utility.jsonstringify(logMessage));
+    const logMessage: string = `[${dateTimeString}] ERROR-MESSAGE: ${Utility.jsonStringify(message)}`;
+    const error: Error = new Error(logMessage);
     const stackTrace: string = error.stack as string;
     Utility.debuggingLog(stackTrace);
     throw error;
-  }
-
-  public static moveFile(file: string, targetDir: string) {
-    const f: string = path.basename(file);
-    const dest: string = path.resolve(targetDir, f);
-    fs.renameSync(file, dest);
   }
 }

@@ -19,7 +19,7 @@ export class OrchestratorEvaluate {
   public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = ''): Promise<void> {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
-      Utility.debuggingThrow('Please provide path to input file/folder');
+      Utility.debuggingThrow('Please provide path to an input .blu file');
     }
     if (Utility.isEmptyString(outputPath)) {
       Utility.debuggingThrow('Please provide an output directory');
@@ -30,7 +30,7 @@ export class OrchestratorEvaluate {
       nlrPath = '';
     }
     // ---- NOTE ---- load the training set
-    const trainingFile: string = path.join(inputPath, 'orchestrator.blu');
+    const trainingFile: string = inputPath;
     if (!Utility.exists(trainingFile)) {
       Utility.debuggingThrow(`training set file does not exist, trainingFile=${trainingFile}`);
     }
@@ -139,7 +139,7 @@ export class OrchestratorEvaluate {
       trainingSetScoreOutputFile,
       trainingSetSummaryOutputFile);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
-      Utility.debuggingLog(`evaluationOutput=${Utility.jsonstringify(evaluationOutput)}`);
+      Utility.debuggingLog(`evaluationOutput=${Utility.jsonStringify(evaluationOutput)}`);
     }
 
     // ---- NOTE ---- THE END

@@ -5,6 +5,8 @@
 
 import assert = require('assert');
 
+import {} from 'mocha';
+
 import {Utility} from '../src/utility';
 
 export class UnitTestHelper {
@@ -22,14 +24,14 @@ export class UnitTestHelper {
 }
 
 describe('Test Suite - utility', () => {
-  it('Test.0000 exampleFunctionUtility()', function () {
+  it('Test.0000 Utility.exists()', function () {
     Utility.toPrintDebuggingLogToConsole = true; // UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
     this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
     Utility.debuggingLog(
       `process.cwd()=${process.cwd()}`);
-    Utility.debuggingLog(
-      `process.argv=${process.argv}`);
-    // const filename: string = '../src/resources/data/Email.txt';
+    const doesExist: boolean = Utility.exists('resources/data/Columnar/Email.txt');
+    Utility.debuggingLog(`doesExist=${doesExist}`);
+    assert.ok(doesExist);
   });
 });
 
