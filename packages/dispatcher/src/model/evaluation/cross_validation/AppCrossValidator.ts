@@ -108,6 +108,8 @@ export function mainCrossValidatorWithData(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
     return crossValidator;
@@ -199,6 +201,8 @@ export async function mainCrossValidatorWithLuContent(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
     return crossValidator;
@@ -302,6 +306,8 @@ export function mainCrossValidatorWithColumnarContent(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
     return crossValidator;

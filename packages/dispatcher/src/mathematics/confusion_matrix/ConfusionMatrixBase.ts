@@ -44,6 +44,17 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             "averageFalseNegatives": number,
             "averageSupport": number,
             "support": number },
+        "positiveSupportLabelMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "support": number },
         "weightedMacroAverageMetrics": {
             "weightedAveragePrecision": number,
             "weightedAverageRecall": number,
@@ -162,6 +173,69 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             "averageSupport": averageSupport,
             // tslint:disable-next-line: object-literal-key-quotes
             "support": supportMacroAverage };
+        const positiveSupportLabelMacroAverageMetricArray: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices);
+        const positiveSupportLabelAveragePrecision: number =
+            positiveSupportLabelMacroAverageMetricArray.averagePrecision;
+        const positiveSupportLabelAverageRecall: number =
+            positiveSupportLabelMacroAverageMetricArray.averageRecall;
+        const positiveSupportLabelAverageF1Score: number =
+            positiveSupportLabelMacroAverageMetricArray.averageF1Score;
+        const positiveSupportLabelAverageAccuracy: number =
+            positiveSupportLabelMacroAverageMetricArray.averageAccuracy;
+        const positiveSupportLabelAverageTruePositives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageTruePositives;
+        const positiveSupportLabelAverageFalsePositives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageFalsePositives;
+        const positiveSupportLabelAverageTrueNegatives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageTrueNegatives;
+        const positiveSupportLabelAverageFalseNegatives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageFalseNegatives;
+        const positiveSupportLabelAverageSupport: number =
+            positiveSupportLabelMacroAverageMetricArray.averageSupport;
+        const positiveSupportLabelSupportMacroAverage: number =
+            positiveSupportLabelMacroAverageMetricArray.total;
+        const positiveSupportLabelMacroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "support": number } = {
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averagePrecision": positiveSupportLabelAveragePrecision,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageRecall": positiveSupportLabelAverageRecall,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageF1Score": positiveSupportLabelAverageF1Score,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageAccuracy": positiveSupportLabelAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": positiveSupportLabelAverageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": positiveSupportLabelAverageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": positiveSupportLabelAverageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": positiveSupportLabelAverageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": positiveSupportLabelAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "support": positiveSupportLabelSupportMacroAverage };
         const weightedMacroAverageMetricArray: {
             "averagePrecision": number,
             "averageRecall": number,
@@ -222,6 +296,17 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
                 "averageFalseNegatives": number,
                 "averageSupport": number,
                 "support": number },
+            "positiveSupportLabelMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "support": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
@@ -234,6 +319,7 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             labelBinaryConfusionMatrixMap,
             microAverageMetrics,
             macroAverageMetrics,
+            positiveSupportLabelMacroAverageMetrics,
             weightedMacroAverageMetrics,
             };
         return confusionMatrixMetricStructure;
@@ -346,6 +432,80 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         const averageSupport: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getSupport(), 0) / numberLabels;
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
+        const macroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } = {
+                averagePrecision,
+                averageRecall,
+                averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
+                total };
+        return macroAverageMetrics;
+    }
+
+    public getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        const numberPositiveSupportLabels: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? 1 : 0), 0);
+        const averagePrecision: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getPrecision(), 0) / numberPositiveSupportLabels;
+        const averageRecall: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getRecall(), 0) / numberPositiveSupportLabels;
+        const averageF1Score: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getF1Score(), 0) / numberPositiveSupportLabels;
+        const averageTruePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTruePositives(), 0) / numberPositiveSupportLabels;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalsePositives(), 0) / numberPositiveSupportLabels;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTrueNegatives(), 0) / numberPositiveSupportLabels;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalseNegatives(), 0) / numberPositiveSupportLabels;
+        const averageAccuracy: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getAccuracy(), 0) / numberPositiveSupportLabels;
+        const averageSupport: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getSupport(), 0) / numberPositiveSupportLabels;
         // ---- NOTE-use-getTotal() ---- const total: number =
         // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
         // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);

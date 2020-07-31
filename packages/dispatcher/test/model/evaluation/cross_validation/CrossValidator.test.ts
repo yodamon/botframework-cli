@@ -93,6 +93,8 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
     });
@@ -169,6 +171,8 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
     });
