@@ -20,6 +20,8 @@ export default class OrchestratorTest extends Command {
     test: flags.string({char: 't', description: 'Path to a test file.'}),
     out: flags.string({char: 'o', description: 'Directory where analysis files will be placed.'}),
     model: flags.string({char: 'm', description: 'Directory or a config file hosting Orchestrator model files.'}),
+    ambiguous: flags.string({char: 'a', description: 'Ambiguous threshold, default to 0.2'}),
+    low_confidence: flags.string({char: 'l', description: 'Low confidence threshold, default to 0.5'}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }
@@ -35,15 +37,34 @@ export default class OrchestratorTest extends Command {
       nlrPath = path.resolve(nlrPath);
     }
 
+    let ambiguousClosenessParameter: number = 0.2;
+    let lowConfidenceScoreThresholdParameter: number = 0.5;
+    if (flags.ambiguous) {
+      ambiguousClosenessParameter = Number(flags.ambiguous);
+      if (Number.isNaN(ambiguousClosenessParameter)) {
+        Utility.writeLineToConsole(`ambiguous parameter "${flags.ambiguous}" is not a number`);
+      }
+    }
+    if (flags.low_confidence) {
+      lowConfidenceScoreThresholdParameter = Number(flags.low_confidence);
+      if (Number.isNaN(lowConfidenceScoreThresholdParameter)) {
+        Utility.writeLineToConsole(`low_confidence parameter "${flags.ambiguous}" is not a number`);
+      }
+    }
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
     Utility.debuggingLog(`OrchestratorTest.run(): inputPath=${inputPath}`);
     Utility.debuggingLog(`OrchestratorTest.run(): testPath=${testPath}`);
     Utility.debuggingLog(`OrchestratorTest.run(): outputPath=${outputPath}`);
     Utility.debuggingLog(`OrchestratorTest.run(): nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): ambiguousClosenessParameter=${ambiguousClosenessParameter}`);
+    Utility.debuggingLog(`OrchestratorTest.run(): lowConfidenceScoreThresholdParameter=${lowConfidenceScoreThresholdParameter}`);
 
     try {
-      await Orchestrator.testAsync(nlrPath, inputPath, testPath, outputPath);
+      await Orchestrator.testAsync(
+        nlrPath, inputPath, testPath, outputPath,
+        ambiguousClosenessParameter,
+        lowConfidenceScoreThresholdParameter);
     } catch (error) {
       throw (new CLIError(error));
     }

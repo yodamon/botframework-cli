@@ -47,7 +47,13 @@ export class OrchestratorPredict {
     'Please enter an index from the Misclassified report > ';
 
   static readonly questionForUtteranceLabelsFromLowConfidence: string =
-    'Please enter an index from the LowConfidence report > ';
+    'Please enter an index from the Low-Confidence report > ';
+
+  static readonly questionForAmbiguousThreshold: string =
+    'Please enter a threshold for generating the Ambiguous report > ';
+
+  static readonly questionForLowConfidenceThreshold: string =
+    'Please enter a threshold for generating the Low-Confidence report > ';
 
   static readonly interactive: readline.Interface = readline.createInterface(process.stdin, process.stdout);
 
@@ -64,6 +70,10 @@ export class OrchestratorPredict {
   protected outputPath: string = '';
 
   protected nlrPath: string = '';
+
+  protected ambiguousCloseness: number = 0.2;
+
+  protected lowConfidenceScoreThreshold: number = 0.5;
 
   protected trainingFile: string = '';
 
@@ -135,7 +145,12 @@ export class OrchestratorPredict {
     'scoreStructureArray': ScoreStructure[];
   } = Utility.generateEmptyEvaluationReport();
 
-  constructor(nlrPath: string, inputPath: string, outputPath: string) {
+  /* eslint-disable max-params */
+  /* eslint-disable complexity */
+  constructor(
+    nlrPath: string, inputPath: string, outputPath: string,
+    ambiguousClosenessParameter: number,
+    lowConfidenceScoreThresholdParameter: number) {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
       Utility.debuggingThrow('Please provide path to an input .blu file');
@@ -146,9 +161,21 @@ export class OrchestratorPredict {
     if (Utility.isEmptyString(nlrPath)) {
       Utility.debuggingThrow('The nlrPath argument is empty');
     }
+    if (nlrPath) {
+      nlrPath = path.resolve(nlrPath);
+    } else {
+      nlrPath = '';
+    }
+    Utility.debuggingLog(`inputPath=${inputPath}`);
+    Utility.debuggingLog(`outputPath=${outputPath}`);
+    Utility.debuggingLog(`nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`ambiguousClosenessParameter=${ambiguousClosenessParameter}`);
+    Utility.debuggingLog(`lowConfidenceScoreThresholdParameter=${lowConfidenceScoreThresholdParameter}`);
     this.inputPath = inputPath;
     this.outputPath = outputPath;
-    this.nlrPath = path.resolve(nlrPath);
+    this.nlrPath = nlrPath;
+    this.ambiguousCloseness = ambiguousClosenessParameter;
+    this.lowConfidenceScoreThreshold = lowConfidenceScoreThresholdParameter;
     // ---- NOTE ---- load the training set
     this.trainingFile = this.inputPath;
     // if (!Utility.exists(this.trainingFile)) {
@@ -171,12 +198,16 @@ export class OrchestratorPredict {
     Utility.debuggingLog('OrchestratorPredict.runAsync(), after calling LabelResolver.createWithSnapshotAsync()');
   }
 
-  // eslint-disable-next-line complexity
-  public static async runAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<number> {
+  public static async runAsync(
+    nlrPath: string, inputPath: string, outputPath: string,
+    ambiguousClosenessParameter: number,
+    lowConfidenceScoreThresholdParameter: number): Promise<number> {
     const orchestratorPredict: OrchestratorPredict = new OrchestratorPredict(
       nlrPath,
       inputPath,
-      outputPath);
+      outputPath,
+      ambiguousClosenessParameter,
+      lowConfidenceScoreThresholdParameter);
     // ---- NOTE ---- create a LabelResolver object.
     await orchestratorPredict.buildLabelResolver();
     // ---- NOTE ---- prepare readline.
@@ -184,6 +215,9 @@ export class OrchestratorPredict {
     // ---- NOTE ---- enter the interaction loop.
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      console.log(`> "Current" utterance:          "${orchestratorPredict.currentUtterance}"`);
+      console.log(`> "Current" intent label array: "${orchestratorPredict.currentIntentLabels}"`);
+      console.log(`> "New"     intent label array: "${orchestratorPredict.newIntentLabels}"`);
       // eslint-disable-next-line no-await-in-loop
       command = await OrchestratorPredict.question(OrchestratorPredict.commandprefix);
       command = command.trim();
@@ -230,6 +264,12 @@ export class OrchestratorPredict {
         break;
       // eslint-disable-next-line no-await-in-loop
       case 'vl': await orchestratorPredict.commandLetVL();
+        break;
+      // eslint-disable-next-line no-await-in-loop
+      case 'vat': await orchestratorPredict.commandLetVAT();
+        break;
+      // eslint-disable-next-line no-await-in-loop
+      case 'vlt': await orchestratorPredict.commandLetVLT();
         break;
       case 'a': orchestratorPredict.commandLetA();
         break;
@@ -279,6 +319,8 @@ export class OrchestratorPredict {
     console.log('          and enter an index for retrieving utterance/intents and save them into "current"');
     console.log('    vl  - reference the validation LowConfidence report (previously generated by the "v" command) ');
     console.log('          and enter an index for retrieving utterance/intents and save them into "current"');
+    console.log('    vat - enter a new validation report ambiguous closeness threshold');
+    console.log('    vlt - enter a new validation report low-confidence threshold');
     console.log('    a   - add the "current" utterance and intent labels to the model example set');
     console.log('    r   - remove the "current" utterance and intent labels from the model example set');
     console.log('    c   - remove the "current" utterance\'s intent labels and then ');
@@ -290,14 +332,15 @@ export class OrchestratorPredict {
   }
 
   public commandLetD(): number {
-    console.log(`> "Current" utterance:                "${this.currentUtterance}"`);
-    console.log(`> "Current" intent label array input: "${this.currentIntentLabels}"`);
-    console.log(`> "New"     intent label array input: "${this.newIntentLabels}"`);
+    console.log(`> "Current" utterance:          "${this.currentUtterance}"`);
+    console.log(`> "Current" intent label array: "${this.currentIntentLabels}"`);
+    console.log(`> "New"     intent label array: "${this.newIntentLabels}"`);
+    console.log(`> Ambiguous closeness:           ${this.ambiguousCloseness}`);
+    console.log(`> Low-confidence closeness:      ${this.lowConfidenceScoreThreshold}`);
     const labelResolverConfig: any = Utility.getLabelResolverSettings(this.labelResolver);
     console.log(`> Orchestrator configuration:         ${labelResolverConfig}`);
     const labels: string[] = this.labelResolver.getLabels(LabelType.Intent);
-    this.currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
-      labels);
+    this.currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(labels);
     console.log(`> Current label-index map: ${Utility.jsonStringify(this.currentLabelArrayAndMap.stringMap)}`);
     return 0;
   }
@@ -311,8 +354,7 @@ export class OrchestratorPredict {
       return -1;
     }
     const labels: string[] = this.labelResolver.getLabels(LabelType.Intent);
-    this.currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(
-      labels);
+    this.currentLabelArrayAndMap = Utility.buildStringIdNumberValueDictionaryFromStringArray(labels);
     Utility.examplesToUtteranceLabelMaps(
       examples,
       this.currentUtteranceLabelsMap,
@@ -431,7 +473,9 @@ export class OrchestratorPredict {
       utteranceLabelDuplicateMap,
       this.labelsOutputFilename,
       this.predictingSetScoreOutputFilename,
-      this.predictingSetSummaryOutputFilename);
+      this.predictingSetSummaryOutputFilename,
+      this.ambiguousCloseness,
+      this.lowConfidenceScoreThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       Utility.debuggingLog(`currentEvaluationOutput=${Utility.jsonStringify(this.currentEvaluationOutput)}`);
     }
@@ -590,6 +634,28 @@ export class OrchestratorPredict {
       console.log('ERROR: Please enter an integer index to access the validation LowConfidence entry');
       return -5;
     }
+    return 0;
+  }
+
+  public async commandLetVAT(): Promise<number> {
+    const ambiguousClosenessParameter: string = await OrchestratorPredict.question(OrchestratorPredict.questionForAmbiguousThreshold);
+    const ambiguousCloseness: number = Number(ambiguousClosenessParameter);
+    if (Number.isNaN(ambiguousCloseness)) {
+      Utility.debuggingLog(`The input "${ambiguousClosenessParameter}" is not a number.`);
+      return -1;
+    }
+    this.ambiguousCloseness = ambiguousCloseness;
+    return 0;
+  }
+
+  public async commandLetVLT(): Promise<number> {
+    const lowConfidenceScoreThresholdParameter: string = await OrchestratorPredict.question(OrchestratorPredict.questionForLowConfidenceThreshold);
+    const lowConfidenceScoreThreshold: number = Number(lowConfidenceScoreThresholdParameter);
+    if (Number.isNaN(lowConfidenceScoreThreshold)) {
+      Utility.debuggingLog(`The input "${lowConfidenceScoreThresholdParameter}" is not a number.`);
+      return -1;
+    }
+    this.lowConfidenceScoreThreshold = lowConfidenceScoreThreshold;
     return 0;
   }
 

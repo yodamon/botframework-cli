@@ -27,8 +27,12 @@ export class Orchestrator {
     await OrchestratorBuild.runAsync(nlrPath, inputPath, outputPath, isDialog, luConfigPath);
   }
 
-  public static async evaluateAsync(inputPath: string, outputPath: string, nlrPath: string = ''): Promise<void> {
-    await OrchestratorEvaluate.runAsync(inputPath, outputPath, nlrPath);
+  // eslint-disable-next-line max-params
+  public static async evaluateAsync(
+    inputPath: string, outputPath: string, nlrPath: string = '',
+    ambiguousClosenessParameter: number = 0.2,
+    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
+    await OrchestratorEvaluate.runAsync(inputPath, outputPath, nlrPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
   }
 
   public static async fineTuneAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
@@ -43,11 +47,19 @@ export class Orchestrator {
     return OrchestratorNlr.listAsync();
   }
 
-  public static async predictAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
-    await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath);
+  // eslint-disable-next-line max-params
+  public static async predictAsync(
+    nlrPath: string, inputPath: string, outputPath: string,
+    ambiguousClosenessParameter: number = 0.2,
+    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
+    await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
   }
 
-  public static async testAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string): Promise<void> {
-    await OrchestratorTest.runAsync(nlrPath, inputPath, testPath, outputPath);
+  // eslint-disable-next-line max-params
+  public static async testAsync(
+    nlrPath: string, inputPath: string, testPath: string, outputPath: string,
+    ambiguousClosenessParameter: number = 0.2,
+    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
+    await OrchestratorTest.runAsync(nlrPath, inputPath, testPath, outputPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
   }
 }
