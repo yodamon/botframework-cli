@@ -6,6 +6,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import {Utility} from './utility';
+import {PrebuiltToRecognizerMap} from './resources/recognizerMap';
 
 const ReadText: any = require('read-text-file');
 const LuisBuilder: any = require('@microsoft/bf-lu').V2.LuisBuilder;
@@ -102,6 +103,73 @@ export class OrchestratorHelper {
     }
 
     return {utteranceLabelsMap, utteranceLabelDuplicateMap};
+  }
+
+  public static writeDialogFiles(out: string, isDialog: boolean, baseName: string, recognizers: any = [])
+  {
+    if (!isDialog) return undefined;
+    let recoContent = {
+      "$kind": "Microsoft.OrchestratorRecognizer",
+      "modelPath": "=settings.orchestrator.modelPath",
+      "snapshotPath": `=settings.orchestrator.snapshots.${baseName}`,
+      "entityRecognizers": recognizers
+    };
+
+    let recoFileName = path.join(out, `${baseName}.lu.dialog`);
+    this.writeToFile(recoFileName, JSON.stringify(recoContent, null, 2));
+    let multiRecoContent = {
+      "$kind": "Microsoft.MultiLanguageRecognizer",
+      "recognizers": {
+          "en-us": `${baseName}.en-us.lu`,
+          "": `${baseName}.en-us.lu`
+      }
+    };
+
+    let multiRecoFileName = path.join(out, `${baseName}.en-us.lu.dialog`);
+    this.writeToFile(multiRecoFileName, JSON.stringify(multiRecoContent, null, 2));
+    return baseName;
+  }
+
+  public static writeSettingsFile(nlrpath: string, settings: any, out: string)
+  {
+    let content = {
+      "orchestrator": {
+        "modelPath": nlrpath,
+        "snapshots": settings
+      }
+    };
+
+    let contentFileName = path.join(out, `orchestrator.settings.json`);
+
+    this.writeToFile(contentFileName, JSON.stringify(content, null, 2));
+  }
+
+  public static async getEntitiesInLu(input: string) : Promise<any>
+  {
+    const fileContents: string = OrchestratorHelper.readFile(input);
+    const luObject: any = {
+      content: fileContents,
+      id: input,
+    };
+    const luisObject: any = await LuisBuilder.fromLUAsync([luObject], OrchestratorHelper.findLuFiles);
+    return this.transformEntities(luisObject);
+  }
+
+  public static transformEntities(luisObject: any) : string[]
+  {
+    if (luisObject.prebuiltEntities === undefined || !Array.isArray(luisObject.prebuiltEntities) || luisObject.prebuiltEntities.length === 0) return [];
+    let entitiesList: any = [];
+    (luisObject.prebuiltEntities || []).forEach((item: any) => {
+      let mapValue = PrebuiltToRecognizerMap[item.name.toLowerCase().trim()];
+      if (mapValue !== undefined && mapValue !== "") {
+        entitiesList.push({
+          "$kind": mapValue
+        });
+      } else {
+        process.stdout.write(`\n[WARN:] No entity recognizer available for Prebuilt entity "${item.name}"\n`);
+      }
+    })
+    return entitiesList;
   }
 
   // eslint-disable-next-line max-params

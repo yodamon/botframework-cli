@@ -26,7 +26,9 @@ export class OrchestratorBuild {
       }
 
       if (!inputPath || inputPath.length === 0) {
-        throw new Error('Please provide path to input file/folder');
+        if (!luConfigFile || luConfigFile.length === 0) {
+          throw new Error('Please set either --in or --luconfig');
+        }
       }
 
       if (!outputPath || outputPath.length === 0) {
@@ -47,19 +49,35 @@ export class OrchestratorBuild {
       OrchestratorBuild.LuConfigFile = luConfigFile;
       OrchestratorBuild.Orchestrator = orchestrator;
       OrchestratorBuild.OutputPath = outputPath;
-
-      if (OrchestratorHelper.isDirectory(inputPath)) {
-        await OrchestratorBuild.iterateInputFolder(inputPath);
+      let bluPaths: any = {};
+      if (inputPath !== "") {
+        if (OrchestratorHelper.isDirectory(inputPath)) {
+          await OrchestratorBuild.iterateInputFolder(inputPath, isDialog, bluPaths);
+        } else {
+          await OrchestratorBuild.processLuFile(inputPath, isDialog, bluPaths);
+        }
       } else {
-        await OrchestratorBuild.processLuFile(inputPath);
+        await OrchestratorBuild.processConfigFile(luConfigFile, isDialog, bluPaths);
+      }
+      if (Object.getOwnPropertyNames(bluPaths).length !== 0) {
+        OrchestratorHelper.writeSettingsFile(nlrPath, bluPaths, OrchestratorBuild.OutputPath);
       }
     } catch (error) {
       throw new Error(error);
     }
   }
 
-  private static async processLuFile(luFile: string) {
+  private static async processConfigFile (configFile: string, isDialog: boolean, bluPaths: any)
+  {
+    let configContent = JSON.parse(OrchestratorHelper.readFile(configFile));
+    for (var file of (configContent.models || [])) {
+      await OrchestratorBuild.processLuFile(path.resolve(file), isDialog, bluPaths);
+    }
+  }
+
+  private static async processLuFile(luFile: string, isDialog: boolean, bluPaths: any) {
     const labelResolver: any = OrchestratorBuild.Orchestrator.createLabelResolver();
+    const baseName: string = path.basename(luFile, '.lu');
     Utility.debuggingLog('Created label resolver');
 
     const result: any = (await OrchestratorHelper.getUtteranceLabelsMap(luFile, false)).utteranceLabelsMap;
@@ -67,25 +85,28 @@ export class OrchestratorBuild {
 
     LabelResolver.addExamples(result, labelResolver);
     const snapshot: any = labelResolver.createSnapshot();
-    const snapshotFile: any = path.join(OrchestratorBuild.OutputPath, path.basename(luFile, '.lu') + '.blu');
+    const snapshotFile: any = path.join(OrchestratorBuild.OutputPath, baseName + '.blu');
     OrchestratorHelper.writeToFile(snapshotFile, snapshot);
     Utility.debuggingLog(`Snapshot written to ${snapshotFile}`);
+    const entities: any = await OrchestratorHelper.getEntitiesInLu(luFile);
+    const settingsKeyForBlu = OrchestratorHelper.writeDialogFiles(OrchestratorBuild.OutputPath, isDialog, baseName, entities);
+    if (settingsKeyForBlu !== undefined) bluPaths[baseName] = snapshotFile;
   }
 
-  private static async iterateInputFolder(inputPath: string) {
+  private static async iterateInputFolder(inputPath: string, isDialog: boolean, bluPaths: any) {
     const items: string[] = fs.readdirSync(inputPath);
     for (const item of items) {
-      const currentItemPath: string = path.join(OrchestratorBuild.OutputPath, item);
+      const currentItemPath: string = path.join(inputPath, item);
       const isDirectory: boolean = fs.lstatSync(currentItemPath).isDirectory();
 
       if (isDirectory) {
         // eslint-disable-next-line no-await-in-loop
-        await OrchestratorBuild.iterateInputFolder(currentItemPath);
+        await OrchestratorBuild.iterateInputFolder(currentItemPath, isDialog, bluPaths);
       } else {
         const ext: string = path.extname(item);
         if (ext === '.lu') {
           // eslint-disable-next-line no-await-in-loop
-          await OrchestratorBuild.processLuFile(currentItemPath);
+          await OrchestratorBuild.processLuFile(currentItemPath, isDialog, bluPaths);
         }
       }
     }

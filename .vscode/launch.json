@@ -11,7 +11,14 @@
             //"preLaunchTask": "${defaultBuildTask}",
             "program": "${workspaceFolder}/packages/orchestrator/bin/run",
             "args": [
-                "orchestrator:nlr:get",
+                "orchestrator:build",
+                "--in",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative",
+                "--out",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative\\generated",
+                "--dialog",
+                "--model",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative\\model"
                 //"--out",
                 //"c:\\todelete\\",
                 //"--versionId",

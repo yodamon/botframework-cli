@@ -24,7 +24,7 @@ export default class OrchestratorBuild extends Command {
 
   async run() {
     const {flags}: flags.Output = this.parse(OrchestratorBuild);
-    const input: string = path.resolve(flags.in || __dirname);
+    const input: string = flags.in ? path.resolve(flags.in) : "";
     const output: string = path.resolve(flags.out || __dirname);
     const isDialog: boolean = flags.dialog;
     let luConfigPath: string = flags.luconfig;
