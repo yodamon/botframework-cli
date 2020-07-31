@@ -17,7 +17,11 @@ import {Utility} from './utility';
 
 export class OrchestratorTest {
   // eslint-disable-next-line complexity
-  public static async runAsync(nlrPath: string, inputPath: string, testPath: string, outputPath: string): Promise<void> {
+  // eslint-disable-next-line max-params
+  public static async runAsync(
+    nlrPath: string, inputPath: string, testPath: string, outputPath: string,
+    ambiguousClosenessParameter: number,
+    lowConfidenceScoreThresholdParameter: number): Promise<void> {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
       Utility.debuggingThrow('Please provide path to an input .blu file');
@@ -32,6 +36,14 @@ export class OrchestratorTest {
       Utility.debuggingThrow('The nlrPath argument is empty');
     }
     nlrPath = path.resolve(nlrPath);
+    const ambiguousCloseness: number = ambiguousClosenessParameter;
+    const lowConfidenceScoreThreshold: number = lowConfidenceScoreThresholdParameter;
+    Utility.debuggingLog(`inputPath=${inputPath}`);
+    Utility.debuggingLog(`testPath=${testPath}`);
+    Utility.debuggingLog(`outputPath=${outputPath}`);
+    Utility.debuggingLog(`nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`ambiguousCloseness=${ambiguousCloseness}`);
+    Utility.debuggingLog(`lowConfidenceScoreThreshold=${lowConfidenceScoreThreshold}`);
 
     // ---- NOTE ---- load the training set
     const trainingFile: string = inputPath;
@@ -118,7 +130,9 @@ export class OrchestratorTest {
       utteranceLabelDuplicateMap,
       labelsOutputFilename,
       testingSetScoreOutputFile,
-      testingSetSummaryOutputFile);
+      testingSetSummaryOutputFile,
+      ambiguousCloseness,
+      lowConfidenceScoreThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       Utility.debuggingLog(`evaluationOutput=${Utility.jsonStringify(evaluationOutput)}`);
     }

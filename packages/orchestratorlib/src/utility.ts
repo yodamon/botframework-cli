@@ -132,8 +132,7 @@ export class Utility {
         const currentLabelArrayAndMap: {
           'stringArray': string[];
           'stringMap': {[id: string]: number};} =
-          Utility.buildStringIdNumberValueDictionaryFromStringArray(
-            labels);
+          Utility.buildStringIdNumberValueDictionaryFromStringArray(labels);
         const labelArray: string[] = currentLabelArrayAndMap.stringArray;
         // eslint-disable-next-line max-depth
         if ((labelIndex < 0) || (labelIndex >= labelArray.length)) {
@@ -282,7 +281,9 @@ export class Utility {
     utteranceLabelDuplicateMap: Map<string, Set<string>>,
     labelsOutputFilename: string,
     evaluationSetScoreOutputFilename: string,
-    evaluationSetSummaryOutputFilename: string): {
+    evaluationSetSummaryOutputFilename: string,
+    ambiguousCloseness: number,
+    lowConfidenceScoreThreshold: number): {
       'evaluationReportLabelUtteranceStatistics': {
         'evaluationSummaryTemplate': string;
         'labelArrayAndMap': {
@@ -390,7 +391,9 @@ export class Utility {
     } = Utility.generateEvaluationReportAnalyses(
       evaluationReportLabelUtteranceStatistics.evaluationSummaryTemplate,
       evaluationReportLabelUtteranceStatistics.labelArrayAndMap,
-      scoreStructureArray);
+      scoreStructureArray,
+      ambiguousCloseness,
+      lowConfidenceScoreThreshold);
     Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.generateEvaluationReportAnalyses()');
 
     // ---- NOTE ---- produce a score TSV file.
@@ -449,8 +452,7 @@ export class Utility {
     // ---- NOTE ---- create a label-index map.
     const labelArrayAndMap: {
       'stringArray': string[];
-      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(
-        trainingSetLabels);
+      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(trainingSetLabels);
     Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
     Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
     if (Utility.isEmptyStringArray(labelArrayAndMap.stringArray)) {
@@ -513,12 +515,15 @@ export class Utility {
       utteranceLabelDuplicateHtml};
   }
 
+  // eslint-disable-next-line max-params
   public static generateEvaluationReportAnalyses(
     evaluationSummaryTemplate: string,
     labelArrayAndMap: {
       'stringArray': string[];
       'stringMap': {[id: string]: number};},
-    scoreStructureArray: ScoreStructure[]): {
+    scoreStructureArray: ScoreStructure[],
+    ambiguousCloseness: number,
+    lowConfidenceScoreThreshold: number): {
       'evaluationSummaryTemplate': string;
       'ambiguousAnalysis': {
         'scoringAmbiguousUtterancesArrays': string[][];
@@ -545,7 +550,8 @@ export class Utility {
       'scoringAmbiguousUtterancesArraysHtml': string;
       'scoringAmbiguousUtteranceSimpleArrays': string[][];
     } = Utility.generateAmbiguousStatisticsAndHtmlTable(
-      scoreStructureArray);
+      scoreStructureArray,
+      ambiguousCloseness);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{AMBIGUOUS}', ambiguousAnalysis.scoringAmbiguousUtterancesArraysHtml);
     Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {AMBIGUOUS} content');
 
@@ -565,7 +571,8 @@ export class Utility {
       'scoringLowConfidenceUtterancesArraysHtml': string;
       'scoringLowConfidenceUtterancesSimpleArrays': string[][];
     } = Utility.generateLowConfidenceStatisticsAndHtmlTable(
-      scoreStructureArray);
+      scoreStructureArray,
+      lowConfidenceScoreThreshold);
     evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{LOWCONFIDENCE}', lowConfidenceAnalysis.scoringLowConfidenceUtterancesArraysHtml);
     Utility.debuggingLog('Utility.generateEvaluationReportAnalyses(), finished generating {LOWCONFIDENCE} content');
 
@@ -795,14 +802,15 @@ export class Utility {
   }
 
   public static generateLowConfidenceStatisticsAndHtmlTable(
-    scoreStructureArray: ScoreStructure[]): {
+    scoreStructureArray: ScoreStructure[],
+    lowConfidenceScoreThreshold: number): {
       'scoringLowConfidenceUtterancesArrays': string[][];
       'scoringLowConfidenceUtterancesArraysHtml': string;
       'scoringLowConfidenceUtterancesSimpleArrays': string[][];
     } {
     const scoringLowConfidenceUtterancesArrays: string[][] = [];
     const scoringLowConfidenceUtterancesSimpleArrays: string[][] = [];
-    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < 0.5))) {
+    for (const scoreStructure of scoreStructureArray.filter((x: ScoreStructure) => ((x.labelsPredictedEvaluation === 0) || (x.labelsPredictedEvaluation === 3)) && (x.labelsPredictedScore < lowConfidenceScoreThreshold))) {
       if (scoreStructure) {
         const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;
         const labelsPredictedConcatenated: string = scoreStructure.labelsPredictedConcatenated;
@@ -864,7 +872,8 @@ export class Utility {
   }
 
   public static generateAmbiguousStatisticsAndHtmlTable(
-    scoreStructureArray: ScoreStructure[]): {
+    scoreStructureArray: ScoreStructure[],
+    ambiguousCloseness: number): {
       'scoringAmbiguousUtterancesArrays': string[][];
       'scoringAmbiguousUtterancesArraysHtml': string;
       'scoringAmbiguousUtteranceSimpleArrays': string[][];
@@ -877,7 +886,7 @@ export class Utility {
         const scoreArray: number[] = scoreStructure.scoreArray;
         const scoreArrayAmbiguous: number[][] = scoreArray.map(
           (x: number, index: number) => [x, index, Math.abs((predictedScore - x) / predictedScore)]).filter(
-          (x: number[]) => ((x[2] < 0.2) && (x[2] > 0))).map(
+          (x: number[]) => ((x[2] < ambiguousCloseness) && (x[2] > 0))).map(
           (x: number[]) => [x[1], x[0], x[2]]);
         if (scoreArrayAmbiguous.length > 0) {
           const labelsScoreStructureHtmlTable: string = scoreStructure.labelsScoreStructureHtmlTable;

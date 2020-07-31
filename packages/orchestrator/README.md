@@ -72,24 +72,26 @@ USAGE
   $ bf orchestrator:evaluate
 
 OPTIONS
-  -d, --debug        Print debugging information during execution.
-  -h, --help         Orchestrator 'evaluate' command help.
-
-  -i, --in=in        Path to a previously created Orchestrator .blu file.
-
-  -m, --model=model  Directory or a config file hosting Orchestrator model files. Optional.
-
-  -o, --out=out      Directory where analysis files will be placed.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'evaluate' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files. Optional.
+  -o, --out=out                   Directory where analysis files will be placed.
 ```
 
 DESCRIPTION
-  The 'evaluate' command can execute a leave-one-out-cross-validation (LOOCV) on a model and example set and
-  generate a detailed evaluation report with following sections:
-  1) Intent/utterancce Statistics - intent and utterance distributions.
-  2) Duplicates - utterance with multiple intents and exact utterance/intent duplicates.
-  3) Ambiguous - ambiguous predictions that other intent prediction scores are close to the the correctly predicted intent.
+  The 'evaluate' command can execute a leave-one-out-cross-validation (LOOCV) on a model and example set, then
+  generate a detailed evaluation report which has the following sections:
+  1) Intent/utterancce Statistics - intent and utterance statistics and distributions.
+  2) Duplicates - tables of utterance with multiple intents and exact utterance/intent duplicates.
+  3) Ambiguous - ambiguous predictions that there are some other intent predictions whose
+     scores are close to the correctly predicted intents. Ambiguity closeness is controlled by the "ambiguous" parameter, default to 0.2. I.e., if there is a prediction whose score is within 80% of
+     the correctly predicted intent score, then the prediction itself is considered "ambiguous."
   4) Misclassified - utterance's intent labels were not scored the highest.
-  5) Low Confidence - utterance intent labels are highest but lower than a threshold.
+  5) Low Confidence - utterance intent labels are scored the highest, but they are lower than a threshold.
+     This threshold can be configured through the "low_confidence" parameter, the default is 0.5.
   6) Metrics - test confisuon matrix metrics.
 
 EXAMPLE
@@ -164,23 +166,24 @@ USAGE
   $ bf orchestrator:predict
 
 OPTIONS
-  -d, --debug        Print debugging information during execution.
-  -h, --help         Orchestrator 'predict' command help.
-
-  -i, --in=in        Path to a previously created Orchestrator .blu file. Optional.
-
-  -m, --model=model  Directory or a config file hosting Orchestrator model files.
-
-  -o, --out=out      Directory where analysis files will be placed.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'predict' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file. Optional.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files.
+  -o, --out=out                   Directory where analysis files will be placed.
 ```
 
 DESCRIPTION
-  The 'predict' command is an interactive process that can help a user
+  The 'predict' command is an interactive process that can help a user doing the following
   1) Predict the intent of an input utterance using the 'p' commandlet.
   2) Analyze a model example set, by executing the 'v' (validation) commandlet and produce an evaluation
      report in real-time.
-  3) Add, remove, or change the intents of an input utterace using the 'a', 'r', and 'c' commandlets, respectively.
-  4) Remove labels from the model example set using the 'rl' commandlet.
+  3) Add, remove, or change the intents of an input utterace using the 'a', 'r', and 'c' commandlets,
+     respectively. Users can reference a validation report and choose an ambiguous, misclassified, or
+     low-confidence utterance and change their intent labels.
+  4) Remove some labels completely from the model example set using the 'rl' commandlet.
   5) Create a new model example set snapshot using the 'n' commandlet.
 
   Below is a list of the commandlets that can be issued during a 'predict' session.
@@ -232,17 +235,14 @@ USAGE
   $ bf orchestrator:test
 
 OPTIONS
-  -d, --debug        Print debugging information during execution.
-  -h, --help         Orchestrator 'test' command help.
-
-  -i, --in=in        Path to a previously created Orchestrator .blu file.
-
-  -m, --model=model  Directory or a config file hosting Orchestrator model files.
-
-  -o, --out=out      Path where generated orchestrator example file will be placed. Default to current working
-                     directory.
-
-  -t, --test=test    Path to a test file.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'test' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files.
+  -o, --out=out                   Directory where analysis files will be placed.
+  -t, --test=test                 Path to a test file.
 ```
 
 DESCRIPTION
