@@ -131,6 +131,9 @@ export function mainConfusionMatrixFunction(
     Utility.debuggingLog(
         "macro-average metrics = " + confusionMatrix.getMacroAverageMetrics());
     Utility.debuggingLog(
+        "positive-support-abel-macro-average metrics = " +
+        confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
+    Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
     Utility.debuggingLog(
         "labels=" + confusionMatrix.getLabels());
@@ -370,6 +373,9 @@ export function exampleFunctionConfusionMatrix(): void {
         "micro-average metrics = " + confusionMatrix.getMicroAverageMetrics());
     Utility.debuggingLog(
         "macro-average metrics = " + confusionMatrix.getMacroAverageMetrics());
+    Utility.debuggingLog(
+        "positive-support-abel-macro-average metrics = " +
+        confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
 }

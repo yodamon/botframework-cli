@@ -25,7 +25,7 @@ export class UnitTestHelper {
 
 describe('Test Suite - utility', () => {
   it('Test.0000 Utility.exists()', function () {
-    Utility.toPrintDebuggingLogToConsole = true; // UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
+    Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
     this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
     Utility.debuggingLog(
       `process.cwd()=${process.cwd()}`);

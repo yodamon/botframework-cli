@@ -13,6 +13,8 @@ const LuisBuilder: any = require('@microsoft/bf-lu').V2.LuisBuilder;
 const QnaMakerBuilder: any = require('@microsoft/bf-lu').V2.QnAMakerBuilder;
 const processedFiles: string[] = [];
 
+// const uknownLabel: string = 'UNKNOWN';
+
 export class OrchestratorHelper {
   public static exists(path: string): boolean {
     return fs.existsSync(path);
@@ -196,7 +198,7 @@ export class OrchestratorHelper {
         utteranceLabelDuplicateMap);
     } else if (ext === '.json') {
       Utility.writeToConsole(`Processing ${filePath}...\n`);
-      OrchestratorHelper.getIntentsUtterances(
+      OrchestratorHelper.getLuisIntentsUtterances(
         fs.readJsonSync(filePath),
         OrchestratorHelper.getLabelFromFileName(fileName, ext, hierarchical),
         utteranceLabelsMap,
@@ -242,7 +244,7 @@ export class OrchestratorHelper {
       id: luFile,
     };
     const luisObject: any = await LuisBuilder.fromLUAsync([luObject], OrchestratorHelper.findLuFiles);
-    OrchestratorHelper.getIntentsUtterances(luisObject, hierarchicalLabel, utteranceLabelsMap, utteranceLabelDuplicateMap);
+    OrchestratorHelper.getLuisIntentsUtterances(luisObject, hierarchicalLabel, utteranceLabelsMap, utteranceLabelDuplicateMap);
   }
 
   static async parseTsvFile(
@@ -380,7 +382,7 @@ export class OrchestratorHelper {
     }
   }
 
-  static getIntentsUtterances(
+  static getLuisIntentsUtterances(
     luisObject: any,
     hierarchicalLabel: string,
     utteranceLabelsMap: { [id: string]: string[] },

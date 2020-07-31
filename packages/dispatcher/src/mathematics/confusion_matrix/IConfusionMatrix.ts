@@ -30,6 +30,17 @@ export interface IConfusionMatrix {
             "averageFalseNegatives": number,
             "averageSupport": number,
             "support": number },
+        "positiveSupportLabelMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "support": number },
         "weightedMacroAverageMetrics": {
             "weightedAveragePrecision": number,
             "weightedAverageRecall": number,
@@ -54,6 +65,18 @@ export interface IConfusionMatrix {
         "total": number };
 
     getMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,

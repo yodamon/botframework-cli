@@ -733,6 +733,32 @@ export class Utility {
       macroAverageMetrics.total,
     ];
     scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineMacroAverage);
+    const positiveSupportLabelMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getPositiveSupportLabelMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLinePositiveSupportLabelMacroAverage: any[] = [
+      'Macro-Average',
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averagePrecision),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageRecall),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageF1Score),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageAccuracy),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageTruePositives),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalsePositives),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(positiveSupportLabelMacroAverageMetrics.averageSupport),
+      positiveSupportLabelMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLinePositiveSupportLabelMacroAverage);
     const weightedMacroAverageMetrics: {
       'averagePrecision': number;
       'averageRecall': number;

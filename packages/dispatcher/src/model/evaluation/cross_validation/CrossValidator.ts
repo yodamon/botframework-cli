@@ -254,6 +254,17 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "averageFalseNegatives": number,
                 "averageSupport": number,
                 "support": number },
+            "positiveSupportLabelMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "support": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
@@ -267,6 +278,8 @@ export class CrossValidator extends AbstractBaseEvaluator {
            `${confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
            `,confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
            `${confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+           `,confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+           `${confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
            `,confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
            `${confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
