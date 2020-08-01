@@ -60,18 +60,24 @@ export class OrchestratorTest {
     Utility.debuggingLog('OrchestratorTest.runAsync(), after calling LabelResolver.createWithSnapshotAsync()');
 
     // ---- NOTE ---- process the training set, retrieve labels
-    const trainingSetUtterancesLabelsMap: { [id: string]: string[] } = {};
-    const trainingSetUtterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
-    await OrchestratorHelper.processFile(trainingFile, path.basename(trainingFile), trainingSetUtterancesLabelsMap, trainingSetUtterancesDuplicateLabelsMap, false);
+    let processedUtteranceLabelsMap: {
+      'utteranceLabelsMap': { [id: string]: string[] };
+      'utteranceLabelDuplicateMap': Map<string, Set<string>>; } = await OrchestratorHelper.getUtteranceLabelsMap(trainingFile, false);
+    const trainingSetUtterancesLabelsMap: { [id: string]: string[] } = processedUtteranceLabelsMap.utteranceLabelsMap;
+    // const trainingSetUtterancesDuplicateLabelsMap: Map<string, Set<string>> = processedUtteranceLabelsMap.utteranceLabelDuplicateMap;
+    Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.getUtteranceLabelsMap() for training set');
     const trainingSetLabels: string[] =
       [...Object.values(trainingSetUtterancesLabelsMap)].reduce(
         (accumulant: string[], entry: string[]) => accumulant.concat(entry), []);
+    const trainingSetLabelSet: Set<string> =
+      new Set<string>(trainingSetLabels);
 
     // ---- NOTE ---- process the testing set.
-    const utteranceLabelsMap: { [id: string]: string[] } = {};
-    const utteranceLabelDuplicateMap: Map<string, Set<string>> = new Map<string, Set<string>>();
-    await OrchestratorHelper.processFile(testPath, path.basename(testPath), utteranceLabelsMap, utteranceLabelDuplicateMap, false);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.processFile()');
+    processedUtteranceLabelsMap = await OrchestratorHelper.getUtteranceLabelsMap(testPath, false);
+    Utility.processUnknowLabelsInUtteranceLabelsMapUsingLabelSet(processedUtteranceLabelsMap, trainingSetLabelSet);
+    const utteranceLabelsMap: { [id: string]: string[] } = processedUtteranceLabelsMap.utteranceLabelsMap;
+    const utteranceLabelDuplicateMap: Map<string, Set<string>> = processedUtteranceLabelsMap.utteranceLabelDuplicateMap;
+    Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.getUtteranceLabelsMap() for testing set');
     // Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(utteranceLabelsMap)=${JSON.stringify(utteranceLabelsMap)}`);
     // ---- Utility.debuggingLog(`OrchestratorTest.runAsync(), JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utteranceLabelDuplicateMap))=${JSON.stringify(Utility.convertStringKeyGenericSetNativeMapToDictionary<string>(utteranceLabelDuplicateMap))}`);
     Utility.debuggingLog(`OrchestratorTest.runAsync(), number of unique utterances=${Object.keys(utteranceLabelsMap).length}`);

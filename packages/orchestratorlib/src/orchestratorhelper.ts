@@ -13,8 +13,6 @@ const LuisBuilder: any = require('@microsoft/bf-lu').V2.LuisBuilder;
 const QnaMakerBuilder: any = require('@microsoft/bf-lu').V2.QnAMakerBuilder;
 const processedFiles: string[] = [];
 
-// const uknownLabel: string = 'UNKNOWN';
-
 export class OrchestratorHelper {
   public static exists(path: string): boolean {
     return fs.existsSync(path);
@@ -104,17 +102,21 @@ export class OrchestratorHelper {
       await OrchestratorHelper.processFile(filePath, path.basename(filePath), utteranceLabelsMap, utteranceLabelDuplicateMap, hierarchical);
     }
 
-    return {utteranceLabelsMap, utteranceLabelDuplicateMap};
+    return Utility.processUnknowLabelsInUtteranceLabelsMap({utteranceLabelsMap, utteranceLabelDuplicateMap});
   }
 
-  public static writeDialogFiles(out: string, isDialog: boolean, baseName: string, recognizers: any = [])
-  {
+  public static writeDialogFiles(out: string, isDialog: boolean, baseName: string, recognizers: any = []) {
     if (!isDialog) return undefined;
-    let recoContent = {
-      "$kind": "Microsoft.OrchestratorRecognizer",
-      "modelPath": "=settings.orchestrator.modelPath",
-      "snapshotPath": `=settings.orchestrator.snapshots.${baseName}`,
-      "entityRecognizers": recognizers
+    const recoContent: {
+      '$kind': string;
+      'modelPath': string;
+      'snapshotPath': string;
+      'entityRecognizers': any;
+    } = {
+      $kind: 'Microsoft.OrchestratorRecognizer',
+      modelPath: '=settings.orchestrator.modelPath',
+      snapshotPath: `=settings.orchestrator.snapshots.${baseName}`,
+      entityRecognizers: recognizers,
     };
 
     let recoFileName = path.join(out, `${baseName}.lu.dialog`);
@@ -132,21 +134,25 @@ export class OrchestratorHelper {
     return baseName;
   }
 
-  public static writeSettingsFile(nlrpath: string, settings: any, out: string)
-  {
-    let content = {
-      "orchestrator": {
-        "modelPath": nlrpath,
-        "snapshots": settings
+  public static writeSettingsFile(nlrpath: string, settings: any, out: string) {
+    const content: {
+      'orchestrator': {
+        'modelPath': string;
+        'snapshots': string;
+      };
+    } = {
+      'orchestrator': {
+        'modelPath': nlrpath,
+        'snapshots': settings
       }
     };
 
-    let contentFileName = path.join(out, `orchestrator.settings.json`);
+    const contentFileName: string = path.join(out, `orchestrator.settings.json`);
 
     this.writeToFile(contentFileName, JSON.stringify(content, null, 2));
   }
 
-  public static async getEntitiesInLu(input: string) : Promise<any>
+  public static async getEntitiesInLu(input: string): Promise<any>
   {
     const fileContents: string = OrchestratorHelper.readFile(input);
     const luObject: any = {
@@ -157,18 +163,17 @@ export class OrchestratorHelper {
     return this.transformEntities(luisObject);
   }
 
-  public static transformEntities(luisObject: any) : string[]
-  {
+  public static transformEntities(luisObject: any): string[] {
     if (luisObject.prebuiltEntities === undefined || !Array.isArray(luisObject.prebuiltEntities) || luisObject.prebuiltEntities.length === 0) return [];
-    let entitiesList: any = [];
+    const entitiesList: any = [];
     (luisObject.prebuiltEntities || []).forEach((item: any) => {
-      let mapValue = PrebuiltToRecognizerMap[item.name.toLowerCase().trim()];
-      if (mapValue !== undefined && mapValue !== "") {
+      const mapValue = PrebuiltToRecognizerMap[item.name.toLowerCase().trim()];
+      if (mapValue !== undefined && mapValue !== '') {
         entitiesList.push({
-          "$kind": mapValue
+          '$kind': mapValue
         });
       } else {
-        process.stdout.write(`\n[WARN:] No entity recognizer available for Prebuilt entity "${item.name}"\n`);
+        process.stdout.write(`\n[WARN:] No entity recognizer available for Prebuilt entity '${item.name}'\n`);
       }
     })
     return entitiesList;

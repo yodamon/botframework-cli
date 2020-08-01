@@ -69,6 +69,8 @@ function getTestingConfusionMatrix(): ConfusionMatrix {
         confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
+    Utility.debuggingLog(
+        "sumup-weighted-macro-average metrics = " + confusionMatrix.getSumupWeightedMacroAverageMetrics());
     return confusionMatrix;
 }
 
@@ -236,6 +238,12 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } =
             confusionMatrix.getMacroAverageMetrics();
         assert.ok(Utility.almostEqual(
@@ -260,6 +268,12 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } =
             confusionMatrix.getPositiveSupportLabelMacroAverageMetrics();
         assert.ok(Utility.almostEqual(
@@ -284,6 +298,8 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } =
             confusionMatrix.getWeightedMacroAverageMetrics();
         assert.ok(Utility.almostEqual(
@@ -302,7 +318,39 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
             `confusionMatrixMetrics.total=${confusionMatrixMetrics.total}`);
     });
 
-    it("Test.1000 validateLabelId()", function() {
+    it("Test.1000 getSumupWeightedMacroAverageMetrics()", function() {
+        Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
+        this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
+        const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
+        const confusionMatrixMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getSumupWeightedMacroAverageMetrics();
+        assert.ok(Utility.almostEqual(
+            confusionMatrixMetrics.averagePrecision, 0.3333333333333333),
+            `confusionMatrixMetrics.averagePrecision=${
+                confusionMatrixMetrics.averagePrecision}`);
+        assert.ok(Utility.almostEqual(
+            confusionMatrixMetrics.averageRecall, 0.3333333333333333),
+            `confusionMatrixMetrics.averageRecall=${
+                confusionMatrixMetrics.averageRecall}`);
+        assert.ok(Utility.almostEqual(
+            confusionMatrixMetrics.averageF1Score, 0.3333333333333333),
+            `confusionMatrixMetrics.averageF1Score=${confusionMatrixMetrics.averageF1Score}`);
+        assert.ok(
+            confusionMatrixMetrics.total === 9,
+            `confusionMatrixMetrics.total=${confusionMatrixMetrics.total}`);
+    });
+
+    it("Test.1100 validateLabelId()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
@@ -311,7 +359,7 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
         assert.ok(isValid,
             `labelId=${labelId}`);
     });
-    it("Test.1001 validateLabelId()", function() {
+    it("Test.1101 validateLabelId()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
@@ -319,7 +367,7 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
         assert.throws(() => { confusionMatrix.validateLabelId(labelId); },
             `labelId=${labelId}`);
     });
-    it("Test.1002 validateLabelId()", function() {
+    it("Test.1102 validateLabelId()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
@@ -327,7 +375,7 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
         assert.throws(() => { confusionMatrix.validateLabelId(labelId); },
             `labelId=${labelId}`);
     });
-    it("Test.1003 validateLabel()", function() {
+    it("Test.1103 validateLabel()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
@@ -336,7 +384,7 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
         assert.ok(isValid,
             `label=${label}`);
     });
-    it("Test.1004 validateLabel()", function() {
+    it("Test.1104 validateLabel()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix =  getTestingConfusionMatrix();
@@ -345,7 +393,7 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
             `label=${label}`);
     });
 
-    it("Test.1100 generateConfusionMatrixMetricStructure()", function() {
+    it("Test.1200 generateConfusionMatrixMetricStructure()", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
         this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
         const confusionMatrix: ConfusionMatrix = getTestingConfusionMatrix();
@@ -387,7 +435,18 @@ describe("Test Suite - model/evaluation/confusion_matrix/confusion_matrix", () =
                 "weightedAverageF1Score": number,
                 "weightedAverageAccuracy": number,
                 "weightedAverageSupport": number,
-                "support": number } } =
+                "support": number },
+            "sumupWeightedMacroAverageMetricArray": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number } } =
             confusionMatrix.generateConfusionMatrixMetricStructure();
         const confusionMatrixMetrics: [number, number, number, number, number] =
             [ confusionMatrixMetricStructure.macroAverageMetrics.averagePrecision,

@@ -136,6 +136,8 @@ export function mainConfusionMatrixFunction(
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
     Utility.debuggingLog(
+        "sumup-weighted-macro-average metrics = " + confusionMatrix.getSumupWeightedMacroAverageMetrics());
+    Utility.debuggingLog(
         "labels=" + confusionMatrix.getLabels());
     // -----------------------------------------------------------------------
     return {
@@ -378,6 +380,10 @@ export function exampleFunctionConfusionMatrix(): void {
         confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
+    Utility.debuggingLog(
+        "sumup-weighted-macro-average metrics = " + confusionMatrix.getSumupWeightedMacroAverageMetrics());
+    Utility.debuggingLog(
+        "labels=" + confusionMatrix.getLabels());
 }
 
 if (require.main === module) {

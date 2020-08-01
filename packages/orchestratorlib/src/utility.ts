@@ -25,6 +25,10 @@ export class Utility {
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
 
+  public static readonly UnknownLabel: string = 'UNKNOWN';
+
+  public static readonly UnknownLabelSet: Set<string> = new Set<string>(['', 'NONE', Utility.UnknownLabel]);
+
   // eslint-disable-next-line max-params
   public static processUtteranceMultiLabelTsv(
     lines: string[],
@@ -746,7 +750,7 @@ export class Utility {
       'total': number;
     } = confusionMatrix.getPositiveSupportLabelMacroAverageMetrics();
     const scoringConfusionMatrixOutputLinePositiveSupportLabelMacroAverage: any[] = [
-      'Macro-Average',
+      'Positive Support Macro-Average',
       Utility.round(positiveSupportLabelMacroAverageMetrics.averagePrecision),
       Utility.round(positiveSupportLabelMacroAverageMetrics.averageRecall),
       Utility.round(positiveSupportLabelMacroAverageMetrics.averageF1Score),
@@ -781,6 +785,32 @@ export class Utility {
       weightedMacroAverageMetrics.total,
     ];
     scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineWeightedMacroAverage);
+    const sumupWeightedMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getSumupWeightedMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineSumupWeightedMacroAverage: any[] = [
+      'Weighted Sum Macro-Average',
+      Utility.round(sumupWeightedMacroAverageMetrics.averagePrecision),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageRecall),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageF1Score),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageAccuracy),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageTruePositives),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageFalsePositives),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(sumupWeightedMacroAverageMetrics.averageSupport),
+      sumupWeightedMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSumupWeightedMacroAverage);
     const subsetMacroAverageMetrics: {
       'averagePrecision': number;
       'averageRecall': number;
@@ -1183,6 +1213,103 @@ export class Utility {
       }
     }
     return reversed;
+  }
+
+  public static processUnknowLabelsInUtteranceLabelsMapUsingLabelSet(
+    utteranceLabels: {
+      'utteranceLabelsMap': { [id: string]: string[] };
+      'utteranceLabelDuplicateMap': Map<string, Set<string>>; },
+    labelSet: Set<string>): {
+        'utteranceLabelsMap': { [id: string]: string[] };
+        'utteranceLabelDuplicateMap': Map<string, Set<string>>; } {
+    const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+    const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+    if (utteranceLabelsMap) {
+      for (const utteranceKey in utteranceLabelsMap) {
+        if (utteranceKey) {
+          const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+            (label: string) => !Utility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+          const hasConcreteLabel: boolean = concreteLabels.length > 0;
+          if (!hasConcreteLabel) {
+            utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+            utteranceLabelsMap[utteranceKey].push(Utility.UnknownLabel);
+            continue;
+          }
+          utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+          for (const label of concreteLabels) {
+            utteranceLabelsMap[utteranceKey].push(label);
+          }
+        }
+      }
+    }
+    if (utteranceLabelDuplicateMap) {
+      utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+        const labelsArray: string[] = [...labelsSet];
+        const concreteLabels: string[] = labelsArray.filter(
+          (label: string) => !Utility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+        const hasConcreteLabel: boolean = concreteLabels.length > 0;
+        // eslint-disable-next-line max-depth
+        if (hasConcreteLabel) {
+          labelsSet.clear(); // ---- NOTE ---- truncate the array!
+          // eslint-disable-next-line max-depth
+          for (const label of concreteLabels) {
+            labelsSet.add(label);
+          }
+        } else {
+          labelsSet.clear(); // ---- NOTE ---- truncate the array!
+          labelsSet.add(Utility.UnknownLabel);
+        }
+      });
+    }
+    return utteranceLabels;
+  }
+
+  public static processUnknowLabelsInUtteranceLabelsMap(
+    utteranceLabels: {
+      'utteranceLabelsMap': { [id: string]: string[] };
+      'utteranceLabelDuplicateMap': Map<string, Set<string>>; }): {
+        'utteranceLabelsMap': { [id: string]: string[] };
+        'utteranceLabelDuplicateMap': Map<string, Set<string>>; } {
+    const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+    const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+    if (utteranceLabelsMap) {
+      for (const utteranceKey in utteranceLabelsMap) {
+        if (utteranceKey) {
+          const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+            (label: string) => !Utility.UnknownLabelSet.has(label.toUpperCase()));
+          const hasConcreteLabel: boolean = concreteLabels.length > 0;
+          if (!hasConcreteLabel) {
+            utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+            utteranceLabelsMap[utteranceKey].push(Utility.UnknownLabel);
+            continue;
+          }
+          utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+          for (const label of concreteLabels) {
+            utteranceLabelsMap[utteranceKey].push(label);
+          }
+        }
+      }
+    }
+    if (utteranceLabelDuplicateMap) {
+      utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+        const labelsArray: string[] = [...labelsSet];
+        const concreteLabels: string[] = labelsArray.filter(
+          (label: string) => !Utility.UnknownLabelSet.has(label.toUpperCase()));
+        const hasConcreteLabel: boolean = concreteLabels.length > 0;
+        // eslint-disable-next-line max-depth
+        if (hasConcreteLabel) {
+          labelsSet.clear(); // ---- NOTE ---- truncate the array!
+          // eslint-disable-next-line max-depth
+          for (const label of concreteLabels) {
+            labelsSet.add(label);
+          }
+        } else {
+          labelsSet.clear(); // ---- NOTE ---- truncate the array!
+          labelsSet.add(Utility.UnknownLabel);
+        }
+      });
+    }
+    return utteranceLabels;
   }
 
   // eslint-disable-next-line max-params

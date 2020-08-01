@@ -47,7 +47,18 @@ export interface IConfusionMatrix {
             "weightedAverageF1Score": number,
             "weightedAverageAccuracy": number,
             "weightedAverageSupport": number,
-            "support": number } };
+            "support": number },
+        "sumupWeightedMacroAverageMetricArray": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } };
 
     getNumberLabels(): number;
     getLabels(): string[];
@@ -92,6 +103,18 @@ export interface IConfusionMatrix {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getSumupWeightedMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
         "averageAccuracy": number,
         "averageSupport": number,
         "total": number };

@@ -271,7 +271,18 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "weightedAverageF1Score": number,
                 "weightedAverageAccuracy": number,
                 "weightedAverageSupport": number,
-                "support": number } } =
+                "support": number },
+            "sumupWeightedMacroAverageMetricArray": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number } } =
             confusionMatrixCrossValidation.generateConfusionMatrixMetricStructure();
         Utility.debuggingLog(
            `confusionMatrixCrossValidation.getMicroAverageMetrics()=` +
@@ -281,7 +292,9 @@ export class CrossValidator extends AbstractBaseEvaluator {
            `,confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
            `${confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
            `,confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
+           `${confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
+           `,confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
+           `${confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
             confusionMatrixMetricStructure;
         return outputEvaluationReport;

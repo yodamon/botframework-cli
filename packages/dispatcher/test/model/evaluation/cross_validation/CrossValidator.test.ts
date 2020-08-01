@@ -96,7 +96,9 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
-            `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
+            `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
     });
     it("Test.0001 crossValidate() - ColumnarContentEmail", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
@@ -174,6 +176,8 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
-            `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}`);
+            `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
     });
 });

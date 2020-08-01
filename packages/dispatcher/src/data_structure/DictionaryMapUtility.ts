@@ -33,6 +33,110 @@ import { Utility } from "../utility/Utility";
 
 export class DictionaryMapUtility {
 
+    public static readonly UnknownLabel: string = "UNKNOWN";
+
+    public static readonly UnknownLabelSet: Set<string> =
+        new Set<string>(["", "NONE", DictionaryMapUtility.UnknownLabel]);
+
+    public static processUnknowLabelsInUtteranceLabelsMapUsingLabelSet(
+        utteranceLabels: {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; },
+        labelSet: Set<string>): {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; } {
+        const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+        const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+        if (utteranceLabelsMap) {
+            for (const utteranceKey in utteranceLabelsMap) {
+                if (utteranceKey) {
+                    const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+                        (label: string) =>
+                        !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+                    const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                    if (!hasConcreteLabel) {
+                        utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                        utteranceLabelsMap[utteranceKey].push(DictionaryMapUtility.UnknownLabel);
+                        continue;
+                    }
+                    utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                    for (const label of concreteLabels) {
+                        utteranceLabelsMap[utteranceKey].push(label);
+                    }
+                }
+          }
+        }
+        if (utteranceLabelDuplicateMap) {
+            utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+                const labelsArray: string[] = [...labelsSet];
+                const concreteLabels: string[] = labelsArray.filter(
+                    (label: string) =>
+                    !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+                const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                // eslint-disable-next-line max-depth
+                if (hasConcreteLabel) {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    // eslint-disable-next-line max-depth
+                    for (const label of concreteLabels) {
+                        labelsSet.add(label);
+                    }
+                } else {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    labelsSet.add(DictionaryMapUtility.UnknownLabel);
+                }
+            });
+        }
+        return utteranceLabels;
+      }
+
+      public static processUnknowLabelsInUtteranceLabelsMap(
+        utteranceLabels: {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; }): {
+                "utteranceLabelsMap": { [id: string]: string[] };
+                "utteranceLabelDuplicateMap": Map<string, Set<string>>; } {
+        const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+        const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+        if (utteranceLabelsMap) {
+            for (const utteranceKey in utteranceLabelsMap) {
+                if (utteranceKey) {
+                    const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+                        (label: string) => !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()));
+                    const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                    if (!hasConcreteLabel) {
+                        utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                        utteranceLabelsMap[utteranceKey].push(DictionaryMapUtility.UnknownLabel);
+                        continue;
+                    }
+                    utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                    for (const label of concreteLabels) {
+                        utteranceLabelsMap[utteranceKey].push(label);
+                    }
+                }
+            }
+        }
+        if (utteranceLabelDuplicateMap) {
+            utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+                const labelsArray: string[] = [...labelsSet];
+                const concreteLabels: string[] = labelsArray.filter(
+                    (label: string) => !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()));
+                const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                // eslint-disable-next-line max-depth
+                if (hasConcreteLabel) {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    // eslint-disable-next-line max-depth
+                    for (const label of concreteLabels) {
+                        labelsSet.add(label);
+                    }
+                } else {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    labelsSet.add(DictionaryMapUtility.UnknownLabel);
+                }
+            });
+        }
+        return utteranceLabels;
+      }
+
     public static convertStringKeyGenericSetNativeMapToDictionary<T>(
         stringKeyGenericSetMap: Map<string, Set<T>>): { [id: string]: Set<T> } {
         const stringIdGenericSetDictionary: { [id: string]: Set<T> } = {};

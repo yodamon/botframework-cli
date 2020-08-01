@@ -185,7 +185,18 @@ export class Tester extends AbstractBaseModelFeaturizerEvaluator {
                 "weightedAverageF1Score": number,
                 "weightedAverageAccuracy": number,
                 "weightedAverageSupport": number,
-                "support": number } } =
+                "support": number },
+            "sumupWeightedMacroAverageMetricArray": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number } } =
             confusionMatrixTest.generateConfusionMatrixMetricStructure();
         Utility.debuggingLog(
            `confusionMatrixTest.getMicroAverageMetrics()=` +
@@ -195,7 +206,9 @@ export class Tester extends AbstractBaseModelFeaturizerEvaluator {
            `,confusionMatrixTest.getPositiveSupportLabelMacroAverageMetrics()=` +
            `${confusionMatrixTest.getPositiveSupportLabelMacroAverageMetrics()}` +
            `,confusionMatrixTest.getWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixTest.getWeightedMacroAverageMetrics()}`);
+           `${confusionMatrixTest.getWeightedMacroAverageMetrics()}` +
+           `,confusionMatrixTest.getSumupWeightedMacroAverageMetrics()=` +
+           `${confusionMatrixTest.getSumupWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
             confusionMatrixMetricStructure;
         return outputEvaluationReport;

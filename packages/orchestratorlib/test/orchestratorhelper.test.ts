@@ -27,8 +27,29 @@ describe('Test Suite - orchestratorhelper', () => {
       utteranceLabelsMap,
       utteranceLabelDuplicateMap);
     Utility.debuggingLog(
-      `utteranceLabelsMap=${utteranceLabelsMap}`);
-    assert.ok(utteranceLabelsMap);
+      `utteranceLabelsMap=${Utility.jsonStringify(utteranceLabelsMap)}`);
+    assert.ok(Object.entries(utteranceLabelsMap).length === 1);
+    assert.ok(utteranceLabelsMap[utterance].length === 1);
+  });
+  it('Test.0001 OrchestratorHelper.addNewLabelUtterance() empty label', function () {
+    Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
+    this.timeout(UnitTestHelper.getDefaultUnitTestTimeout());
+    const utterance: string = 'afadf ;mdc';
+    const label: string = '';
+    const hierarchicalLabel: string = '';
+    const utteranceLabelsMap: { [id: string]: string[] } = {};
+    const utteranceLabelDuplicateMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+    OrchestratorHelper.addNewLabelUtterance(
+      utterance,
+      label,
+      hierarchicalLabel,
+      utteranceLabelsMap,
+      utteranceLabelDuplicateMap);
+    Utility.debuggingLog(
+      `utteranceLabelsMap=${Utility.jsonStringify(utteranceLabelsMap)}`);
+    assert.ok(Object.entries(utteranceLabelsMap).length === 1);
+    assert.ok(utteranceLabelsMap[utterance].length === 1);
+    assert.ok(utteranceLabelsMap[utterance][0] === '');
   });
 });
 
