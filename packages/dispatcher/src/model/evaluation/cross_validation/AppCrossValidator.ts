@@ -108,12 +108,17 @@ export function mainCrossValidatorWithData(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+        // tslint:disable-next-line: max-line-length
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-        `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-        `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
     return crossValidator;
     // -----------------------------------------------------------------------
 }
@@ -203,12 +208,17 @@ export async function mainCrossValidatorWithLuContent(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+        // tslint:disable-next-line: max-line-length
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-        `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-        `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
     return crossValidator;
     // -----------------------------------------------------------------------
 }
@@ -310,12 +320,17 @@ export function mainCrossValidatorWithColumnarContent(
         `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+        `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+        // tslint:disable-next-line: max-line-length
+        `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
         `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
         `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-        `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-        `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+        `,crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+        `${crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
     return crossValidator;
     // -----------------------------------------------------------------------
 }

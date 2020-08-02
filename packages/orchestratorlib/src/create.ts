@@ -29,17 +29,16 @@ export class OrchestratorCreate {
 
     const snapshot: any = labelResolver.createSnapshot();
 
-    let outPath = OrchestratorCreate.getOutputPath(outputPath, inputPath)
+    const outPath: string = OrchestratorCreate.getOutputPath(outputPath, inputPath);
     OrchestratorHelper.writeToFile(outPath, snapshot);
     Utility.debuggingLog(`Snapshot written to ${outputPath}`);
   }
 
-  private static getOutputPath(out: string, base: string)
-  {
-    let retValue = out;
-    if (!out.endsWith(`.blu`)) {
-      const srcBaseFileName = path.basename(base);
-      const dstBaseFileName = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
+  private static getOutputPath(out: string, base: string): string {
+    let retValue: string = out;
+    if (!out.endsWith('.blu')) {
+      const srcBaseFileName: string = path.basename(base);
+      const dstBaseFileName: string = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
       retValue = path.join(out, `${dstBaseFileName}.blu`);
     }
     return retValue;

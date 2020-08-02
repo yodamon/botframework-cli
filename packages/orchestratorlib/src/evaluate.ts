@@ -19,8 +19,10 @@ export class OrchestratorEvaluate {
   // eslint-disable-next-line max-params
   public static async runAsync(
     inputPath: string, outputPath: string, nlrPath: string = '',
-    ambiguousClosenessParameter: number = 0.2,
-    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
+    ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter,
+    lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter,
+    multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter,
+    unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter): Promise<void> {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
       Utility.debuggingThrow('Please provide path to an input .blu file');
@@ -35,11 +37,15 @@ export class OrchestratorEvaluate {
     }
     const ambiguousCloseness: number = ambiguousClosenessParameter;
     const lowConfidenceScoreThreshold: number = lowConfidenceScoreThresholdParameter;
+    const multiLabelPredictionThreshold: number = multiLabelPredictionThresholdParameter;
+    const unknownLabelPredictionThreshold: number = unknownLabelPredictionThresholdParameter;
     Utility.debuggingLog(`inputPath=${inputPath}`);
     Utility.debuggingLog(`outputPath=${outputPath}`);
     Utility.debuggingLog(`nlrPath=${nlrPath}`);
     Utility.debuggingLog(`ambiguousCloseness=${ambiguousCloseness}`);
     Utility.debuggingLog(`lowConfidenceScoreThreshold=${lowConfidenceScoreThreshold}`);
+    Utility.debuggingLog(`multiLabelPredictionThreshold=${multiLabelPredictionThreshold}`);
+    Utility.debuggingLog(`unknownLabelPredictionThreshold=${unknownLabelPredictionThreshold}`);
     // ---- NOTE ---- load the training set
     const trainingFile: string = inputPath;
     if (!Utility.exists(trainingFile)) {
@@ -150,7 +156,9 @@ export class OrchestratorEvaluate {
       trainingSetScoreOutputFile,
       trainingSetSummaryOutputFile,
       ambiguousCloseness,
-      lowConfidenceScoreThreshold);
+      lowConfidenceScoreThreshold,
+      multiLabelPredictionThreshold,
+      unknownLabelPredictionThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       Utility.debuggingLog(`evaluationOutput=${Utility.jsonStringify(evaluationOutput)}`);
     }

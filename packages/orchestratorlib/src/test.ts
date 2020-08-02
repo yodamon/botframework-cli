@@ -21,7 +21,9 @@ export class OrchestratorTest {
   public static async runAsync(
     nlrPath: string, inputPath: string, testPath: string, outputPath: string,
     ambiguousClosenessParameter: number,
-    lowConfidenceScoreThresholdParameter: number): Promise<void> {
+    lowConfidenceScoreThresholdParameter: number,
+    multiLabelPredictionThresholdParameter: number,
+    unknownLabelPredictionThresholdParameter: number): Promise<void> {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
       Utility.debuggingThrow('Please provide path to an input .blu file');
@@ -38,12 +40,16 @@ export class OrchestratorTest {
     nlrPath = path.resolve(nlrPath);
     const ambiguousCloseness: number = ambiguousClosenessParameter;
     const lowConfidenceScoreThreshold: number = lowConfidenceScoreThresholdParameter;
+    const multiLabelPredictionThreshold: number = multiLabelPredictionThresholdParameter;
+    const unknownLabelPredictionThreshold: number = unknownLabelPredictionThresholdParameter;
     Utility.debuggingLog(`inputPath=${inputPath}`);
     Utility.debuggingLog(`testPath=${testPath}`);
     Utility.debuggingLog(`outputPath=${outputPath}`);
     Utility.debuggingLog(`nlrPath=${nlrPath}`);
     Utility.debuggingLog(`ambiguousCloseness=${ambiguousCloseness}`);
     Utility.debuggingLog(`lowConfidenceScoreThreshold=${lowConfidenceScoreThreshold}`);
+    Utility.debuggingLog(`multiLabelPredictionThreshold=${multiLabelPredictionThreshold}`);
+    Utility.debuggingLog(`unknownLabelPredictionThreshold=${unknownLabelPredictionThreshold}`);
 
     // ---- NOTE ---- load the training set
     const trainingFile: string = inputPath;
@@ -64,7 +70,7 @@ export class OrchestratorTest {
       'utteranceLabelsMap': { [id: string]: string[] };
       'utteranceLabelDuplicateMap': Map<string, Set<string>>; } = await OrchestratorHelper.getUtteranceLabelsMap(trainingFile, false);
     const trainingSetUtterancesLabelsMap: { [id: string]: string[] } = processedUtteranceLabelsMap.utteranceLabelsMap;
-    // const trainingSetUtterancesDuplicateLabelsMap: Map<string, Set<string>> = processedUtteranceLabelsMap.utteranceLabelDuplicateMap;
+    // ---- NOTE-NO-NEED ---- const trainingSetUtterancesDuplicateLabelsMap: Map<string, Set<string>> = processedUtteranceLabelsMap.utteranceLabelDuplicateMap;
     Utility.debuggingLog('OrchestratorTest.runAsync(), after calling OrchestratorHelper.getUtteranceLabelsMap() for training set');
     const trainingSetLabels: string[] =
       [...Object.values(trainingSetUtterancesLabelsMap)].reduce(
@@ -138,7 +144,9 @@ export class OrchestratorTest {
       testingSetScoreOutputFile,
       testingSetSummaryOutputFile,
       ambiguousCloseness,
-      lowConfidenceScoreThreshold);
+      lowConfidenceScoreThreshold,
+      multiLabelPredictionThreshold,
+      unknownLabelPredictionThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       Utility.debuggingLog(`evaluationOutput=${Utility.jsonStringify(evaluationOutput)}`);
     }

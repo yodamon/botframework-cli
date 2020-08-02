@@ -242,7 +242,7 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "truePositives": number,
                 "falsePositives": number,
                 "falseNegatives": number,
-                "support": number },
+                "total": number },
             "macroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
@@ -253,7 +253,18 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "averageTrueNegatives": number,
                 "averageFalseNegatives": number,
                 "averageSupport": number,
-                "support": number },
+                "total": number },
+            "summationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "positiveSupportLabelMacroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
@@ -264,15 +275,26 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "averageTrueNegatives": number,
                 "averageFalseNegatives": number,
                 "averageSupport": number,
-                "support": number },
+                "total": number },
+            "positiveSupportLabelSummationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
                 "weightedAverageF1Score": number,
                 "weightedAverageAccuracy": number,
                 "weightedAverageSupport": number,
-                "support": number },
-            "sumupWeightedMacroAverageMetricArray": {
+                "total": number },
+            "summationWeightedMacroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
                 "averageF1Score": number,
@@ -285,16 +307,21 @@ export class CrossValidator extends AbstractBaseEvaluator {
                 "total": number } } =
             confusionMatrixCrossValidation.generateConfusionMatrixMetricStructure();
         Utility.debuggingLog(
-           `confusionMatrixCrossValidation.getMicroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
-           `,confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
-           `,confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
-           `,confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-           `,confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+            `confusionMatrixCrossValidation.getMicroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+            // tslint:disable-next-line: max-line-length
+            `${confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
+            `,confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
             confusionMatrixMetricStructure;
         return outputEvaluationReport;

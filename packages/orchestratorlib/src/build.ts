@@ -49,15 +49,13 @@ export class OrchestratorBuild {
       OrchestratorBuild.LuConfigFile = luConfigFile;
       OrchestratorBuild.Orchestrator = orchestrator;
       OrchestratorBuild.OutputPath = outputPath;
-      let bluPaths: any = {};
-      if (inputPath !== "") {
-        if (OrchestratorHelper.isDirectory(inputPath)) {
-          await OrchestratorBuild.iterateInputFolder(inputPath, isDialog, bluPaths);
-        } else {
-          await OrchestratorBuild.processLuFile(inputPath, isDialog, bluPaths);
-        }
-      } else {
+      const bluPaths: any = {};
+      if (Utility.isEmptyString(inputPath)) {
         await OrchestratorBuild.processConfigFile(luConfigFile, isDialog, bluPaths);
+      } else if (OrchestratorHelper.isDirectory(inputPath)) {
+        await OrchestratorBuild.iterateInputFolder(inputPath, isDialog, bluPaths);
+      } else {
+        await OrchestratorBuild.processLuFile(inputPath, isDialog, bluPaths);
       }
       if (Object.getOwnPropertyNames(bluPaths).length !== 0) {
         OrchestratorHelper.writeSettingsFile(nlrPath, bluPaths, OrchestratorBuild.OutputPath);
@@ -67,10 +65,10 @@ export class OrchestratorBuild {
     }
   }
 
-  private static async processConfigFile (configFile: string, isDialog: boolean, bluPaths: any)
-  {
-    let configContent = JSON.parse(OrchestratorHelper.readFile(configFile));
-    for (var file of (configContent.models || [])) {
+  private static async processConfigFile(configFile: string, isDialog: boolean, bluPaths: any) {
+    const configContent: any = JSON.parse(OrchestratorHelper.readFile(configFile));
+    for (const file of (configContent.models || [])) {
+      // eslint-disable-next-line no-await-in-loop
       await OrchestratorBuild.processLuFile(path.resolve(file), isDialog, bluPaths);
     }
   }
@@ -89,7 +87,7 @@ export class OrchestratorBuild {
     OrchestratorHelper.writeToFile(snapshotFile, snapshot);
     Utility.debuggingLog(`Snapshot written to ${snapshotFile}`);
     const entities: any = await OrchestratorHelper.getEntitiesInLu(luFile);
-    const settingsKeyForBlu = OrchestratorHelper.writeDialogFiles(OrchestratorBuild.OutputPath, isDialog, baseName, entities);
+    const settingsKeyForBlu: string|undefined = OrchestratorHelper.writeDialogFiles(OrchestratorBuild.OutputPath, isDialog, baseName, entities);
     if (settingsKeyForBlu !== undefined) bluPaths[baseName] = snapshotFile;
   }
 

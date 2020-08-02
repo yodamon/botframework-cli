@@ -93,12 +93,17 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+            // tslint:disable-next-line: max-line-length
+            `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-            `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-            `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+            `,crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
     });
     it("Test.0001 crossValidate() - ColumnarContentEmail", function() {
         Utility.toPrintDebuggingLogToConsole = UnitTestHelper.getDefaultUnitTestDebuggingLogFlag();
@@ -173,11 +178,16 @@ describe("Test Suite - model/evaluation/cross_validator/CrossValidator", async (
             `${crossValidationResult.confusionMatrixCrossValidation.getMicroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSummationMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelMacroAverageMetrics()}` +
+            `,crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+            // tslint:disable-next-line: max-line-length
+            `${crossValidationResult.confusionMatrixCrossValidation.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
             `,crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()=` +
             `${crossValidationResult.confusionMatrixCrossValidation.getWeightedMacroAverageMetrics()}` +
-            `,crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()=` +
-            `${crossValidationResult.confusionMatrixCrossValidation.getSumupWeightedMacroAverageMetrics()}`);
+            `,crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()=` +
+            `${crossValidationResult.confusionMatrixCrossValidation.getSummationWeightedMacroAverageMetrics()}`);
     });
 });

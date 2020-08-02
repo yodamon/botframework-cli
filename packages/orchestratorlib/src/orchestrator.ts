@@ -11,6 +11,7 @@ import {OrchestratorFineTune} from './finetune';
 import {OrchestratorNlr} from './nlr';
 import {OrchestratorPredict} from './predict';
 import {OrchestratorTest} from './test';
+import {Utility} from '.';
 
 export class Orchestrator {
   public static async createAsync(nlrPath: string, inputPath: string, outputPath: string, hierarchical: boolean = false): Promise<void> {
@@ -30,9 +31,16 @@ export class Orchestrator {
   // eslint-disable-next-line max-params
   public static async evaluateAsync(
     inputPath: string, outputPath: string, nlrPath: string = '',
-    ambiguousClosenessParameter: number = 0.2,
-    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
-    await OrchestratorEvaluate.runAsync(inputPath, outputPath, nlrPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
+    ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter,
+    lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter,
+    multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter,
+    unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter): Promise<void> {
+    await OrchestratorEvaluate.runAsync(
+      inputPath, outputPath, nlrPath,
+      ambiguousClosenessParameter,
+      lowConfidenceScoreThresholdParameter,
+      multiLabelPredictionThresholdParameter,
+      unknownLabelPredictionThresholdParameter);
   }
 
   public static async fineTuneAsync(nlrPath: string, inputPath: string, outputPath: string): Promise<void> {
@@ -50,16 +58,28 @@ export class Orchestrator {
   // eslint-disable-next-line max-params
   public static async predictAsync(
     nlrPath: string, inputPath: string, outputPath: string,
-    ambiguousClosenessParameter: number = 0.2,
-    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
-    await OrchestratorPredict.runAsync(nlrPath, inputPath, outputPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
+    ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter,
+    lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter,
+    multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter,
+    unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter): Promise<void> {
+    await OrchestratorPredict.runAsync(
+      nlrPath, inputPath, outputPath,
+      ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter,
+      multiLabelPredictionThresholdParameter,
+      unknownLabelPredictionThresholdParameter);
   }
 
   // eslint-disable-next-line max-params
   public static async testAsync(
     nlrPath: string, inputPath: string, testPath: string, outputPath: string,
-    ambiguousClosenessParameter: number = 0.2,
-    lowConfidenceScoreThresholdParameter: number = 0.5): Promise<void> {
-    await OrchestratorTest.runAsync(nlrPath, inputPath, testPath, outputPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter);
+    ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter,
+    lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter,
+    multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter,
+    unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter): Promise<void> {
+    await OrchestratorTest.runAsync(
+      nlrPath, inputPath, testPath,
+      outputPath, ambiguousClosenessParameter, lowConfidenceScoreThresholdParameter,
+      multiLabelPredictionThresholdParameter,
+      unknownLabelPredictionThresholdParameter);
   }
 }

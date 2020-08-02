@@ -55,6 +55,12 @@ export class OrchestratorPredict {
   static readonly questionForLowConfidenceThreshold: string =
     'Please enter a threshold for generating the Low-Confidence report > ';
 
+  static readonly questionForMultiLabelPredictionThreshold: string =
+    'Please enter a threshold for multi-label prediction > ';
+
+  static readonly questionForunknownLabelPredictionThreshold: string =
+    'Please enter a threshold for unknow label prediction > ';
+
   static readonly interactive: readline.Interface = readline.createInterface(process.stdin, process.stdout);
 
   static readonly question: any = function (prefix: string) {
@@ -71,9 +77,13 @@ export class OrchestratorPredict {
 
   protected nlrPath: string = '';
 
-  protected ambiguousCloseness: number = 0.2;
+  protected ambiguousCloseness: number = Utility.DefaultAmbiguousClosenessParameter;
 
-  protected lowConfidenceScoreThreshold: number = 0.5;
+  protected lowConfidenceScoreThreshold: number = Utility.DefaultLowConfidenceScoreThresholdParameter;
+
+  protected multiLabelPredictionThreshold: number = Utility.DefaultMultiLabelPredictionThresholdParameter;
+
+  protected unknownLabelPredictionThreshold: number = Utility.DefaultUnknownLabelPredictionThresholdParameter;
 
   protected trainingFile: string = '';
 
@@ -150,7 +160,9 @@ export class OrchestratorPredict {
   constructor(
     nlrPath: string, inputPath: string, outputPath: string,
     ambiguousClosenessParameter: number,
-    lowConfidenceScoreThresholdParameter: number) {
+    lowConfidenceScoreThresholdParameter: number,
+    multiLabelPredictionThresholdParameter: number,
+    unknownLabelPredictionThresholdParameter: number) {
     // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
       Utility.debuggingThrow('Please provide path to an input .blu file');
@@ -171,11 +183,15 @@ export class OrchestratorPredict {
     Utility.debuggingLog(`nlrPath=${nlrPath}`);
     Utility.debuggingLog(`ambiguousClosenessParameter=${ambiguousClosenessParameter}`);
     Utility.debuggingLog(`lowConfidenceScoreThresholdParameter=${lowConfidenceScoreThresholdParameter}`);
+    Utility.debuggingLog(`multiLabelPredictionThresholdParameter=${multiLabelPredictionThresholdParameter}`);
+    Utility.debuggingLog(`unknownLabelPredictionThresholdParameter=${unknownLabelPredictionThresholdParameter}`);
     this.inputPath = inputPath;
     this.outputPath = outputPath;
     this.nlrPath = nlrPath;
     this.ambiguousCloseness = ambiguousClosenessParameter;
     this.lowConfidenceScoreThreshold = lowConfidenceScoreThresholdParameter;
+    this.multiLabelPredictionThreshold = multiLabelPredictionThresholdParameter;
+    this.unknownLabelPredictionThreshold = unknownLabelPredictionThresholdParameter;
     // ---- NOTE ---- load the training set
     this.trainingFile = this.inputPath;
     // if (!Utility.exists(this.trainingFile)) {
@@ -201,13 +217,17 @@ export class OrchestratorPredict {
   public static async runAsync(
     nlrPath: string, inputPath: string, outputPath: string,
     ambiguousClosenessParameter: number,
-    lowConfidenceScoreThresholdParameter: number): Promise<number> {
+    lowConfidenceScoreThresholdParameter: number,
+    multiLabelPredictionThresholdParameter: number,
+    unknownLabelPredictionThresholdParameter: number): Promise<number> {
     const orchestratorPredict: OrchestratorPredict = new OrchestratorPredict(
       nlrPath,
       inputPath,
       outputPath,
       ambiguousClosenessParameter,
-      lowConfidenceScoreThresholdParameter);
+      lowConfidenceScoreThresholdParameter,
+      multiLabelPredictionThresholdParameter,
+      unknownLabelPredictionThresholdParameter);
     // ---- NOTE ---- create a LabelResolver object.
     await orchestratorPredict.buildLabelResolver();
     // ---- NOTE ---- prepare readline.
@@ -271,6 +291,12 @@ export class OrchestratorPredict {
       // eslint-disable-next-line no-await-in-loop
       case 'vlt': await orchestratorPredict.commandLetVLT();
         break;
+      // eslint-disable-next-line no-await-in-loop
+      case 'vmt': await orchestratorPredict.commandLetVMT();
+        break;
+      // eslint-disable-next-line no-await-in-loop
+      case 'vut': await orchestratorPredict.commandLetVUT();
+        break;
       case 'a': orchestratorPredict.commandLetA();
         break;
       case 'r': orchestratorPredict.commandLetR();
@@ -293,7 +319,7 @@ export class OrchestratorPredict {
   }
 
   public commandLetH(): number {
-    console.log('  Commandlets: h, q, d, s, u, cu, i, ci, ni, cni, q, p, v, vd, va, vm, vl, a, r, c, rl, n');
+    console.log('  Commandlets: h, q, d, s, u, cu, i, ci, ni, cni, q, p, v, vd, va, vm, vl, vat, vlt, vmt, vut, a, r, c, rl, n');
     console.log('    h   - print this help message');
     console.log('    q   - quit');
     console.log('    d   - display utterance, intent label array inputs, Orchestrator config, and the label-index map');
@@ -319,8 +345,10 @@ export class OrchestratorPredict {
     console.log('          and enter an index for retrieving utterance/intents and save them into "current"');
     console.log('    vl  - reference the validation LowConfidence report (previously generated by the "v" command) ');
     console.log('          and enter an index for retrieving utterance/intents and save them into "current"');
-    console.log('    vat - enter a new validation report ambiguous closeness threshold');
-    console.log('    vlt - enter a new validation report low-confidence threshold');
+    console.log('    vat - enter a new validation-report ambiguous closeness threshold');
+    console.log('    vlt - enter a new validation-report low-confidence threshold');
+    console.log('    vmt - enter a new multi-label threshold');
+    console.log('    vut - enter a new unknown-label threshold');
     console.log('    a   - add the "current" utterance and intent labels to the model example set');
     console.log('    r   - remove the "current" utterance and intent labels from the model example set');
     console.log('    c   - remove the "current" utterance\'s intent labels and then ');
@@ -337,6 +365,8 @@ export class OrchestratorPredict {
     console.log(`> "New"     intent label array: "${this.newIntentLabels}"`);
     console.log(`> Ambiguous closeness:           ${this.ambiguousCloseness}`);
     console.log(`> Low-confidence closeness:      ${this.lowConfidenceScoreThreshold}`);
+    console.log(`> Multi-label threshold:         ${this.multiLabelPredictionThreshold}`);
+    console.log(`> Unknown-label threshold:       ${this.unknownLabelPredictionThreshold}`);
     const labelResolverConfig: any = Utility.getLabelResolverSettings(this.labelResolver);
     console.log(`> Orchestrator configuration:         ${labelResolverConfig}`);
     const labels: string[] = this.labelResolver.getLabels(LabelType.Intent);
@@ -391,7 +421,7 @@ export class OrchestratorPredict {
     // eslint-disable-next-line no-await-in-loop
     let label: string = await OrchestratorPredict.question(OrchestratorPredict.questionForCurrentIntentLabel);
     label = label.trim();
-    const errorMessage: string = Utility.parseLabelEntry(
+    const errorMessage: string = Utility.parseLabelResolverLabelEntry(
       this.labelResolver,
       label,
       this.currentIntentLabels);
@@ -411,7 +441,7 @@ export class OrchestratorPredict {
     // eslint-disable-next-line no-await-in-loop
     let label: string = await OrchestratorPredict.question(OrchestratorPredict.questionForNewIntentLabel);
     label = label.trim();
-    const errorMessage: string = Utility.parseLabelEntry(
+    const errorMessage: string = Utility.parseLabelResolverLabelEntry(
       this.labelResolver,
       label,
       this.newIntentLabels);
@@ -475,7 +505,9 @@ export class OrchestratorPredict {
       this.predictingSetScoreOutputFilename,
       this.predictingSetSummaryOutputFilename,
       this.ambiguousCloseness,
-      this.lowConfidenceScoreThreshold);
+      this.lowConfidenceScoreThreshold,
+      this.multiLabelPredictionThreshold,
+      this.unknownLabelPredictionThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       Utility.debuggingLog(`currentEvaluationOutput=${Utility.jsonStringify(this.currentEvaluationOutput)}`);
     }
@@ -656,6 +688,28 @@ export class OrchestratorPredict {
       return -1;
     }
     this.lowConfidenceScoreThreshold = lowConfidenceScoreThreshold;
+    return 0;
+  }
+
+  public async commandLetVMT(): Promise<number> {
+    const multiLabelPredictionThresholdParameter: string = await OrchestratorPredict.question(OrchestratorPredict.questionForAmbiguousThreshold);
+    const multiLabelPredictionThreshold: number = Number(multiLabelPredictionThresholdParameter);
+    if (Number.isNaN(multiLabelPredictionThreshold)) {
+      Utility.debuggingLog(`The input "${multiLabelPredictionThresholdParameter}" is not a number.`);
+      return -1;
+    }
+    this.multiLabelPredictionThreshold = multiLabelPredictionThreshold;
+    return 0;
+  }
+
+  public async commandLetVUT(): Promise<number> {
+    const unknownLabelPredictionThresholdParameter: string = await OrchestratorPredict.question(OrchestratorPredict.questionForLowConfidenceThreshold);
+    const unknownLabelPredictionThreshold: number = Number(unknownLabelPredictionThresholdParameter);
+    if (Number.isNaN(unknownLabelPredictionThreshold)) {
+      Utility.debuggingLog(`The input "${unknownLabelPredictionThresholdParameter}" is not a number.`);
+      return -1;
+    }
+    this.unknownLabelPredictionThreshold = unknownLabelPredictionThreshold;
     return 0;
   }
 

@@ -25,6 +25,14 @@ export class Utility {
 
   public static toPrintDetailedDebuggingLogToConsole: boolean = false;
 
+  public static readonly DefaultAmbiguousClosenessParameter: number = 0.2;
+
+  public static readonly DefaultLowConfidenceScoreThresholdParameter: number = 0.5;
+
+  public static readonly DefaultMultiLabelPredictionThresholdParameter: number = 1.0;
+
+  public static readonly DefaultUnknownLabelPredictionThresholdParameter: number = 0.3;
+
   public static readonly UnknownLabel: string = 'UNKNOWN';
 
   public static readonly UnknownLabelSet: Set<string> = new Set<string>(['', 'NONE', Utility.UnknownLabel]);
@@ -124,7 +132,7 @@ export class Utility {
     return true;
   }
 
-  public static parseLabelEntry(
+  public static parseLabelResolverLabelEntry(
     labelResolver: any,
     label: string,
     intentLabelArray: string[]): string {
@@ -287,7 +295,9 @@ export class Utility {
     evaluationSetScoreOutputFilename: string,
     evaluationSetSummaryOutputFilename: string,
     ambiguousCloseness: number,
-    lowConfidenceScoreThreshold: number): {
+    lowConfidenceScoreThreshold: number,
+    multiLabelPredictionThreshold: number,
+    unknownLabelPredictionThreshold: number): {
       'evaluationReportLabelUtteranceStatistics': {
         'evaluationSummaryTemplate': string;
         'labelArrayAndMap': {
@@ -351,7 +361,9 @@ export class Utility {
     } = Utility.generateEvaluationReportLabelUtteranceStatistics(
       trainingSetLabels,
       utteranceLabelsMap,
-      utteranceLabelDuplicateMap);
+      utteranceLabelDuplicateMap,
+      // ---- multiLabelPredictionThreshold,
+      unknownLabelPredictionThreshold);
     Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.generateEvaluationReportLabelUtteranceStatistics()');
 
     // ---- NOTE ---- output the labels by their index order to a file.
@@ -367,7 +379,9 @@ export class Utility {
     const scoreStructureArray: ScoreStructure[] = Utility.score(
       labelResolver,
       utteranceLabelsPairArray,
-      evaluationReportLabelUtteranceStatistics.labelArrayAndMap);
+      evaluationReportLabelUtteranceStatistics.labelArrayAndMap,
+      multiLabelPredictionThreshold,
+      unknownLabelPredictionThreshold);
     Utility.debuggingLog('Utility.generateEvaluationReport(), finished calling Utility.score()');
 
     // ---- NOTE ---- generate evaluation report after calling the score() function.
@@ -431,10 +445,13 @@ export class Utility {
       scoreStructureArray};
   }
 
+  // eslint-disable-next-line max-params
   public static generateEvaluationReportLabelUtteranceStatistics(
     trainingSetLabels: string[],
     utteranceLabelsMap: { [id: string]: string[] },
-    utteranceLabelDuplicateMap: Map<string, Set<string>>): {
+    utteranceLabelDuplicateMap: Map<string, Set<string>>,
+    // ---- multiLabelPredictionThreshold: number,
+    unknownLabelPredictionThreshold: number): {
       'evaluationSummaryTemplate': string;
       'labelArrayAndMap': {
         'stringArray': string[];
@@ -456,12 +473,22 @@ export class Utility {
     // ---- NOTE ---- create a label-index map.
     const labelArrayAndMap: {
       'stringArray': string[];
-      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(trainingSetLabels);
+      'stringMap': {[id: string]: number};} =
+      Utility.buildStringIdNumberValueDictionaryFromStringArray(trainingSetLabels);
     Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
     Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
     if (Utility.isEmptyStringArray(labelArrayAndMap.stringArray)) {
       Utility.debuggingThrow('there is no label, something wrong?');
     }
+    // ---- NOTE ---- as the unknown threshold is greater than 0, the score function can make an UNKNOWN prediction.
+    if (unknownLabelPredictionThreshold > 0) {
+      if (!(Utility.UnknownLabel in labelArrayAndMap.stringMap)) {
+        labelArrayAndMap.stringArray.push(Utility.UnknownLabel);
+        labelArrayAndMap.stringMap[Utility.UnknownLabel] = labelArrayAndMap.stringArray.length - 1;
+      }
+    }
+    Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
+    Utility.debuggingLog(`Utility.generateEvaluationReportLabelUtteranceStatistics(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
 
     // ---- NOTE ---- load the evaluation summary template.
     let evaluationSummaryTemplate: string = EvaluationSummaryTemplateHtml.html;
@@ -729,14 +756,40 @@ export class Utility {
       Utility.round(macroAverageMetrics.averageRecall),
       Utility.round(macroAverageMetrics.averageF1Score),
       Utility.round(macroAverageMetrics.averageAccuracy),
-      Utility.round(macroAverageMetrics.averageTruePositives),
-      Utility.round(macroAverageMetrics.averageFalsePositives),
-      Utility.round(macroAverageMetrics.averageTrueNegatives),
-      Utility.round(macroAverageMetrics.averageFalseNegatives),
-      Utility.round(macroAverageMetrics.averageSupport),
-      macroAverageMetrics.total,
+      'N/A', // ---- Utility.round(macroAverageMetrics.averageTruePositives),
+      'N/A', // ---- Utility.round(macroAverageMetrics.averageFalsePositives),
+      'N/A', // ---- Utility.round(macroAverageMetrics.averageTrueNegatives),
+      'N/A', // ---- Utility.round(macroAverageMetrics.averageFalseNegatives),
+      'N/A', // ---- Utility.round(macroAverageMetrics.averageSupport),
+      'N/A', // ---- macroAverageMetrics.total,
     ];
     scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineMacroAverage);
+    const summationMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getSummationMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineSummationMacroAverage: any[] = [
+      'Summation Macro-Average',
+      Utility.round(summationMacroAverageMetrics.averagePrecision),
+      Utility.round(summationMacroAverageMetrics.averageRecall),
+      Utility.round(summationMacroAverageMetrics.averageF1Score),
+      Utility.round(summationMacroAverageMetrics.averageAccuracy),
+      Utility.round(summationMacroAverageMetrics.averageTruePositives),
+      Utility.round(summationMacroAverageMetrics.averageFalsePositives),
+      Utility.round(summationMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(summationMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(summationMacroAverageMetrics.averageSupport),
+      'N/A', // ---- summationMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSummationMacroAverage);
     const positiveSupportLabelMacroAverageMetrics: {
       'averagePrecision': number;
       'averageRecall': number;
@@ -755,14 +808,40 @@ export class Utility {
       Utility.round(positiveSupportLabelMacroAverageMetrics.averageRecall),
       Utility.round(positiveSupportLabelMacroAverageMetrics.averageF1Score),
       Utility.round(positiveSupportLabelMacroAverageMetrics.averageAccuracy),
-      Utility.round(positiveSupportLabelMacroAverageMetrics.averageTruePositives),
-      Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalsePositives),
-      Utility.round(positiveSupportLabelMacroAverageMetrics.averageTrueNegatives),
-      Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalseNegatives),
-      Utility.round(positiveSupportLabelMacroAverageMetrics.averageSupport),
-      positiveSupportLabelMacroAverageMetrics.total,
+      'N/A', // ---- Utility.round(positiveSupportLabelMacroAverageMetrics.averageTruePositives),
+      'N/A', // ---- Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalsePositives),
+      'N/A', // ---- Utility.round(positiveSupportLabelMacroAverageMetrics.averageTrueNegatives),
+      'N/A', // ---- Utility.round(positiveSupportLabelMacroAverageMetrics.averageFalseNegatives),
+      'N/A', // ---- Utility.round(positiveSupportLabelMacroAverageMetrics.averageSupport),
+      'N/A', // ---- positiveSupportLabelMacroAverageMetrics.total,
     ];
     scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLinePositiveSupportLabelMacroAverage);
+    const positiveSupportLabelSummationMacroAverageMetrics: {
+      'averagePrecision': number;
+      'averageRecall': number;
+      'averageF1Score': number;
+      'averageAccuracy': number;
+      'averageTruePositives': number;
+      'averageFalsePositives': number;
+      'averageTrueNegatives': number;
+      'averageFalseNegatives': number;
+      'averageSupport': number;
+      'total': number;
+    } = confusionMatrix.getPositiveSupportLabelSummationMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLinePositiveSupportLabelSummationMacroAverage: any[] = [
+      'Positive Support Summation Macro-Average',
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averagePrecision),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageRecall),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageF1Score),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageAccuracy),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageTruePositives),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageFalsePositives),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(positiveSupportLabelSummationMacroAverageMetrics.averageSupport),
+      'N/A', // ---- positiveSupportLabelSummationMacroAverageMetrics.total,
+    ];
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLinePositiveSupportLabelSummationMacroAverage);
     const weightedMacroAverageMetrics: {
       'averagePrecision': number;
       'averageRecall': number;
@@ -782,10 +861,10 @@ export class Utility {
       'N/A',
       'N/A',
       'N/A',
-      weightedMacroAverageMetrics.total,
+      'N/A', // ---- weightedMacroAverageMetrics.total,
     ];
     scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineWeightedMacroAverage);
-    const sumupWeightedMacroAverageMetrics: {
+    const summationWeightedMacroAverageMetrics: {
       'averagePrecision': number;
       'averageRecall': number;
       'averageF1Score': number;
@@ -796,22 +875,22 @@ export class Utility {
       'averageFalseNegatives': number;
       'averageSupport': number;
       'total': number;
-    } = confusionMatrix.getSumupWeightedMacroAverageMetrics();
-    const scoringConfusionMatrixOutputLineSumupWeightedMacroAverage: any[] = [
-      'Weighted Sum Macro-Average',
-      Utility.round(sumupWeightedMacroAverageMetrics.averagePrecision),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageRecall),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageF1Score),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageAccuracy),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageTruePositives),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageFalsePositives),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageTrueNegatives),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageFalseNegatives),
-      Utility.round(sumupWeightedMacroAverageMetrics.averageSupport),
-      sumupWeightedMacroAverageMetrics.total,
+    } = confusionMatrix.getSummationWeightedMacroAverageMetrics();
+    const scoringConfusionMatrixOutputLineSummationWeightedMacroAverage: any[] = [
+      'Weighted Summation Macro-Average',
+      Utility.round(summationWeightedMacroAverageMetrics.averagePrecision),
+      Utility.round(summationWeightedMacroAverageMetrics.averageRecall),
+      Utility.round(summationWeightedMacroAverageMetrics.averageF1Score),
+      Utility.round(summationWeightedMacroAverageMetrics.averageAccuracy),
+      Utility.round(summationWeightedMacroAverageMetrics.averageTruePositives),
+      Utility.round(summationWeightedMacroAverageMetrics.averageFalsePositives),
+      Utility.round(summationWeightedMacroAverageMetrics.averageTrueNegatives),
+      Utility.round(summationWeightedMacroAverageMetrics.averageFalseNegatives),
+      Utility.round(summationWeightedMacroAverageMetrics.averageSupport),
+      'N/A', // ---- summationWeightedMacroAverageMetrics.total,
     ];
-    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSumupWeightedMacroAverage);
-    const subsetMacroAverageMetrics: {
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSummationWeightedMacroAverage);
+    const subsetMacroAggregateMetrics: {
       'averagePrecision': number;
       'averageRecall': number;
       'averageF1Score': number;
@@ -823,20 +902,20 @@ export class Utility {
       'averageSupport': number;
       'total': number;
     } = multiLabelConfusionMatrixSubset.getMacroAverageMetrics();
-    const scoringConfusionMatrixOutputLineSubsetMacroAverage: any[] = [
-      'Multi-Label Subset Average',
-      Utility.round(subsetMacroAverageMetrics.averagePrecision),
-      Utility.round(subsetMacroAverageMetrics.averageRecall),
-      Utility.round(subsetMacroAverageMetrics.averageF1Score),
-      Utility.round(subsetMacroAverageMetrics.averageAccuracy),
-      Utility.round(subsetMacroAverageMetrics.averageTruePositives),
-      Utility.round(subsetMacroAverageMetrics.averageFalsePositives),
-      Utility.round(subsetMacroAverageMetrics.averageTrueNegatives),
-      Utility.round(subsetMacroAverageMetrics.averageFalseNegatives),
-      Utility.round(subsetMacroAverageMetrics.averageSupport),
-      subsetMacroAverageMetrics.total,
+    const scoringConfusionMatrixOutputLineSubsetMacroAggregate: any[] = [
+      'Multi-Label Subset Aggregate',
+      Utility.round(subsetMacroAggregateMetrics.averagePrecision),
+      Utility.round(subsetMacroAggregateMetrics.averageRecall),
+      Utility.round(subsetMacroAggregateMetrics.averageF1Score),
+      Utility.round(subsetMacroAggregateMetrics.averageAccuracy),
+      Utility.round(subsetMacroAggregateMetrics.averageTruePositives),
+      Utility.round(subsetMacroAggregateMetrics.averageFalsePositives),
+      Utility.round(subsetMacroAggregateMetrics.averageTrueNegatives),
+      Utility.round(subsetMacroAggregateMetrics.averageFalseNegatives),
+      Utility.round(subsetMacroAggregateMetrics.averageSupport),
+      subsetMacroAggregateMetrics.total,
     ];
-    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSubsetMacroAverage);
+    scoringConfusionMatrixAverageOutputLines.push(scoringConfusionMatrixOutputLineSubsetMacroAggregate);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getMicroAverageMetrics())=${JSON.stringify(confusionMatrix.getMicroAverageMetrics())}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getMacroAverageMetrics())=${JSON.stringify(confusionMatrix.getMacroAverageMetrics())}`);
     Utility.debuggingLog(`Utility.generateConfusionMatrixMetricsAndHtmlTable(), JSON.stringify(confusionMatrix.getWeightedMacroAverageMetrics())=${JSON.stringify(confusionMatrix.getWeightedMacroAverageMetrics())}`);
@@ -977,12 +1056,15 @@ export class Utility {
     return {scoringAmbiguousUtterancesArrays, scoringAmbiguousUtterancesArraysHtml, scoringAmbiguousUtteranceSimpleArrays};
   }
 
+  // eslint-disable-next-line max-params
   public static score(
     labelResolver: any,
     utteranceLabelsPairArray: [string, string[]][],
     labelArrayAndMap: {
       'stringArray': string[];
-      'stringMap': {[id: string]: number};}): ScoreStructure[] {
+      'stringMap': {[id: string]: number};},
+    multiLabelPredictionThreshold: number,
+    unknownLabelPredictionThreshold: number): ScoreStructure[] {
     const scoreStructureArray: ScoreStructure[] = [];
     for (const utteranceLabels of utteranceLabelsPairArray) {
       if (utteranceLabels) {
@@ -1008,13 +1090,20 @@ export class Utility {
           Utility.debuggingLog(`Utility.score(), JSON.stringify(scoreResultArray)=${JSON.stringify(scoreResultArray)}`);
         }
         const scoreArray: number[] = scoreResultArray.map((x: Result) => x.score);
-        const argMax: { 'indexesMax': number[]; 'max': number } = Utility.getIndexesOnMaxEntries(scoreArray);
+        const argMax: { 'indexesMax': number[]; 'max': number } =
+          ((multiLabelPredictionThreshold > 0) ?
+            Utility.getIndexesOnMaxOrEntriesOverThreshold(scoreArray, multiLabelPredictionThreshold) :
+            Utility.getIndexesOnMaxEntries(scoreArray));
         if (Utility.toPrintDetailedDebuggingLogToConsole) {
           Utility.debuggingLog(`Utility.score(), JSON.stringify(argMax.indexesMax)=${JSON.stringify(argMax.indexesMax)}`);
         }
         const labelsPredictedScore: number = argMax.max;
-        const labelsPredictedIndexes: number[] = argMax.indexesMax;
-        const labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].label.name);
+        let labelsPredictedIndexes: number[] = argMax.indexesMax;
+        let labelsPredicted: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].label.name);
+        if (labelsPredictedScore < unknownLabelPredictionThreshold) {
+          labelsPredictedIndexes = [labelArrayAndMap.stringMap[Utility.UnknownLabel]];
+          labelsPredicted = [Utility.UnknownLabel];
+        }
         const labelsPredictedConcatenated: string = labelsPredicted.join(',');
         const labelsPredictedEvaluation: number = Utility.evaluateMultiLabelPrediction(labels, labelsPredicted);
         const labelsPredictedClosestText: string[] = labelsPredictedIndexes.map((x: number) => scoreResultArray[x].closest_text);
@@ -1312,6 +1401,24 @@ export class Utility {
     return utteranceLabels;
   }
 
+  public static processUnknowLabelsInBluFileContent(bluFileContents: string): string {
+    const lines: string[] = bluFileContents.split('\n');
+    for (let lineIndex: number = 1; lineIndex < lines.length; lineIndex++) {
+      const lineComponents: string[] = lines[lineIndex].split('\t');
+      const labels: string[] = lineComponents[0].split(',');
+      const concreteLabels: string[] = labels.filter(
+        (label: string) => !Utility.UnknownLabelSet.has(label.toUpperCase()));
+      const hasConcreteLabel: boolean = concreteLabels.length > 0;
+      if (hasConcreteLabel) {
+        lineComponents[0] = concreteLabels.join(',');
+      } else {
+        lineComponents[0] = Utility.UnknownLabel;
+      }
+      lines[lineIndex] = lineComponents.join('\t');
+    }
+    return lines.join('\n');
+  }
+
   // eslint-disable-next-line max-params
   public static storeDataArraysToTsvFile(
     outputFilename: string,
@@ -1482,6 +1589,36 @@ export class Utility {
     return outputContent;
   }
 
+  public static getIndexesOnMaxOrEntriesOverThreshold(
+    inputArray: number[],
+    threshold: number):
+    { 'indexesMax': number[]; 'max': number } {
+    if (Utility.isEmptyNumberArray(inputArray)) {
+      Utility.debuggingThrow('inputArray is empty');
+    }
+    const indexesOverTheThreshold: number[] = [];
+    let indexesMax: number[] = [0];
+    let max: number = inputArray[0];
+    for (let i: number = 1; i < inputArray.length; i++) {
+      const inputCurrent: number = inputArray[i];
+      if (inputCurrent > threshold) {
+        indexesOverTheThreshold.push(i);
+      }
+      if (inputCurrent > max) {
+        max = inputCurrent;
+        indexesMax = [i];
+        continue;
+      }
+      if (inputCurrent === max) {
+        indexesMax.push(i);
+      }
+    }
+    if (indexesOverTheThreshold.length > 0) {
+      indexesMax = indexesOverTheThreshold;
+    }
+    return {indexesMax, max};
+  }
+
   public static getIndexesOnMaxEntries(
     inputArray: number[]):
     { 'indexesMax': number[]; 'max': number } {
@@ -1599,7 +1736,8 @@ export class Utility {
 
   public static scoreResultsToArray(
     results: any,
-    labelIndexMap: {[id: string]: number}, digits: number = 10000): Result[] {
+    labelIndexMap: {[id: string]: number},
+    digits: number = 10000): Result[] {
     const scoreResultArray: Result[] = [];
     for (const result of results) {
       if (result) {

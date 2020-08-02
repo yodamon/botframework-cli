@@ -46,7 +46,7 @@ export class LabelResolver {
 
   public static async createWithSnapshotAsync(nlrPath: string, snapshotPath: string) {
     const encoder: TextEncoder = new TextEncoder();
-    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
+    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readBluSnapshotFile(snapshotPath));
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): nlrPath=${nlrPath}`);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): typeof(snapshot)=${typeof snapshot}`);

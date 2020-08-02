@@ -131,12 +131,17 @@ export function mainConfusionMatrixFunction(
     Utility.debuggingLog(
         "macro-average metrics = " + confusionMatrix.getMacroAverageMetrics());
     Utility.debuggingLog(
-        "positive-support-abel-macro-average metrics = " +
+        "summation-macro-average metrics = " + confusionMatrix.getSummationMacroAverageMetrics());
+    Utility.debuggingLog(
+        "positive-support-label-macro-average metrics = " +
         confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
+    Utility.debuggingLog(
+        "positive-support-label-summation-macro-average metrics = " +
+        confusionMatrix.getPositiveSupportLabelSummationMacroAverageMetrics());
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
     Utility.debuggingLog(
-        "sumup-weighted-macro-average metrics = " + confusionMatrix.getSumupWeightedMacroAverageMetrics());
+        "summation-weighted-macro-average metrics = " + confusionMatrix.getSummationWeightedMacroAverageMetrics());
     Utility.debuggingLog(
         "labels=" + confusionMatrix.getLabels());
     // -----------------------------------------------------------------------
@@ -376,12 +381,17 @@ export function exampleFunctionConfusionMatrix(): void {
     Utility.debuggingLog(
         "macro-average metrics = " + confusionMatrix.getMacroAverageMetrics());
     Utility.debuggingLog(
-        "positive-support-abel-macro-average metrics = " +
+        "summation-macro-average metrics = " + confusionMatrix.getSummationMacroAverageMetrics());
+    Utility.debuggingLog(
+        "positive-support-label-macro-average metrics = " +
         confusionMatrix.getPositiveSupportLabelMacroAverageMetrics());
+    Utility.debuggingLog(
+        "positive-support-label-summation-macro-average metrics = " +
+        confusionMatrix.getPositiveSupportLabelSummationMacroAverageMetrics());
     Utility.debuggingLog(
         "weighted-macro-average metrics = " + confusionMatrix.getWeightedMacroAverageMetrics());
     Utility.debuggingLog(
-        "sumup-weighted-macro-average metrics = " + confusionMatrix.getSumupWeightedMacroAverageMetrics());
+        "summation-weighted-macro-average metrics = " + confusionMatrix.getSummationWeightedMacroAverageMetrics());
     Utility.debuggingLog(
         "labels=" + confusionMatrix.getLabels());
 }

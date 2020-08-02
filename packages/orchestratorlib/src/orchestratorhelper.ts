@@ -27,6 +27,10 @@ export class OrchestratorHelper {
     }
   }
 
+  public static readBluSnapshotFile(filePath: string): string {
+    return Utility.processUnknowLabelsInBluFileContent(ReadText.readSync(filePath));
+  }
+
   public static readFile(filePath: string): string {
     return ReadText.readSync(filePath);
   }

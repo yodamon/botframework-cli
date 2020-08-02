@@ -181,7 +181,7 @@ export class Predictor extends AbstractBaseModelFeaturizerEvaluator {
                 "truePositives": number,
                 "falsePositives": number,
                 "falseNegatives": number,
-                "support": number },
+                "total": number },
             "macroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
@@ -192,7 +192,18 @@ export class Predictor extends AbstractBaseModelFeaturizerEvaluator {
                 "averageTrueNegatives": number,
                 "averageFalseNegatives": number,
                 "averageSupport": number,
-                "support": number },
+                "total": number },
+            "summationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "positiveSupportLabelMacroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
@@ -203,15 +214,26 @@ export class Predictor extends AbstractBaseModelFeaturizerEvaluator {
                 "averageTrueNegatives": number,
                 "averageFalseNegatives": number,
                 "averageSupport": number,
-                "support": number },
+                "total": number },
+            "positiveSupportLabelSummationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
                 "weightedAverageF1Score": number,
                 "weightedAverageAccuracy": number,
                 "weightedAverageSupport": number,
-                "support": number },
-            "sumupWeightedMacroAverageMetricArray": {
+                "total": number },
+            "summationWeightedMacroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
                 "averageF1Score": number,
@@ -224,16 +246,21 @@ export class Predictor extends AbstractBaseModelFeaturizerEvaluator {
                 "total": number } } =
             confusionMatrixPrediction.generateConfusionMatrixMetricStructure();
         Utility.debuggingLog(
-           `confusionMatrixPrediction.getMicroAverageMetrics()=` +
-           `${confusionMatrixPrediction.getMicroAverageMetrics()}` +
-           `,confusionMatrixPrediction.getMacroAverageMetrics()=` +
-           `${confusionMatrixPrediction.getMacroAverageMetrics()}` +
-           `,confusionMatrixPrediction.getPositiveSupportLabelMacroAverageMetrics()=` +
-           `${confusionMatrixPrediction.getPositiveSupportLabelMacroAverageMetrics()}` +
-           `,confusionMatrixPrediction.getWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixPrediction.getWeightedMacroAverageMetrics()}` +
-           `,confusionMatrixPrediction.getSumupWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixPrediction.getSumupWeightedMacroAverageMetrics()}`);
+            `confusionMatrixPrediction.getMicroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getMicroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getMacroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getMacroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getSummationMacroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getSummationMacroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getPositiveSupportLabelMacroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getPositiveSupportLabelMacroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+            // tslint:disable-next-line: max-line-length
+            `${confusionMatrixPrediction.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getWeightedMacroAverageMetrics()}` +
+            `,confusionMatrixPrediction.getSummationWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixPrediction.getSummationWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
             confusionMatrixMetricStructure;
         return outputEvaluationReport;

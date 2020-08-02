@@ -11,7 +11,6 @@ import ErrnoException = NodeJS.ErrnoException;
 
 export default class OrchestratorFinetune extends Command {
   static description: string = 'Manage Orchestrator fine tuning.';
-  // eslint-disable-next-line @typescript-eslint/typedef
   /*
   static args=[
     {
@@ -41,7 +40,6 @@ export default class OrchestratorFinetune extends Command {
   }
 
   async run(): Promise<number> {
-    // eslint-disable-next-line @typescript-eslint/typedef
     // const {args, flags} = this.parse(OrchestratorFinetune);
     // const input: string  = flags.in || __dirname;
     // const output: string = flags.out || __dirname;
