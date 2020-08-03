@@ -4,7 +4,6 @@
  */
 
 import { IConfusionMatrix } from "./IConfusionMatrix";
-
 import { BinaryConfusionMatrix } from "./BinaryConfusionMatrix";
 
 import { DictionaryMapUtility } from "../../data_structure/DictionaryMapUtility";
@@ -28,20 +27,74 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         "confusionMatrix": IConfusionMatrix,
         "labelBinaryConfusionMatrixBasicMetricMap": { [id: string]: { [id: string]: number } },
         "labelBinaryConfusionMatrixMap": { [id: string]: BinaryConfusionMatrix },
+        "microAverageMetrics": {
+            "accuracy": number,
+            "truePositives": number,
+            "falsePositives": number,
+            "falseNegatives": number,
+            "total": number },
         "macroAverageMetrics": {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
-            "support": number },
-        "microAverageMetrics": {
-            "accuracy": number,
-            "truePositives": number,
-            "support": number },
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "summationMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "positiveSupportLabelMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "positiveSupportLabelSummationMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
         "weightedMacroAverageMetrics": {
             "weightedAveragePrecision": number,
             "weightedAverageRecall": number,
             "weightedAverageF1Score": number,
-            "support": number } } {
+            "weightedAverageAccuracy": number,
+            "weightedAverageSupport": number,
+            "total": number },
+        "summationWeightedMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } } {
         const confusionMatrix: IConfusionMatrix = this;
         const crossValidationBinaryConfusionMatrix: BinaryConfusionMatrix[] =
             confusionMatrix.getBinaryConfusionMatrices();
@@ -60,28 +113,46 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         const microAverageMetricArray: {
             "averagePrecisionRecallF1Accuracy": number,
             "truePositives": number,
+            "falsePositives": number,
+            "falseNegatives": number,
             "total": number } =
             confusionMatrix.getMicroAverageMetrics(binaryConfusionMatrices);
         const accuracy: number =
             microAverageMetricArray.averagePrecisionRecallF1Accuracy;
         const truePositives: number =
             microAverageMetricArray.truePositives;
+        const falsePositives: number =
+            microAverageMetricArray.falsePositives;
+        const falseNegatives: number =
+            microAverageMetricArray.falseNegatives;
         const supportMicroAverage: number =
             microAverageMetricArray.total;
         const microAverageMetrics: {
             "accuracy": number,
             "truePositives": number,
-            "support": number } = {
+            "falsePositives": number,
+            "falseNegatives": number,
+            "total": number } = {
             // tslint:disable-next-line: object-literal-key-quotes
             "accuracy": accuracy,
             // tslint:disable-next-line: object-literal-key-quotes
             "truePositives": truePositives,
             // tslint:disable-next-line: object-literal-key-quotes
-            "support": supportMicroAverage };
+            "falsePositives": falsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "falseNegatives": falseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": supportMicroAverage };
         const macroAverageMetricArray: {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
             "total": number } =
             confusionMatrix.getMacroAverageMetrics(binaryConfusionMatrices);
         const averagePrecision: number =
@@ -90,13 +161,31 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             macroAverageMetricArray.averageRecall;
         const averageF1Score: number =
             macroAverageMetricArray.averageF1Score;
+        const averageAccuracy: number =
+            macroAverageMetricArray.averageAccuracy;
+        const averageTruePositives: number =
+            macroAverageMetricArray.averageTruePositives;
+        const averageFalsePositives: number =
+            macroAverageMetricArray.averageFalsePositives;
+        const averageTrueNegatives: number =
+            macroAverageMetricArray.averageTrueNegatives;
+        const averageFalseNegatives: number =
+            macroAverageMetricArray.averageFalseNegatives;
+        const averageSupport: number =
+            macroAverageMetricArray.averageSupport;
         const supportMacroAverage: number =
             macroAverageMetricArray.total;
         const macroAverageMetrics: {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
-            "support": number } = {
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } = {
             // tslint:disable-next-line: object-literal-key-quotes
             "averagePrecision": averagePrecision,
             // tslint:disable-next-line: object-literal-key-quotes
@@ -104,11 +193,214 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             // tslint:disable-next-line: object-literal-key-quotes
             "averageF1Score": averageF1Score,
             // tslint:disable-next-line: object-literal-key-quotes
-            "support": supportMacroAverage };
+            "averageAccuracy": averageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": averageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": averageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": averageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": averageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": averageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": supportMacroAverage };
+        const summationMacroAverageMetricArray: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getSummationMacroAverageMetrics(binaryConfusionMatrices);
+        const summationAveragePrecision: number =
+            summationMacroAverageMetricArray.averagePrecision;
+        const summationAverageRecall: number =
+            summationMacroAverageMetricArray.averageRecall;
+        const summationAverageF1Score: number =
+            summationMacroAverageMetricArray.averageF1Score;
+        const summationAverageAccuracy: number =
+            summationMacroAverageMetricArray.averageAccuracy;
+        const summationAverageTruePositives: number =
+            summationMacroAverageMetricArray.averageTruePositives;
+        const summationAverageFalsePositives: number =
+            summationMacroAverageMetricArray.averageFalsePositives;
+        const summationAverageTrueNegatives: number =
+            summationMacroAverageMetricArray.averageTrueNegatives;
+        const summationAverageFalseNegatives: number =
+            summationMacroAverageMetricArray.averageFalseNegatives;
+        const summationAverageSupport: number =
+            summationMacroAverageMetricArray.averageSupport;
+        const summationSupportMacroAverage: number =
+            summationMacroAverageMetricArray.total;
+        const summationMacroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } = {
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averagePrecision": summationAveragePrecision,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageRecall": summationAverageRecall,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageF1Score": summationAverageF1Score,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageAccuracy": summationAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": summationAverageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": summationAverageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": summationAverageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": summationAverageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": summationAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": summationSupportMacroAverage };
+        const positiveSupportLabelMacroAverageMetricArray: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices);
+        const positiveSupportLabelAveragePrecision: number =
+            positiveSupportLabelMacroAverageMetricArray.averagePrecision;
+        const positiveSupportLabelAverageRecall: number =
+            positiveSupportLabelMacroAverageMetricArray.averageRecall;
+        const positiveSupportLabelAverageF1Score: number =
+            positiveSupportLabelMacroAverageMetricArray.averageF1Score;
+        const positiveSupportLabelAverageAccuracy: number =
+            positiveSupportLabelMacroAverageMetricArray.averageAccuracy;
+        const positiveSupportLabelAverageTruePositives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageTruePositives;
+        const positiveSupportLabelAverageFalsePositives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageFalsePositives;
+        const positiveSupportLabelAverageTrueNegatives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageTrueNegatives;
+        const positiveSupportLabelAverageFalseNegatives: number =
+            positiveSupportLabelMacroAverageMetricArray.averageFalseNegatives;
+        const positiveSupportLabelAverageSupport: number =
+            positiveSupportLabelMacroAverageMetricArray.averageSupport;
+        const positiveSupportLabelSupportMacroAverage: number =
+            positiveSupportLabelMacroAverageMetricArray.total;
+        const positiveSupportLabelMacroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } = {
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averagePrecision": positiveSupportLabelAveragePrecision,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageRecall": positiveSupportLabelAverageRecall,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageF1Score": positiveSupportLabelAverageF1Score,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageAccuracy": positiveSupportLabelAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": positiveSupportLabelAverageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": positiveSupportLabelAverageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": positiveSupportLabelAverageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": positiveSupportLabelAverageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": positiveSupportLabelAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": positiveSupportLabelSupportMacroAverage };
+        const positiveSupportLabelSummationMacroAverageMetricArray: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getPositiveSupportLabelSummationMacroAverageMetrics(binaryConfusionMatrices);
+        const positiveSupportLabelSummationAveragePrecision: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averagePrecision;
+        const positiveSupportLabelSummationAverageRecall: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageRecall;
+        const positiveSupportLabelSummationAverageF1Score: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageF1Score;
+        const positiveSupportLabelSummationAverageAccuracy: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageAccuracy;
+        const positiveSupportLabelSummationAverageTruePositives: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageTruePositives;
+        const positiveSupportLabelSummationAverageFalsePositives: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageFalsePositives;
+        const positiveSupportLabelSummationAverageTrueNegatives: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageTrueNegatives;
+        const positiveSupportLabelSummationAverageFalseNegatives: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageFalseNegatives;
+        const positiveSupportLabelSummationAverageSupport: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.averageSupport;
+        const positiveSupportLabelSummationSupportMacroAverage: number =
+            positiveSupportLabelSummationMacroAverageMetricArray.total;
+        const positiveSupportLabelSummationMacroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } = {
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averagePrecision": positiveSupportLabelSummationAveragePrecision,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageRecall": positiveSupportLabelSummationAverageRecall,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageF1Score": positiveSupportLabelSummationAverageF1Score,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageAccuracy": positiveSupportLabelSummationAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": positiveSupportLabelSummationAverageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": positiveSupportLabelSummationAverageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": positiveSupportLabelSummationAverageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": positiveSupportLabelSummationAverageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": positiveSupportLabelSummationAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": positiveSupportLabelSummationSupportMacroAverage };
         const weightedMacroAverageMetricArray: {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } =
             confusionMatrix.getWeightedMacroAverageMetrics(binaryConfusionMatrices);
         const weightedAveragePrecision: number =
@@ -117,13 +409,19 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             weightedMacroAverageMetricArray.averageRecall;
         const weightedAverageF1Score: number =
             weightedMacroAverageMetricArray.averageF1Score;
+        const weightedAverageAccuracy: number =
+            weightedMacroAverageMetricArray.averageAccuracy;
+        const weightedAverageSupport: number =
+            weightedMacroAverageMetricArray.averageSupport;
         const supportWeightedMacroAverage: number =
             weightedMacroAverageMetricArray.total;
         const weightedMacroAverageMetrics: {
             "weightedAveragePrecision": number,
             "weightedAverageRecall": number,
             "weightedAverageF1Score": number,
-            "support": number } = {
+            "weightedAverageAccuracy": number,
+            "weightedAverageSupport": number,
+            "total": number } = {
             // tslint:disable-next-line: object-literal-key-quotes
             "weightedAveragePrecision": weightedAveragePrecision,
             // tslint:disable-next-line: object-literal-key-quotes
@@ -131,32 +429,156 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
             // tslint:disable-next-line: object-literal-key-quotes
             "weightedAverageF1Score": weightedAverageF1Score,
             // tslint:disable-next-line: object-literal-key-quotes
-            "support": supportWeightedMacroAverage };
+            "weightedAverageAccuracy": weightedAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "weightedAverageSupport": weightedAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": supportWeightedMacroAverage };
+        const summationWeightedMacroAverageMetricArray: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } =
+            confusionMatrix.getSummationWeightedMacroAverageMetrics(binaryConfusionMatrices);
+        const summationWeightedAveragePrecision: number =
+            summationWeightedMacroAverageMetricArray.averagePrecision;
+        const summationWeightedAverageRecall: number =
+            summationWeightedMacroAverageMetricArray.averageRecall;
+        const summationWeightedAverageF1Score: number =
+            summationWeightedMacroAverageMetricArray.averageF1Score;
+        const summationWeightedAverageAccuracy: number =
+            summationWeightedMacroAverageMetricArray.averageAccuracy;
+        const summationWeightedAverageTruePositives: number =
+            summationWeightedMacroAverageMetricArray.averageTruePositives;
+        const summationWeightedAverageFalsePositives: number =
+            summationWeightedMacroAverageMetricArray.averageFalsePositives;
+        const summationWeightedAverageTrueNegatives: number =
+            summationWeightedMacroAverageMetricArray.averageTrueNegatives;
+        const summationWeightedAverageFalseNegatives: number =
+            summationWeightedMacroAverageMetricArray.averageFalseNegatives;
+        const summationWeightedAverageSupport: number =
+            summationWeightedMacroAverageMetricArray.averageSupport;
+        const summationWeightedSupportMacroAverage: number =
+            summationWeightedMacroAverageMetricArray.total;
+        const summationWeightedMacroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } = {
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averagePrecision": summationWeightedAveragePrecision,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageRecall": summationWeightedAverageRecall,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageF1Score": summationWeightedAverageF1Score,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageAccuracy": summationWeightedAverageAccuracy,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTruePositives": summationWeightedAverageTruePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalsePositives": summationWeightedAverageFalsePositives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageTrueNegatives": summationWeightedAverageTrueNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageFalseNegatives": summationWeightedAverageFalseNegatives,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "averageSupport": summationWeightedAverageSupport,
+            // tslint:disable-next-line: object-literal-key-quotes
+            "total": summationWeightedSupportMacroAverage };
         const confusionMatrixMetricStructure: {
             "confusionMatrix": IConfusionMatrix,
             "labelBinaryConfusionMatrixBasicMetricMap": { [id: string]: { [id: string]: number } },
             "labelBinaryConfusionMatrixMap": { [id: string]: BinaryConfusionMatrix },
+            "microAverageMetrics": {
+                "accuracy": number,
+                "truePositives": number,
+                "falsePositives": number,
+                "falseNegatives": number,
+                "total": number },
             "macroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
                 "averageF1Score": number,
-                "support": number },
-            "microAverageMetrics": {
-                "accuracy": number,
-                "truePositives": number,
-                "support": number },
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "summationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "positiveSupportLabelMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "positiveSupportLabelSummationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
                 "weightedAverageF1Score": number,
-                "support": number } } = {
+                "weightedAverageAccuracy": number,
+                "weightedAverageSupport": number,
+                "total": number },
+            "summationWeightedMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number } } = {
             confusionMatrix,
             labelBinaryConfusionMatrixBasicMetricMap,
             labelBinaryConfusionMatrixMap,
-            macroAverageMetrics,
             microAverageMetrics,
+            macroAverageMetrics,
+            summationMacroAverageMetrics,
+            positiveSupportLabelMacroAverageMetrics,
+            positiveSupportLabelSummationMacroAverageMetrics,
             weightedMacroAverageMetrics,
-            };
+            summationWeightedMacroAverageMetrics };
         return confusionMatrixMetricStructure;
     }
 
@@ -172,10 +594,7 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
 
     public abstract getBinaryConfusionMatrices(): BinaryConfusionMatrix[];
 
-    public getMicroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
-        "averagePrecisionRecallF1Accuracy": number,
-        "truePositives": number,
-        "total": number } {
+    public getTotal(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): number {
         if (Utility.isEmptyArray(binaryConfusionMatrices)) {
             binaryConfusionMatrices =
                 this.getBinaryConfusionMatrices();
@@ -183,17 +602,45 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         const total: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        return total;
+    }
+
+    public getMicroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecisionRecallF1Accuracy": number,
+        "truePositives": number,
+        "falsePositives": number,
+        "falseNegatives": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
         const truePositives: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getTruePositives(), 0);
+        const falsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalsePositives(), 0);
+        const falseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalseNegatives(), 0);
         const averagePrecisionRecallF1Accuracy: number =
             truePositives / total;
         const microAverageMetrics: {
             "averagePrecisionRecallF1Accuracy": number,
             "truePositives": number,
+            "falsePositives": number,
+            "falseNegatives": number,
             "total": number } = {
             averagePrecisionRecallF1Accuracy,
             truePositives,
+            falsePositives,
+            falseNegatives,
             total };
         return microAverageMetrics;
     }
@@ -202,6 +649,12 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
         "total": number } {
         if (Utility.isEmptyArray(binaryConfusionMatrices)) {
             binaryConfusionMatrices =
@@ -218,17 +671,297 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         const averageF1Score: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getF1Score(), 0) / numberLabels;
-        const total: number =
+        const averageTruePositives: number =
             binaryConfusionMatrices.reduce(
-                (accumulation, entry) => accumulation + entry.getPositives(), 0);
+                (accumulation, entry) => accumulation + entry.getTruePositives(), 0) / numberLabels;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalsePositives(), 0) / numberLabels;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTrueNegatives(), 0) / numberLabels;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalseNegatives(), 0) / numberLabels;
+        const averageAccuracy: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getAccuracy(), 0) / numberLabels;
+        const averageSupport: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getSupport(), 0) / numberLabels;
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
         const macroAverageMetrics: {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } = {
                 averagePrecision,
                 averageRecall,
                 averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
+                total };
+        return macroAverageMetrics;
+    }
+
+    public getSummationMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        const numberLabels: number =
+            binaryConfusionMatrices.length;
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
+        const averageTruePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTruePositives(), 0) / numberLabels;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalsePositives(), 0) / numberLabels;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTrueNegatives(), 0) / numberLabels;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalseNegatives(), 0) / numberLabels;
+        const summationArithmeticAverageTotal: number =
+            averageTruePositives + averageFalsePositives + averageTrueNegatives + averageFalseNegatives;
+        const summationArithmeticAveragePositives: number =
+            averageTruePositives + averageFalseNegatives;
+        const summationArithmeticAveragePredictedPositives: number =
+            averageTruePositives + averageFalsePositives;
+        const summationArithmeticAverageBinaryConfusionMatrix: BinaryConfusionMatrix =
+            new BinaryConfusionMatrix(
+                summationArithmeticAverageTotal,
+                averageTruePositives,
+                summationArithmeticAveragePositives,
+                summationArithmeticAveragePredictedPositives);
+        const averagePrecision: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getPrecision();
+        const averageRecall: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getRecall();
+        const averageF1Score: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getF1Score();
+        const averageAccuracy: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getAccuracy();
+        const averageSupport: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getSupport();
+        const macroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } = {
+                averagePrecision,
+                averageRecall,
+                averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
+                total };
+        return macroAverageMetrics;
+    }
+
+    public getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        const numberPositiveSupportLabels: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? 1 : 0), 0);
+        const averagePrecision: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getPrecision() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageRecall: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getRecall() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageF1Score: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getF1Score() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageTruePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getTruePositives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getFalsePositives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getTrueNegatives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getFalseNegatives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageAccuracy: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getAccuracy() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageSupport: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getSupport() : 0), 0) /
+                numberPositiveSupportLabels;
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
+        const macroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } = {
+                averagePrecision,
+                averageRecall,
+                averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
+                total };
+        return macroAverageMetrics;
+    }
+
+    public getPositiveSupportLabelSummationMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        const numberPositiveSupportLabels: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? 1 : 0), 0);
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
+        const averageTruePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getTruePositives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getFalsePositives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getTrueNegatives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + (entry.getSupport() > 0 ? entry.getFalseNegatives() : 0), 0) /
+                numberPositiveSupportLabels;
+        const summationArithmeticAverageTotal: number =
+            averageTruePositives + averageFalsePositives + averageTrueNegatives + averageFalseNegatives;
+        const summationArithmeticAveragePositives: number =
+            averageTruePositives + averageFalseNegatives;
+        const summationArithmeticAveragePredictedPositives: number =
+            averageTruePositives + averageFalsePositives;
+        const summationArithmeticAverageBinaryConfusionMatrix: BinaryConfusionMatrix =
+            new BinaryConfusionMatrix(
+                summationArithmeticAverageTotal,
+                averageTruePositives,
+                summationArithmeticAveragePositives,
+                summationArithmeticAveragePredictedPositives);
+        const averagePrecision: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getPrecision();
+        const averageRecall: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getRecall();
+        const averageF1Score: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getF1Score();
+        const averageAccuracy: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getAccuracy();
+        const averageSupport: number =
+            summationArithmeticAverageBinaryConfusionMatrix.getSupport();
+        const macroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } = {
+                averagePrecision,
+                averageRecall,
+                averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
                 total };
         return macroAverageMetrics;
     }
@@ -237,14 +970,18 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
         "total": number } {
         if (Utility.isEmptyArray(binaryConfusionMatrices)) {
             binaryConfusionMatrices =
                 this.getBinaryConfusionMatrices();
         }
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
         const total: number =
-            binaryConfusionMatrices.reduce(
-                (accumulation, entry) => accumulation + entry.getPositives(), 0);
+            this.getTotal(binaryConfusionMatrices);
         const averagePrecision: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getPrecision() * entry.getPositives(), 0) / total;
@@ -254,14 +991,102 @@ export abstract class ConfusionMatrixBase implements IConfusionMatrix {
         const averageF1Score: number =
             binaryConfusionMatrices.reduce(
                 (accumulation, entry) => accumulation + entry.getF1Score() * entry.getPositives(), 0) / total;
+        const averageAccuracy: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getAccuracy() * entry.getPositives(), 0) / total;
+        const averageSupport: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getSupport() * entry.getPositives(), 0) / total;
         const macroAverageMetrics: {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
             "total": number } = {
                 averagePrecision,
                 averageRecall,
                 averageF1Score,
+                averageAccuracy,
+                averageSupport,
+                total };
+        return macroAverageMetrics;
+    }
+
+    public getSummationWeightedMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[] = []): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number } {
+        if (Utility.isEmptyArray(binaryConfusionMatrices)) {
+            binaryConfusionMatrices =
+                this.getBinaryConfusionMatrices();
+        }
+        // ---- NOTE-use-getTotal() ---- const total: number =
+        // ---- NOTE-use-getTotal() ----     binaryConfusionMatrices.reduce(
+        // ---- NOTE-use-getTotal() ----         (accumulation, entry) => accumulation + entry.getPositives(), 0);
+        const total: number =
+            this.getTotal(binaryConfusionMatrices);
+        const averageTruePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTruePositives() * entry.getPositives(), 0) / total;
+        const averageFalsePositives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalsePositives() * entry.getPositives(), 0) / total;
+        const averageTrueNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getTrueNegatives() * entry.getPositives(), 0) / total;
+        const averageFalseNegatives: number =
+            binaryConfusionMatrices.reduce(
+                (accumulation, entry) => accumulation + entry.getFalseNegatives() * entry.getPositives(), 0) / total;
+        const summationWeightedAverageTotal: number =
+            averageTruePositives + averageFalsePositives + averageTrueNegatives + averageFalseNegatives;
+        const summationWeightedAveragePositives: number =
+            averageTruePositives + averageFalseNegatives;
+        const summationWeightedAveragePredictedPositives: number =
+            averageTruePositives + averageFalsePositives;
+        const summationWeightedAverageBinaryConfusionMatrix: BinaryConfusionMatrix =
+            new BinaryConfusionMatrix(
+                summationWeightedAverageTotal,
+                averageTruePositives,
+                summationWeightedAveragePositives,
+                summationWeightedAveragePredictedPositives);
+        const averagePrecision: number =
+            summationWeightedAverageBinaryConfusionMatrix.getPrecision();
+        const averageRecall: number =
+            summationWeightedAverageBinaryConfusionMatrix.getRecall();
+        const averageF1Score: number =
+            summationWeightedAverageBinaryConfusionMatrix.getF1Score();
+        const averageAccuracy: number =
+            summationWeightedAverageBinaryConfusionMatrix.getAccuracy();
+        const averageSupport: number =
+            summationWeightedAverageBinaryConfusionMatrix.getSupport();
+        const macroAverageMetrics: {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageAccuracy": number,
+            "averageSupport": number,
+            "total": number } = {
+                averagePrecision,
+                averageRecall,
+                averageF1Score,
+                averageTruePositives,
+                averageFalsePositives,
+                averageTrueNegatives,
+                averageFalseNegatives,
+                averageAccuracy,
+                averageSupport,
                 total };
         return macroAverageMetrics;
     }

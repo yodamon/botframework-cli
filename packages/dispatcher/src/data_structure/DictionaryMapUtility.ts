@@ -3,6 +3,14 @@
  * Licensed under the MIT License.
  */
 
+import { TMapAnyKeyGenericArray } from "./TMapAnyKeyGenericArray";
+import { TMapAnyKeyGenericArrays } from "./TMapAnyKeyGenericArrays";
+import { TMapAnyKeyGenericValue } from "./TMapAnyKeyGenericValue";
+import { TMapAnyKeyGenericSet } from "./TMapAnyKeyGenericSet";
+import { TMapNumberKeyGenericArray } from "./TMapNumberKeyGenericArray";
+import { TMapNumberKeyGenericArrays } from "./TMapNumberKeyGenericArrays";
+import { TMapNumberKeyGenericValue } from "./TMapNumberKeyGenericValue";
+import { TMapNumberKeyGenericSet } from "./TMapNumberKeyGenericSet";
 import { TMapGenericKeyGenericArray } from "./TMapGenericKeyGenericArray";
 import { TMapGenericKeyGenericArrays } from "./TMapGenericKeyGenericArrays";
 import { TMapGenericKeyGenericValue } from "./TMapGenericKeyGenericValue";
@@ -11,10 +19,6 @@ import { TMapStringKeyGenericArray } from "./TMapStringKeyGenericArray";
 import { TMapStringKeyGenericArrays } from "./TMapStringKeyGenericArrays";
 import { TMapStringKeyGenericValue } from "./TMapStringKeyGenericValue";
 import { TMapStringKeyGenericSet } from "./TMapStringKeyGenericSet";
-import { TMapNumberKeyGenericArray } from "./TMapNumberKeyGenericArray";
-import { TMapNumberKeyGenericArrays } from "./TMapNumberKeyGenericArrays";
-import { TMapNumberKeyGenericValue } from "./TMapNumberKeyGenericValue";
-import { TMapNumberKeyGenericSet } from "./TMapNumberKeyGenericSet";
 
 import { IDictionaryNumberIdGenericArray } from "../data_structure/IDictionaryNumberIdGenericArray";
 import { IDictionaryNumberIdGenericArrays } from "../data_structure/IDictionaryNumberIdGenericArrays";
@@ -28,6 +32,110 @@ import { IDictionaryStringIdGenericSet } from "../data_structure/IDictionaryStri
 import { Utility } from "../utility/Utility";
 
 export class DictionaryMapUtility {
+
+    public static readonly UnknownLabel: string = "UNKNOWN";
+
+    public static readonly UnknownLabelSet: Set<string> =
+        new Set<string>(["", "NONE", DictionaryMapUtility.UnknownLabel]);
+
+    public static processUnknowLabelsInUtteranceLabelsMapUsingLabelSet(
+        utteranceLabels: {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; },
+        labelSet: Set<string>): {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; } {
+        const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+        const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+        if (utteranceLabelsMap) {
+            for (const utteranceKey in utteranceLabelsMap) {
+                if (utteranceKey) {
+                    const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+                        (label: string) =>
+                        !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+                    const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                    if (!hasConcreteLabel) {
+                        utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                        utteranceLabelsMap[utteranceKey].push(DictionaryMapUtility.UnknownLabel);
+                        continue;
+                    }
+                    utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                    for (const label of concreteLabels) {
+                        utteranceLabelsMap[utteranceKey].push(label);
+                    }
+                }
+          }
+        }
+        if (utteranceLabelDuplicateMap) {
+            utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+                const labelsArray: string[] = [...labelsSet];
+                const concreteLabels: string[] = labelsArray.filter(
+                    (label: string) =>
+                    !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()) && labelSet.has(label));
+                const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                // eslint-disable-next-line max-depth
+                if (hasConcreteLabel) {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    // eslint-disable-next-line max-depth
+                    for (const label of concreteLabels) {
+                        labelsSet.add(label);
+                    }
+                } else {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    labelsSet.add(DictionaryMapUtility.UnknownLabel);
+                }
+            });
+        }
+        return utteranceLabels;
+      }
+
+      public static processUnknowLabelsInUtteranceLabelsMap(
+        utteranceLabels: {
+            "utteranceLabelsMap": { [id: string]: string[] };
+            "utteranceLabelDuplicateMap": Map<string, Set<string>>; }): {
+                "utteranceLabelsMap": { [id: string]: string[] };
+                "utteranceLabelDuplicateMap": Map<string, Set<string>>; } {
+        const utteranceLabelsMap: { [id: string]: string[] } = utteranceLabels.utteranceLabelsMap;
+        const utteranceLabelDuplicateMap:  Map<string, Set<string>> = utteranceLabels.utteranceLabelDuplicateMap;
+        if (utteranceLabelsMap) {
+            for (const utteranceKey in utteranceLabelsMap) {
+                if (utteranceKey) {
+                    const concreteLabels: string[] = utteranceLabelsMap[utteranceKey].filter(
+                        (label: string) => !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()));
+                    const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                    if (!hasConcreteLabel) {
+                        utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                        utteranceLabelsMap[utteranceKey].push(DictionaryMapUtility.UnknownLabel);
+                        continue;
+                    }
+                    utteranceLabelsMap[utteranceKey].length = 0; // ---- NOTE ---- truncate the array!
+                    for (const label of concreteLabels) {
+                        utteranceLabelsMap[utteranceKey].push(label);
+                    }
+                }
+            }
+        }
+        if (utteranceLabelDuplicateMap) {
+            utteranceLabelDuplicateMap.forEach((labelsSet: Set<string>, _: string) => {
+                const labelsArray: string[] = [...labelsSet];
+                const concreteLabels: string[] = labelsArray.filter(
+                    (label: string) => !DictionaryMapUtility.UnknownLabelSet.has(label.toUpperCase()));
+                const hasConcreteLabel: boolean = concreteLabels.length > 0;
+                // eslint-disable-next-line max-depth
+                if (hasConcreteLabel) {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    // eslint-disable-next-line max-depth
+                    for (const label of concreteLabels) {
+                        labelsSet.add(label);
+                    }
+                } else {
+                    labelsSet.clear(); // ---- NOTE ---- truncate the array!
+                    labelsSet.add(DictionaryMapUtility.UnknownLabel);
+                }
+            });
+        }
+        return utteranceLabels;
+      }
 
     public static convertStringKeyGenericSetNativeMapToDictionary<T>(
         stringKeyGenericSetMap: Map<string, Set<T>>): { [id: string]: Set<T> } {
@@ -298,13 +406,15 @@ export class DictionaryMapUtility {
         delimiter: string = "\t"): {
             "stringArray": string[],
             "stringMap": IDictionaryStringIdGenericValue<number> } {
-        const stringArray: string[] = Utility.split(content, delimiter);
+        let stringArray: string[] = Utility.split(content, delimiter);
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: IDictionaryStringIdGenericValue<number> =
             DictionaryMapUtility.buildStringIdNumberValueDictionaryFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
     }
     public static buildStringIdNumberValueDictionaryFromUniqueStringArray(
         inputStringArray: string[]): IDictionaryStringIdGenericValue<number> {
+        inputStringArray = DictionaryMapUtility.sortStringArray(inputStringArray);
         const stringMap: IDictionaryStringIdGenericValue<number> = { };
         for (let index: number = 0; index < inputStringArray.length; index++) {
             stringMap[inputStringArray[index]] = index;
@@ -334,7 +444,8 @@ export class DictionaryMapUtility {
             "stringArray": string[],
             "stringMap": IDictionaryStringIdGenericValue<number> } {
         const stringSet: Set<string> = new Set(inputStringArray);
-        const stringArray: string[] = Array.from(stringSet.values());
+        let stringArray: string[] = Array.from(stringSet.values());
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: IDictionaryStringIdGenericValue<number> =
             DictionaryMapUtility.buildStringIdNumberValueDictionaryFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
@@ -349,7 +460,8 @@ export class DictionaryMapUtility {
                 stringSet.add(elementString);
             }
         }
-        const stringArray: string[] = Array.from(stringSet.values());
+        let stringArray: string[] = Array.from(stringSet.values());
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: IDictionaryStringIdGenericValue<number> =
             DictionaryMapUtility.buildStringIdNumberValueDictionaryFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
@@ -453,14 +565,17 @@ export class DictionaryMapUtility {
         delimiter: string = "\t"): {
             "stringArray": string[],
             "stringMap": TMapStringKeyGenericValue<number> } {
-        const stringArray: string[] = Utility.split(content, delimiter);
+        let stringArray: string[] = Utility.split(content, delimiter);
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: TMapStringKeyGenericValue<number> =
             DictionaryMapUtility.buildStringKeyNumberValueMapFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
     }
     public static buildStringKeyNumberValueMapFromUniqueStringArray(
         inputStringArray: string[]): TMapStringKeyGenericValue<number> {
-        const stringMap: TMapStringKeyGenericValue<number> = DictionaryMapUtility.newTMapStringKeyGenericValue();
+        inputStringArray = DictionaryMapUtility.sortStringArray(inputStringArray);
+        const stringMap: TMapStringKeyGenericValue<number> =
+            DictionaryMapUtility.newTMapStringKeyGenericValue();
         for (let index: number = 0; index < inputStringArray.length; index++) {
             stringMap.set(inputStringArray[index], index);
         }
@@ -489,7 +604,8 @@ export class DictionaryMapUtility {
             "stringArray": string[],
             "stringMap": TMapStringKeyGenericValue<number> } {
         const stringSet: Set<string> = new Set(inputStringArray);
-        const stringArray: string[] = Array.from(stringSet.values());
+        let stringArray: string[] = Array.from(stringSet.values());
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: TMapStringKeyGenericValue<number> =
             DictionaryMapUtility.buildStringKeyNumberValueMapFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
@@ -504,11 +620,49 @@ export class DictionaryMapUtility {
                 stringSet.add(elementString);
             }
         }
-        const stringArray: string[] = Array.from(stringSet.values());
+        let stringArray: string[] = Array.from(stringSet.values());
+        stringArray = DictionaryMapUtility.sortStringArray(stringArray);
         const stringMap: TMapStringKeyGenericValue<number> =
             DictionaryMapUtility.buildStringKeyNumberValueMapFromUniqueStringArray(stringArray);
         return { stringArray, stringMap };
     }
+
+    public static sortAnyArray(inputStringArray: any[]): any[] {
+        return inputStringArray.sort(
+          (n1: any, n2: any) => {
+            if (n1 > n2) {
+              return 1;
+            }
+            if (n1 < n2) {
+              return -1;
+            }
+            return 0;
+          });
+      }
+    public static sortNumberArray(inputStringArray: number[]): number[] {
+        return inputStringArray.sort(
+          (n1: number, n2: number) => {
+            if (n1 > n2) {
+              return 1;
+            }
+            if (n1 < n2) {
+              return -1;
+            }
+            return 0;
+          });
+      }
+    public static sortStringArray(inputStringArray: string[]): string[] {
+        return inputStringArray.sort(
+          (n1: string, n2: string) => {
+            if (n1 > n2) {
+              return 1;
+            }
+            if (n1 < n2) {
+              return -1;
+            }
+            return 0;
+          });
+      }
 
     public static validateStringArrayAndStringKeyNumberValueMap(
         stringArray: string[],
@@ -1105,6 +1259,26 @@ export class DictionaryMapUtility {
             DictionaryMapUtility.getNumberIdGenericArraysDictionaryLength(numberIdGenericArraysMap) > 0);
     }
 
+    public static isEmptyAnyKeyGenericSetMap<T>(
+        anyKeyGenericSetMap: TMapAnyKeyGenericSet<T>): boolean {
+        return !(anyKeyGenericSetMap &&
+            DictionaryMapUtility.getAnyKeyGenericSetMapLength(anyKeyGenericSetMap) > 0);
+    }
+    public static isEmptyAnyKeyGenericValueMap<T>(
+        anyKeyGenericValueMap: TMapAnyKeyGenericValue<T>): boolean {
+        return !(anyKeyGenericValueMap &&
+            DictionaryMapUtility.getAnyKeyGenericValueMapLength(anyKeyGenericValueMap) > 0);
+    }
+    public static isEmptyAnyKeyGenericArrayMap<T>(
+        anyKeyGenericArrayMap: TMapAnyKeyGenericArray<T>): boolean {
+        return !(anyKeyGenericArrayMap &&
+            DictionaryMapUtility.getAnyKeyGenericArrayMapLength(anyKeyGenericArrayMap) > 0);
+    }
+    public static isEmptyAnyKeyGenericArraysMap<T>(
+        anyKeyGenericArraysMap: TMapAnyKeyGenericArrays<T>): boolean {
+        return !(anyKeyGenericArraysMap &&
+            DictionaryMapUtility.getAnyKeyGenericArraysMapLength(anyKeyGenericArraysMap) > 0);
+    }
     public static isEmptyGenericKeyGenericSetMap<I, T>(
         genericKeyGenericSetMap: TMapGenericKeyGenericSet<I, T>): boolean {
         return !(genericKeyGenericSetMap &&
@@ -1125,26 +1299,6 @@ export class DictionaryMapUtility {
         return !(genericKeyGenericArraysMap &&
             DictionaryMapUtility.getGenericKeyGenericArraysMapLength(genericKeyGenericArraysMap) > 0);
     }
-    public static isEmptyStringKeyGenericSetMap<T>(
-        stringKeyGenericSetMap: TMapStringKeyGenericSet<T>): boolean {
-        return !(stringKeyGenericSetMap &&
-            DictionaryMapUtility.getStringKeyGenericSetMapLength(stringKeyGenericSetMap) > 0);
-    }
-    public static isEmptyStringKeyGenericValueMap<T>(
-        stringKeyGenericValueMap: TMapStringKeyGenericValue<T>): boolean {
-        return !(stringKeyGenericValueMap &&
-            DictionaryMapUtility.getStringKeyGenericValueMapLength(stringKeyGenericValueMap) > 0);
-    }
-    public static isEmptyStringKeyGenericArrayMap<T>(
-        stringKeyGenericArrayMap: TMapStringKeyGenericArray<T>): boolean {
-        return !(stringKeyGenericArrayMap &&
-            DictionaryMapUtility.getStringKeyGenericArrayMapLength(stringKeyGenericArrayMap) > 0);
-    }
-    public static isEmptyStringKeyGenericArraysMap<T>(
-        stringKeyGenericArraysMap: TMapStringKeyGenericArrays<T>): boolean {
-        return !(stringKeyGenericArraysMap &&
-            DictionaryMapUtility.getStringKeyGenericArraysMapLength(stringKeyGenericArraysMap) > 0);
-    }
     public static isEmptyNumberKeyGenericSetMap<T>(
         numberKeyGenericSetMap: TMapNumberKeyGenericSet<T>): boolean {
         return !(numberKeyGenericSetMap &&
@@ -1164,6 +1318,26 @@ export class DictionaryMapUtility {
         numberKeyGenericArraysMap: TMapNumberKeyGenericArrays<T>): boolean {
         return !(numberKeyGenericArraysMap &&
             DictionaryMapUtility.getNumberKeyGenericArraysMapLength(numberKeyGenericArraysMap) > 0);
+    }
+    public static isEmptyStringKeyGenericSetMap<T>(
+        stringKeyGenericSetMap: TMapStringKeyGenericSet<T>): boolean {
+        return !(stringKeyGenericSetMap &&
+            DictionaryMapUtility.getStringKeyGenericSetMapLength(stringKeyGenericSetMap) > 0);
+    }
+    public static isEmptyStringKeyGenericValueMap<T>(
+        stringKeyGenericValueMap: TMapStringKeyGenericValue<T>): boolean {
+        return !(stringKeyGenericValueMap &&
+            DictionaryMapUtility.getStringKeyGenericValueMapLength(stringKeyGenericValueMap) > 0);
+    }
+    public static isEmptyStringKeyGenericArrayMap<T>(
+        stringKeyGenericArrayMap: TMapStringKeyGenericArray<T>): boolean {
+        return !(stringKeyGenericArrayMap &&
+            DictionaryMapUtility.getStringKeyGenericArrayMapLength(stringKeyGenericArrayMap) > 0);
+    }
+    public static isEmptyStringKeyGenericArraysMap<T>(
+        stringKeyGenericArraysMap: TMapStringKeyGenericArrays<T>): boolean {
+        return !(stringKeyGenericArraysMap &&
+            DictionaryMapUtility.getStringKeyGenericArraysMapLength(stringKeyGenericArraysMap) > 0);
     }
 
     public static getStringIdGenericSetDictionaryLength<T>(map: IDictionaryStringIdGenericSet<T>): number {
@@ -1191,77 +1365,101 @@ export class DictionaryMapUtility {
         return (Object.keys(map).length);
     }
 
-    public static getGenericKeyGenericSetMapLength<I, T>(map: TMapGenericKeyGenericSet<I, T>): number {
+    public static getAnyKeyGenericSetMapLength<T>(map: TMapAnyKeyGenericSet<T>): number {
         return [...map].length;
     }
-    public static getStringKeyGenericSetMapLength<T>(map: TMapStringKeyGenericSet<T>): number {
+    public static getGenericKeyGenericSetMapLength<I, T>(map: TMapGenericKeyGenericSet<I, T>): number {
         return [...map].length;
     }
     public static getNumberKeyGenericSetMapLength<T>(map: TMapNumberKeyGenericSet<T>): number {
         return [...map].length;
     }
-    public static getGenericKeyGenericValueMapLength<I, T>(map: TMapGenericKeyGenericValue<I, T>): number {
+    public static getStringKeyGenericSetMapLength<T>(map: TMapStringKeyGenericSet<T>): number {
         return [...map].length;
     }
-    public static getStringKeyGenericValueMapLength<T>(map: TMapStringKeyGenericValue<T>): number {
+    public static getAnyKeyGenericValueMapLength<T>(map: TMapAnyKeyGenericValue<T>): number {
+        return [...map].length;
+    }
+    public static getGenericKeyGenericValueMapLength<I, T>(map: TMapGenericKeyGenericValue<I, T>): number {
         return [...map].length;
     }
     public static getNumberKeyGenericValueMapLength<T>(map: TMapNumberKeyGenericValue<T>): number {
         return [...map].length;
     }
-    public static getGenericKeyGenericArrayMapLength<I, T>(map: TMapGenericKeyGenericArray<I, T>): number {
+    public static getStringKeyGenericValueMapLength<T>(map: TMapStringKeyGenericValue<T>): number {
         return [...map].length;
     }
-    public static getStringKeyGenericArrayMapLength<T>(map: TMapStringKeyGenericArray<T>): number {
+    public static getAnyKeyGenericArrayMapLength<T>(map: TMapAnyKeyGenericArray<T>): number {
+        return [...map].length;
+    }
+    public static getGenericKeyGenericArrayMapLength<I, T>(map: TMapGenericKeyGenericArray<I, T>): number {
         return [...map].length;
     }
     public static getNumberKeyGenericArrayMapLength<T>(map: TMapNumberKeyGenericArray<T>): number {
         return [...map].length;
     }
+    public static getStringKeyGenericArrayMapLength<T>(map: TMapStringKeyGenericArray<T>): number {
+        return [...map].length;
+    }
+    public static getAnyKeyGenericArraysMapLength<T>(map: TMapAnyKeyGenericArrays<T>): number {
+        return [...map].length;
+    }
     public static getGenericKeyGenericArraysMapLength<I, T>(map: TMapGenericKeyGenericArrays<I, T>): number {
         return (Object.keys(map).length);
-    }
-    public static getStringKeyGenericArraysMapLength<T>(map: TMapStringKeyGenericArrays<T>): number {
-        return [...map].length;
     }
     public static getNumberKeyGenericArraysMapLength<T>(map: TMapNumberKeyGenericArrays<T>): number {
         return [...map].length;
     }
+    public static getStringKeyGenericArraysMapLength<T>(map: TMapStringKeyGenericArrays<T>): number {
+        return [...map].length;
+    }
 
+    public static newTMapAnyKeyGenericSet<T>(): TMapAnyKeyGenericSet<T> {
+        return new Map<any, Set<T>>();
+    }
     public static newTMapGenericKeyGenericSet<I, T>(): TMapGenericKeyGenericSet<I, T> {
         return new Map<I, Set<T>>();
-    }
-    public static newTMapStringKeyGenericSet<T>(): TMapStringKeyGenericSet<T> {
-        return new Map<string, Set<T>>();
     }
     public static newTMapNumberKeyGenericSet<T>(): TMapNumberKeyGenericSet<T> {
         return new Map<number, Set<T>>();
     }
+    public static newTMapStringKeyGenericSet<T>(): TMapStringKeyGenericSet<T> {
+        return new Map<string, Set<T>>();
+    }
+    public static newTMapAnyKeyGenericValue<T>(): TMapAnyKeyGenericValue<T> {
+        return new Map<any, T>();
+    }
     public static newTMapGenericKeyGenericValue<I, T>(): TMapGenericKeyGenericValue<I, T> {
         return new Map<I, T>();
-    }
-    public static newTMapStringKeyGenericValue<T>(): TMapStringKeyGenericValue<T> {
-        return new Map<string, T>();
     }
     public static newTMapNumberKeyGenericValue<T>(): TMapNumberKeyGenericValue<T> {
         return new Map<number, T>();
     }
+    public static newTMapStringKeyGenericValue<T>(): TMapStringKeyGenericValue<T> {
+        return new Map<string, T>();
+    }
+    public static newTMapAnyKeyGenericArray<T>(): TMapAnyKeyGenericArray<T> {
+        return new Map<any, T[]>();
+    }
     public static newTMapGenericKeyGenericArray<I, T>(): TMapGenericKeyGenericArray<I, T> {
         return new Map<I, T[]>();
-    }
-    public static newTMapStringKeyGenericArray<T>(): TMapStringKeyGenericArray<T> {
-        return new Map<string, T[]>();
     }
     public static newTMapNumberKeyGenericArray<T>(): TMapNumberKeyGenericArray<T> {
         return new Map<number, T[]>();
     }
+    public static newTMapStringKeyGenericArray<T>(): TMapStringKeyGenericArray<T> {
+        return new Map<string, T[]>();
+    }
+    public static newTMapAnyKeyGenericArrays<T>(): TMapAnyKeyGenericArrays<T> {
+        return new Map<any, T[][]>();
+    }
     public static newTMapGenericKeyGenericArrays<I, T>(): TMapGenericKeyGenericArrays<I, T> {
         return new Map<I, T[][]>();
     }
-    public static newTMapStringKeyGenericArrays<T>(): TMapStringKeyGenericArrays<T> {
-        return new Map<string, T[][]>();
-    }
     public static newTMapNumberKeyGenericArrays<T>(): TMapNumberKeyGenericArrays<T> {
         return new Map<number, T[][]>();
+    }
+    public static newTMapStringKeyGenericArrays<T>(): TMapStringKeyGenericArrays<T> {
+        return new Map<string, T[][]>();
     }
 }

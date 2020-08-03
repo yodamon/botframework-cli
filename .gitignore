@@ -85,3 +85,4 @@ packages/orchestrator/src/commands/orchestrator/netcoreapp3.1/**
 *.tsv
 *.blu
 **/orchestrator.json
+packages/orchestrator/src/commands/orchestrator/nlr/**

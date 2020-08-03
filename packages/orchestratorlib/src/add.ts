@@ -4,7 +4,6 @@
  */
 
 import * as path from 'path';
-import {Utility} from './utility';
 import {LabelResolver} from './labelresolver';
 import {OrchestratorHelper} from './orchestratorhelper';
 
@@ -36,9 +35,9 @@ export class OrchestratorAdd {
 
     const ext: string = OrchestratorHelper.isDirectory(inputPath) ? '' : path.extname(inputPath);
     if (ext === '.blu') {
-      labelResolver.addSnapshot(new TextEncoder().encode(OrchestratorHelper.readFile(inputPath)), labelPrefix);
+      labelResolver.addSnapshot(new TextEncoder().encode(OrchestratorHelper.readBluSnapshotFile(inputPath)), labelPrefix);
     } else {
-      LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath)).utterancesLabelsMap);
+      LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath)).utteranceLabelsMap);
     }
 
     OrchestratorHelper.writeToFile(outputPath, labelResolver.createSnapshot());

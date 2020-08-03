@@ -5,24 +5,27 @@
 
 import * as path from 'path';
 
-import {BinaryConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/BinaryConfusionMatrix';
-import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrix';
-import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher/lib/mathematics/confusion_matrix/MultiLabelConfusionMatrixSubset';
+import {MultiLabelConfusionMatrix} from '@microsoft/bf-dispatcher';
+import {MultiLabelConfusionMatrixSubset} from '@microsoft/bf-dispatcher';
 
 import {LabelType} from './label-type';
-import {Result} from './result';
 import {ScoreStructure}  from './score-structure';
 
 import {LabelResolver} from './labelresolver';
-import {OrchestratorHelper} from './orchestratorhelper';
 
-import {EvaluationSummaryTemplateHtml} from './resources/evaluation-summary-template-html';
 import {Utility} from './utility';
 
 export class OrchestratorEvaluate {
-  public static async runAsync(inputPath: string, outputPath: string, nlrPath: string = '') {
+  // eslint-disable-next-line max-params
+  public static async runAsync(
+    inputPath: string, outputPath: string, nlrPath: string = '',
+    ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter,
+    lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter,
+    multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter,
+    unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter): Promise<void> {
+    // ---- NOTE ---- process arguments
     if (Utility.isEmptyString(inputPath)) {
-      Utility.debuggingThrow('Please provide path to input file/folder');
+      Utility.debuggingThrow('Please provide path to an input .blu file');
     }
     if (Utility.isEmptyString(outputPath)) {
       Utility.debuggingThrow('Please provide an output directory');
@@ -32,80 +35,47 @@ export class OrchestratorEvaluate {
     } else {
       nlrPath = '';
     }
-    const trainingFile: string = path.join(inputPath, 'orchestrator.blu');
+    const ambiguousCloseness: number = ambiguousClosenessParameter;
+    const lowConfidenceScoreThreshold: number = lowConfidenceScoreThresholdParameter;
+    const multiLabelPredictionThreshold: number = multiLabelPredictionThresholdParameter;
+    const unknownLabelPredictionThreshold: number = unknownLabelPredictionThresholdParameter;
+    Utility.debuggingLog(`inputPath=${inputPath}`);
+    Utility.debuggingLog(`outputPath=${outputPath}`);
+    Utility.debuggingLog(`nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`ambiguousCloseness=${ambiguousCloseness}`);
+    Utility.debuggingLog(`lowConfidenceScoreThreshold=${lowConfidenceScoreThreshold}`);
+    Utility.debuggingLog(`multiLabelPredictionThreshold=${multiLabelPredictionThreshold}`);
+    Utility.debuggingLog(`unknownLabelPredictionThreshold=${unknownLabelPredictionThreshold}`);
+    // ---- NOTE ---- load the training set
+    const trainingFile: string = inputPath;
     if (!Utility.exists(trainingFile)) {
       Utility.debuggingThrow(`training set file does not exist, trainingFile=${trainingFile}`);
     }
     const trainingSetScoreOutputFile: string = path.join(outputPath, 'orchestrator_training_set_scores.txt');
     const trainingSetSummaryOutputFile: string = path.join(outputPath, 'orchestrator_training_set_summary.html');
+    const labelsOutputFilename: string = path.join(outputPath, 'orchestrator_labels.txt');
 
     Utility.debuggingLog('OrchestratorEvaluate.runAsync(), ready to call LabelResolver.createWithSnapshotAsync()');
     const labelResolver: any = await LabelResolver.createWithSnapshotAsync(nlrPath, trainingFile);
     Utility.debuggingLog('OrchestratorEvaluate.runAsync(), after calling LabelResolver.createWithSnapshotAsync()');
 
-    // ---- NOTE ---- load the evaluation summary template.
-    let evaluationSummaryTemplate: string = EvaluationSummaryTemplateHtml.html;
-
-    // ---- NOTE ---- retrieve labels, and create a label-index map.
+    // ---- NOTE ---- retrieve labels
     const labels: string[] = labelResolver.getLabels(LabelType.Intent);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
       // Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
       Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
     }
-    const labelArrayAndMap: {
-      'stringArray': string[];
-      'stringMap': {[id: string]: number};} = Utility.buildStringIdNumberValueDictionaryFromStringArray(
-        labels);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
-    Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
 
     // ---- NOTE ---- retrieve examples, process the training set, retrieve labels, and create a label-index map.
-    const utterancesLabelsMap: { [id: string]: string[] } = {};
-    const utterancesDuplicateLabelsMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+    const utteranceLabelsMap: { [id: string]: string[] } = {};
+    const utteranceLabelDuplicateMap: Map<string, Set<string>> = new Map<string, Set<string>>();
     const examples: any = labelResolver.getExamples();
-    Utility.examplesToUtteranceLabelMaps(examples, utterancesLabelsMap, utterancesDuplicateLabelsMap);
+    if (examples.length <= 0) {
+      Utility.debuggingThrow('there is no example, something wrong?');
+    }
+    Utility.examplesToUtteranceLabelMaps(examples, utteranceLabelsMap, utteranceLabelDuplicateMap);
     Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), examples.length=${examples.length}`);
-
-    // ---- NOTE ---- generate label statistics.
-    const labelStatisticsAndHtmlTable: {
-      'labelStatistics': string[][];
-      'labelStatisticsHtml': string;
-    } = Utility.generateLabelStatisticsAndHtmlTable(
-      utterancesLabelsMap,
-      labelArrayAndMap);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateLabelStatisticsAndHtmlTable()');
-    // ---- NOTE ---- generate utterance statistics
-    const utteranceStatisticsAndHtmlTable: {
-      'utteranceStatistics': string[][];
-      'utteranceStatisticsHtml': string;
-    } = Utility.generateUtteranceStatisticsAndHtmlTable(
-      utterancesLabelsMap);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finish calling Utility.generateUtteranceStatisticsAndHtmlTable()');
-    // ---- NOTE ---- create the evaluation INTENTUTTERANCESTATISTICS summary from template.
-    const intentsUtterancesStatisticsHtml: string =
-    labelStatisticsAndHtmlTable.labelStatisticsHtml + utteranceStatisticsAndHtmlTable.utteranceStatisticsHtml;
-    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{INTENTUTTERANCESTATISTICS}', intentsUtterancesStatisticsHtml);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {INTENTUTTERANCESTATISTICS} content');
-
-    // ---- NOTE ---- generate duplicate report.
-    const utterancesMultiLabelArrays: [string, string][] = Object.entries(utterancesLabelsMap).filter(
-      (x: [string, string[]]) => x[1].length > 1).map((x: [string, string[]]) => [x[0], x[1].join(',')]);
-    const utterancesMultiLabelArraysHtml: string = Utility.convertDataArraysToIndexedHtmlTable(
-      'Multi-label utterances and their intents',
-      utterancesMultiLabelArrays,
-      ['Utterance', 'Intents']);
-    // ---- NOTE ---- generate duplicate report.
-    const utterancesDuplicateLabelsHtml: string = Utility.convertMapSetToIndexedHtmlTable(
-      'Duplicate utterance and intent pairs',
-      utterancesDuplicateLabelsMap,
-      ['Utterance', 'Intent']);
-    // ---- NOTE ---- create the evaluation DUPLICATES summary from template.
-    const duplicateStatisticsHtml: string =
-      utterancesMultiLabelArraysHtml + utterancesDuplicateLabelsHtml;
-    evaluationSummaryTemplate = evaluationSummaryTemplate.replace('{DUPLICATES}', duplicateStatisticsHtml);
-    Utility.debuggingLog('OrchestratorTest.runAsync(), finished generating {DUPLICATES} content');
-
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
       const examples: any = labelResolver.getExamples();
       const example: any = examples[0];
@@ -134,44 +104,66 @@ export class OrchestratorEvaluate {
       Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), label.span.length=${length}`);
     }
 
-    // ---- NOTE ---- produce the evaluation summary file.
-    Utility.dumpFile(trainingSetSummaryOutputFile, evaluationSummaryTemplate);
-
-    // ---- NOTE ---- debugging ouput.
+    // ---- NOTE ---- integrated step to produce analysis reports.
+    Utility.resetLabelResolverSettingIgnoreSameExample(labelResolver, true);
+    const evaluationOutput: {
+      'evaluationReportLabelUtteranceStatistics': {
+        'evaluationSummaryTemplate': string;
+        'labelArrayAndMap': {
+          'stringArray': string[];
+          'stringMap': {[id: string]: number};};
+        'labelStatisticsAndHtmlTable': {
+          'labelUtterancesMap': { [id: string]: string[] };
+          'labelUtterancesTotal': number;
+          'labelStatistics': string[][];
+          'labelStatisticsHtml': string;};
+        'utteranceStatisticsAndHtmlTable': {
+          'utteranceStatisticsMap': {[id: number]: number};
+          'utteranceStatistics': [string, number][];
+          'utteranceCount': number;
+          'utteranceStatisticsHtml': string;};
+        'utterancesMultiLabelArrays': [string, string][];
+        'utterancesMultiLabelArraysHtml': string;
+        'utteranceLabelDuplicateHtml': string; };
+      'evaluationReportAnalyses': {
+        'evaluationSummaryTemplate': string;
+        'ambiguousAnalysis': {
+          'scoringAmbiguousUtterancesArrays': string[][];
+          'scoringAmbiguousUtterancesArraysHtml': string;
+          'scoringAmbiguousUtteranceSimpleArrays': string[][];};
+        'misclassifiedAnalysis': {
+          'scoringMisclassifiedUtterancesArrays': string[][];
+          'scoringMisclassifiedUtterancesArraysHtml': string;
+          'scoringMisclassifiedUtterancesSimpleArrays': string[][];};
+        'lowConfidenceAnalysis': {
+          'scoringLowConfidenceUtterancesArrays': string[][];
+          'scoringLowConfidenceUtterancesArraysHtml': string;
+          'scoringLowConfidenceUtterancesSimpleArrays': string[][];};
+        'confusionMatrixAnalysis': {
+          'confusionMatrix': MultiLabelConfusionMatrix;
+          'multiLabelConfusionMatrixSubset': MultiLabelConfusionMatrixSubset;
+          'scoringConfusionMatrixOutputLines': string[][];
+          'confusionMatrixMetricsHtml': string;
+          'confusionMatrixAverageMetricsHtml': string;}; };
+        'scoreStructureArray': ScoreStructure[];
+    } =
+    Utility.generateEvaluationReport(
+      labelResolver,
+      labels,
+      utteranceLabelsMap,
+      utteranceLabelDuplicateMap,
+      labelsOutputFilename,
+      trainingSetScoreOutputFile,
+      trainingSetSummaryOutputFile,
+      ambiguousCloseness,
+      lowConfidenceScoreThreshold,
+      multiLabelPredictionThreshold,
+      unknownLabelPredictionThreshold);
     if (Utility.toPrintDetailedDebuggingLogToConsole) {
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringArray)=${JSON.stringify(labelArrayAndMap.stringArray)}`);
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labelArrayAndMap.stringMap)=${JSON.stringify(labelArrayAndMap.stringMap)}`);
-      const labels: any = labelResolver.getLabels();
-      Utility.debuggingLog(`OrchestratorEvaluate.runAsync(), JSON.stringify(labels)=${JSON.stringify(labels)}`);
+      Utility.debuggingLog(`evaluationOutput=${Utility.jsonStringify(evaluationOutput)}`);
     }
 
-    // ---- NOTE ---- the end
-    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), the end');
+    // ---- NOTE ---- THE END
+    Utility.debuggingLog('OrchestratorEvaluate.runAsync(), THE END');
   }
-
-  // protected debug: boolean = false;
-  // protected labelResolver: any = null;
-  //
-  // public constructor(debug: boolean = false) {
-  //   this.debug = debug;
-  // }
-  //
-  // public async loadLabelResolverAsync(nlrPath: string) {
-  //   try {
-  //     if (nlrPath) {
-  //       nlrPath = path.resolve(nlrPath);
-  //     }
-  //     if (nlrPath.length === 0) {
-  //       throw new Error('Please provide path to Orchestrator model');
-  //     }
-  //     this.labelResolver = await LabelResolver.createAsync(nlrPath);
-  //   } catch (error) {
-  //     throw new Error(error);
-  //   }
-  // }
-
-  // public async readSnapshotContent(inputPath: string, outputPath: string): Promise<string> {
-  //   string snapshotContent:  = await OrchestratorHelper.readFile(inputPath);
-  //   return snapshotContent;
-  // }
 }

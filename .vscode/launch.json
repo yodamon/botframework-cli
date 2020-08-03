@@ -11,7 +11,18 @@
             //"preLaunchTask": "${defaultBuildTask}",
             "program": "${workspaceFolder}/packages/orchestrator/bin/run",
             "args": [
-                "orchestrator:create",
+                "orchestrator:build",
+                "--in",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative",
+                "--out",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative\\generated",
+                "--dialog",
+                "--model",
+                "c:\\repos\\botbuilder-dotnet\\samples\\TestBed-Declarative\\model"
+                //"--out",
+                //"c:\\todelete\\",
+                //"--versionId",
+                //"1.0.0-pretrained.20200729.microsoft.dte.en.onnx"
                 // "--debug",
                 // "--in",
                 // "resources/data/Columnar/Email.txt",
@@ -89,6 +100,26 @@
             "preLaunchTask": "${defaultBuildTask}",
             "program": "${workspaceFolder}/packages/luis/node_modules/mocha/bin/_mocha",
             "cwd": "${workspaceFolder}/packages/luis",
+            "args": [
+                "test/",
+                "--timeout",
+                "999999",
+                "--colors",
+                "-g",
+                ".*"
+            ],
+            "internalConsoleOptions": "openOnSessionStart",
+            "outFiles": [
+                "./lib/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "OrchestratorLib Tests",
+            "preLaunchTask": "${defaultBuildTask}",
+            "program": "${workspaceFolder}/packages/orchestratorlib/node_modules/mocha/bin/_mocha",
+            "cwd": "${workspaceFolder}/packages/orchestratorlib",
             "args": [
                 "test/",
                 "--timeout",

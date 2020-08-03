@@ -8,12 +8,21 @@ import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
 import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
 
 export default class OrchestratorPredict extends Command {
-  static description: string = 'Returns score of given utterance using previously created orchestrator examples';
+  static description: string = 'Real-time interaction with Orchestrator model and analysis. Can return score of given utterance using previously created orchestrator examples';
+
+  static examples: Array<string> = [`
+    $ bf orchestrator:predict 
+    $ bf orchestrator:predict --in ./path/to/file/
+    $ bf orchestrator:predict --in ./path/to/file/ --out ./path/to/output/`]
 
   static flags: flags.Input<any> = {
-    in: flags.string({char: 'i', description: 'The path to source label files from where orchestrator example file will be created from. Default to current working directory.'}),
-    out: flags.string({char: 'o', description: 'Path where generated orchestrator example file will be placed. Default to current working directory.'}),
-    model: flags.string({char: 'm', description: 'Path to Orchestrator model.'}),
+    in: flags.string({char: 'l', description: 'Path to a previously created Orchestrator .blu file. Optional.'}),
+    out: flags.string({char: 'o', description: 'Directory where analysis files will be placed.'}),
+    model: flags.string({char: 'm', description: 'Directory or a config file hosting Orchestrator model files.'}),
+    ambiguous: flags.string({char: 'a', description: `Ambiguous threshold, default to ${Utility.DefaultAmbiguousClosenessParameter}`}),
+    low_confidence: flags.string({char: 'l', description: `Low confidence threshold, default to ${Utility.DefaultLowConfidenceScoreThresholdParameter}`}),
+    multi_label: flags.string({char: 'u', description: `Multi-label threshold, default to ${Utility.DefaultMultiLabelPredictionThresholdParameter}`}),
+    unknown: flags.string({char: 'u', description: `Unknow label threshold, default to ${Utility.DefaultUnknownLabelPredictionThresholdParameter}`}),
     debug: flags.boolean({char: 'd'}),
     help: flags.help({char: 'h'}),
   }
@@ -21,42 +30,62 @@ export default class OrchestratorPredict extends Command {
   async run(): Promise<number> {
     const {flags}: flags.Output = this.parse(OrchestratorPredict);
 
-    // const input: string = flags.in;
-    // const output: string = flags.out;
+    const inputPath: string = flags.in;
+    const outputPath: string = flags.out;
     let nlrPath: string = flags.model;
     if (nlrPath) {
       nlrPath = path.resolve(nlrPath);
     }
 
+    let ambiguousClosenessParameter: number = Utility.DefaultAmbiguousClosenessParameter;
+    let lowConfidenceScoreThresholdParameter: number = Utility.DefaultLowConfidenceScoreThresholdParameter;
+    let multiLabelPredictionThresholdParameter: number = Utility.DefaultMultiLabelPredictionThresholdParameter;
+    let unknownLabelPredictionThresholdParameter: number = Utility.DefaultUnknownLabelPredictionThresholdParameter;
+    if (flags.ambiguous) {
+      ambiguousClosenessParameter = Number(flags.ambiguous);
+      if (Number.isNaN(ambiguousClosenessParameter)) {
+        Utility.writeLineToConsole(`ambiguous parameter "${flags.ambiguous}" is not a number`);
+      }
+    }
+    if (flags.low_confidence) {
+      lowConfidenceScoreThresholdParameter = Number(flags.low_confidence);
+      if (Number.isNaN(lowConfidenceScoreThresholdParameter)) {
+        Utility.writeLineToConsole(`low-confidence parameter "${flags.ambiguous}" is not a number`);
+      }
+    }
+    if (flags.multi_label) {
+      multiLabelPredictionThresholdParameter = Number(flags.multi_label);
+      if (Number.isNaN(multiLabelPredictionThresholdParameter)) {
+        Utility.writeLineToConsole(`multi-label threshold parameter "${flags.multi_label}" is not a number`);
+      }
+    }
+    if (flags.unknown) {
+      unknownLabelPredictionThresholdParameter = Number(flags.unknown);
+      if (Number.isNaN(unknownLabelPredictionThresholdParameter)) {
+        Utility.writeLineToConsole(`unknown threshold parameter "${flags.unknown}" is not a number`);
+      }
+    }
+
     Utility.toPrintDebuggingLogToConsole = flags.debug;
 
-    /*
-    let args: string = `predict --in ${input} --out ${output}`;
-    if (flags.debug) {
-      args += ' --debug';
-    }
-    if (nlrPath) {
-      args += ` --model ${nlrPath}`;
-    }
-
-    if (flags.debug) {
-      const loggingMessage: string = `predict.ts: arguments = ${args}`;
-      const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
-      this.log(loggingMessageCodified);
-    }
+    Utility.debuggingLog(`OrchestratorPredict.run(): inputPath=${inputPath}`);
+    Utility.debuggingLog(`OrchestratorPredict.run(): outputPath=${outputPath}`);
+    Utility.debuggingLog(`OrchestratorPredict.run(): nlrPath=${nlrPath}`);
+    Utility.debuggingLog(`OrchestratorPredict.run(): ambiguousClosenessParameter=${ambiguousClosenessParameter}`);
+    Utility.debuggingLog(`OrchestratorPredict.run(): lowConfidenceScoreThresholdParameter=${lowConfidenceScoreThresholdParameter}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): multiLabelPredictionThresholdParameter=${multiLabelPredictionThresholdParameter}`);
+    Utility.debuggingLog(`OrchestratorEvaluate.run(): unknownLabelPredictionThresholdParameter=${unknownLabelPredictionThresholdParameter}`);
 
     try {
-      const command: string = 'dotnet "' + path.join(...[__dirname, 'netcoreapp3.1', 'OrchestratorCli.dll']) + '" ' + args;
-      if (flags.debug) {
-        const loggingMessage: string = `predict.ts: command = ${command}`;
-        const loggingMessageCodified: string = Utility.debuggingLog(loggingMessage);
-        this.log(loggingMessageCodified);
-      }
-      require('child_process').execSync(command, {stdio: [0, 1, 2]});
+      await Orchestrator.predictAsync(
+        nlrPath, inputPath, outputPath,
+        ambiguousClosenessParameter,
+        lowConfidenceScoreThresholdParameter,
+        multiLabelPredictionThresholdParameter,
+        unknownLabelPredictionThresholdParameter);
     } catch (error) {
-      return 1;
+      throw (new CLIError(error));
     }
-    */
     return 0;
   }
 }

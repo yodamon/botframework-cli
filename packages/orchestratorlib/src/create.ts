@@ -25,10 +25,22 @@ export class OrchestratorCreate {
     nlrPath = path.resolve(nlrPath);
 
     const labelResolver: any = await LabelResolver.createAsync(nlrPath);
-    LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical)).utterancesLabelsMap);
+    LabelResolver.addExamples((await OrchestratorHelper.getUtteranceLabelsMap(inputPath, hierarchical)).utteranceLabelsMap);
 
     const snapshot: any = labelResolver.createSnapshot();
-    OrchestratorHelper.writeToFile(outputPath, snapshot);
+
+    const outPath: string = OrchestratorCreate.getOutputPath(outputPath, inputPath);
+    OrchestratorHelper.writeToFile(outPath, snapshot);
     Utility.debuggingLog(`Snapshot written to ${outputPath}`);
+  }
+
+  private static getOutputPath(out: string, base: string): string {
+    let retValue: string = out;
+    if (!out.endsWith('.blu')) {
+      const srcBaseFileName: string = path.basename(base);
+      const dstBaseFileName: string = srcBaseFileName.substring(0, srcBaseFileName.lastIndexOf('.'));
+      retValue = path.join(out, `${dstBaseFileName}.blu`);
+    }
+    return retValue;
   }
 }

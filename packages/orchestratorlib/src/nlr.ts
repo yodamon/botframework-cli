@@ -10,7 +10,7 @@ const Zip: any = require('node-7z-forall');
 const fetch: any = require('node-fetch');
 
 export class OrchestratorNlr {
-  public static async getAsync(nlrPath: string, versionId: string, onFinish: any = null) {
+  public static async getAsync(nlrPath: string, versionId: string, onProgress: any = OrchestratorNlr.defaultHandler, onFinish: any = OrchestratorNlr.defaultHandler) {
     try {
       if (nlrPath) {
         nlrPath = path.resolve(nlrPath);
@@ -24,6 +24,7 @@ export class OrchestratorNlr {
       Utility.debuggingLog(`Nlr path: ${nlrPath}`);
 
       const versions: any = await OrchestratorNlr.getNlrVersionsAsync();
+      onProgress('Downloading model...');
       if (!versions) {
         throw new Error('Failed getting nlr_versions.json');
       }
@@ -33,9 +34,8 @@ export class OrchestratorNlr {
         throw new Error(`Model info for version ${versionId} not found`);
       }
 
-      const url: string = modelInfo.onnxModelUri;
+      const url: string = modelInfo.modelUri;
       const fileName: string = url.substring(url.lastIndexOf('/') + 1);
-      const modelFolder: string = path.join(nlrPath, path.basename(fileName, '.7z'));
       const res: any = await fetch(url);
       const modelZipPath: string = path.join(nlrPath, fileName);
       const fileStream: any = fs.createWriteStream(modelZipPath);
@@ -44,14 +44,15 @@ export class OrchestratorNlr {
         throw new Error(`Failed downloading model version ${versionId}`);
       });
       fileStream.on('finish', () => {
+        onProgress('Model downloaded...');
         Utility.debuggingLog(`Finished downloading model version ${versionId}`);
         const seven: any = new Zip();
+        onProgress('Extracting...');
         seven.extractFull(modelZipPath, nlrPath).then(() => {
+          onProgress('Cleaning up...');
           Utility.debuggingLog(`Finished extracting model version ${versionId}`);
-          OrchestratorNlr.moveFiles(modelFolder, nlrPath);
-          Utility.debuggingLog(`Finished moving files from ${modelFolder} to ${nlrPath}`);
-          fs.rmdirSync(modelFolder);
-          Utility.debuggingLog(`Deleted folder: ${modelFolder}`);
+          fs.unlinkSync(modelZipPath);
+          Utility.debuggingLog(`Cleaned up .7z file: ${modelZipPath}`);
           onFinish();
         });
       });
@@ -70,11 +71,21 @@ export class OrchestratorNlr {
     return JSON.stringify(json, null, 2);
   }
 
-  private static moveFiles(sourceDir: string, targetDir: string) {
-    const items: string[] = fs.readdirSync(sourceDir);
-    for (const item of items) {
-      const currentItemPath: string = path.join(sourceDir, item);
-      Utility.moveFile(currentItemPath, targetDir);
+  private static defaultHandler(status: string) {
+    Utility.debuggingLog(status);
+  }
+
+  private static deleteFolderRecursive(inputPath: string) {
+    if (fs.existsSync(inputPath)) {
+      fs.readdirSync(inputPath).forEach(function (file: string) {
+        const curPath: string = path.join(inputPath, file);
+        if (fs.lstatSync(curPath).isDirectory()) { // recurse
+          OrchestratorNlr.deleteFolderRecursive(curPath);
+        } else { // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(inputPath);
     }
   }
 }

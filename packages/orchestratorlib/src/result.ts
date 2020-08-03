@@ -12,6 +12,22 @@ export class Result {
     this.closest_text = closest_text;
   }
 
+  public toObject(): {
+    'label': {
+      'name': string;
+      'label_type': number;
+      'span': {
+        'offset': number;
+        'length': number; }; };
+    'score': number;
+    'closest_text': string; } {
+    return {
+      label: this.label.toObject(),
+      score: this.score,
+      closest_text: this.closest_text,
+    };
+  }
+
   public label: Label;
 
   public score: number;

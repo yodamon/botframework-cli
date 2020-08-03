@@ -4,15 +4,14 @@
  */
 
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Utility, OrchestratorHelper} from '@microsoft/bf-orchestrator';
+import {OrchestratorHelper} from '@microsoft/bf-orchestrator';
 import * as path from 'path';
 import * as fs from 'fs';
 import ErrnoException = NodeJS.ErrnoException;
 
 export default class OrchestratorFinetune extends Command {
   static description: string = 'Manage Orchestrator fine tuning.';
-
-  // eslint-disable-next-line @typescript-eslint/typedef
+  /*
   static args=[
     {
       name: 'command', required: true, description:
@@ -22,7 +21,7 @@ export default class OrchestratorFinetune extends Command {
               put    - Put finetune training example data to improve orchestrator.\n\
               get    - Get the model for completed finetune job.',
     },
-  ]
+  ] */
 
   static examples: string[] = [`
     $ bf orchestrator:finetune status
@@ -41,17 +40,18 @@ export default class OrchestratorFinetune extends Command {
   }
 
   async run(): Promise<number> {
-    // eslint-disable-next-line @typescript-eslint/typedef
-    const {args, flags} = this.parse(OrchestratorFinetune);
-    const input: string  = flags.in || __dirname;
-    const output: string = flags.out || __dirname;
-    let nlrPath: string = flags.model;
-    if (nlrPath) {
-      nlrPath = path.resolve(nlrPath);
-    }
+    // const {args, flags} = this.parse(OrchestratorFinetune);
+    // const input: string  = flags.in || __dirname;
+    // const output: string = flags.out || __dirname;
+    // let nlrPath: string = flags.model;
+    // if (nlrPath) {
+    //  nlrPath = path.resolve(nlrPath);
+    // }
 
-    Utility.toPrintDebuggingLogToConsole = flags.debug;
+    // Utility.toPrintDebuggingLogToConsole = flags.debug;
 
+    this.log('Fine tuning will be available soon.');
+    /*
     let cli_args: string = `finetune ${args.command} `;
     switch (args.command) {
     case 'status': {
@@ -106,6 +106,7 @@ export default class OrchestratorFinetune extends Command {
     } catch (error) {
       return 1;
     }
+    */
     return 0;
   }
 

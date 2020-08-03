@@ -3300,6 +3300,65 @@ export class MathematicsHelper implements IMathematicsHelper {
         return vector;
     }
 
+    public getIndexesOnMaxOrEntriesOverThresholdOnArray(
+        inputArray: Float32Array | Int32Array | Uint8Array,
+        threshold: number):
+        { "indexesMax": number[]; "max": number } {
+        if (Utility.isEmptyNumberF32I32U8Array(inputArray)) {
+            Utility.debuggingThrow("inputArray is empty");
+        }
+        const indexesOverTheThreshold: number[] = [];
+        let indexesMax: number[] = [0];
+        let max: number = inputArray[0];
+        for (let i: number = 1; i < inputArray.length; i++) {
+            const inputCurrent: number = inputArray[i];
+            if (inputCurrent > threshold) {
+                indexesOverTheThreshold.push(i);
+            }
+            if (inputCurrent > max) {
+                max = inputCurrent;
+                indexesMax = [i];
+                continue;
+            }
+            if (inputCurrent === max) {
+                indexesMax.push(i);
+            }
+        }
+        if (indexesOverTheThreshold.length > 0) {
+            indexesMax = indexesOverTheThreshold;
+        }
+        return {indexesMax, max};
+    }
+    public getIndexesOnMaxOrEntriesOverThreshold(
+        inputArray: number[],
+        threshold: number):
+        { "indexesMax": number[]; "max": number } {
+        if (Utility.isEmptyNumberArray(inputArray)) {
+            Utility.debuggingThrow("inputArray is empty");
+        }
+        const indexesOverTheThreshold: number[] = [];
+        let indexesMax: number[] = [0];
+        let max: number = inputArray[0];
+        for (let i: number = 1; i < inputArray.length; i++) {
+            const inputCurrent: number = inputArray[i];
+            if (inputCurrent > threshold) {
+                indexesOverTheThreshold.push(i);
+            }
+            if (inputCurrent > max) {
+                max = inputCurrent;
+                indexesMax = [i];
+                continue;
+            }
+            if (inputCurrent === max) {
+                indexesMax.push(i);
+            }
+        }
+        if (indexesOverTheThreshold.length > 0) {
+            indexesMax = indexesOverTheThreshold;
+        }
+        return {indexesMax, max};
+    }
+
     public getIndexesOnMaxEntriesOnArray(
         inputArray: Float32Array | Int32Array | Uint8Array):
         { "indexesMax": number[], "max": number } {
@@ -3410,6 +3469,65 @@ export class MathematicsHelper implements IMathematicsHelper {
             }
         }
         return { indexMax, max };
+    }
+
+    public getIndexesOnMinOrEntriesLessThanThresholdOnArray(
+        inputArray: Float32Array | Int32Array | Uint8Array,
+        threshold: number):
+        { "indexesMin": number[]; "min": number } {
+        if (Utility.isEmptyNumberF32I32U8Array(inputArray)) {
+            Utility.debuggingThrow("inputArray is empty");
+        }
+        const indexesOverTheThreshold: number[] = [];
+        let indexesMin: number[] = [0];
+        let min: number = inputArray[0];
+        for (let i: number = 1; i < inputArray.length; i++) {
+            const inputCurrent: number = inputArray[i];
+            if (inputCurrent < threshold) {
+                indexesOverTheThreshold.push(i);
+            }
+            if (inputCurrent < min) {
+                min = inputCurrent;
+                indexesMin = [i];
+                continue;
+            }
+            if (inputCurrent === min) {
+                indexesMin.push(i);
+            }
+        }
+        if (indexesOverTheThreshold.length > 0) {
+            indexesMin = indexesOverTheThreshold;
+        }
+        return {indexesMin, min};
+    }
+    public getIndexesOnMinOrEntriesLessThanThreshold(
+        inputArray: number[],
+        threshold: number):
+        { "indexesMin": number[]; "min": number } {
+        if (Utility.isEmptyNumberArray(inputArray)) {
+            Utility.debuggingThrow("inputArray is empty");
+        }
+        const indexesOverTheThreshold: number[] = [];
+        let indexesMin: number[] = [0];
+        let min: number = inputArray[0];
+        for (let i: number = 1; i < inputArray.length; i++) {
+            const inputCurrent: number = inputArray[i];
+            if (inputCurrent < threshold) {
+                indexesOverTheThreshold.push(i);
+            }
+            if (inputCurrent < min) {
+                min = inputCurrent;
+                indexesMin = [i];
+                continue;
+            }
+            if (inputCurrent === min) {
+                indexesMin.push(i);
+            }
+        }
+        if (indexesOverTheThreshold.length > 0) {
+            indexesMin = indexesOverTheThreshold;
+        }
+        return {indexesMin, min};
     }
 
     public getIndexesOnMinEntriesOnArray(

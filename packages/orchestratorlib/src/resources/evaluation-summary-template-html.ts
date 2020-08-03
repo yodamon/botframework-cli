@@ -85,14 +85,16 @@ export class EvaluationSummaryTemplateHtml {
         <!--
         <span style="float:right"><a href="https://{PORTAL_URL}/applications/{APP_ID}/versions/{VERSION}/dashboard" target="_blank">View in LUIS portal</a></span>
         -->
+        <!--
         <div>
             <p>{EVAL_SUMMARY}</p>
             <p>To improve orchestrator, please update the source models and retrain the orchestrator model by running the command "orchestrator refresh".</p>
         </div>
+        -->
         <br />
         <ul class="nav nav-pills ms-fontSize-mPlus ms-fontWeight-semibold" id="modelAnalysis" role="tablist" style="padding-bottom:10px">
             <li class="nav-item active">
-                <a class="nav-link active" id="intentutterancestatistics-tab" data-toggle="tab" href="#intentutterancestatistics" role="tab" aria-controls="intentutterancestatistics" aria-selected="true"><strong>Intent Statistics</strong></a>
+                <a class="nav-link active" id="intentutterancestatistics-tab" data-toggle="tab" href="#intentutterancestatistics" role="tab" aria-controls="intentutterancestatistics" aria-selected="true"><strong>Intent/utterancce Statistics</strong></a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active" id="duplicates-tab" data-toggle="tab" href="#duplicates" role="tab" aria-controls="duplicates" aria-selected="true"><strong>Duplicates</strong></a>
@@ -150,15 +152,19 @@ export class EvaluationSummaryTemplateHtml {
             </div>
             <div class="tab-pane" id="modelevaluation" role="tabpanel" aria-labelledby="modelevaluation-tab">
                 <p>Overall model performance and links to machine learning model evaluation charts and metrics</p>
+                <!--
                 <p>
                     {MODELEVALUATIONOVERALL}
                 </p>
+                -->
                 <p>
                     {MODELEVALUATION}
                 </p>
+                <!--
                 <p>
                     {CROSSENTROPY}
                 </p>
+                -->
             </div>
             <!--
             <div class="tab-pane" id="modelevaluationtopposition" role="tabpanel" aria-labelledby="modelevaluationtopposition-tab">

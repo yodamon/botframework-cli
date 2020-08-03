@@ -65,24 +65,36 @@ _See code: [src\commands\orchestrator\create.ts](https://github.com/microsoft/bo
 
 ## `bf orchestrator:evaluate`
 
-Create orchestrator evaluation report from .lu/.qna files
+Create Orchestrator leave-one-out cross validation (LOOCV) evaluation report on a previously generated .blu file
 
 ```
 USAGE
   $ bf orchestrator:evaluate
 
 OPTIONS
-  -d, --debug
-  -h, --help         show CLI help
-
-  -i, --in=in        The path to source label files from where orchestrator example file will be created from. Default
-                     to current working directory.
-
-  -m, --model=model  Path to Orchestrator model.
-
-  -o, --out=out      Path where generated orchestrator example file will be placed. Default to current working
-                     directory.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'evaluate' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files. Optional.
+  -o, --out=out                   Directory where analysis files will be placed.
 ```
+
+DESCRIPTION
+  The 'evaluate' command can execute a leave-one-out-cross-validation (LOOCV) on a model and example set, then
+  generate a detailed evaluation report which has the following sections:
+  1) Intent/utterancce Statistics - intent and utterance statistics and distributions.
+  2) Duplicates - tables of utterance with multiple intents and exact utterance/intent duplicates.
+  3) Ambiguous - ambiguous predictions that there are some other intent predictions whose
+     scores are close to the correctly predicted intents. Ambiguity closeness is controlled by the "ambiguous" parameter, default to 0.2. I.e., if there is a prediction whose score is within 80% of
+     the correctly predicted intent score, then the prediction itself is considered "ambiguous."
+  4) Misclassified - utterance's intent labels were not scored the highest.
+  5) Low Confidence - utterance intent labels are scored the highest, but they are lower than a threshold.
+     This threshold can be configured through the "low_confidence" parameter, the default is 0.5.
+  6) Metrics - test confisuon matrix metrics.
+
+EXAMPLE
 
 _See code: [src\commands\orchestrator\evaluate.ts](https://github.com/microsoft/botframework-cli/blob/v1.0.0/src\commands\orchestrator\evaluate.ts)_
 
@@ -154,39 +166,89 @@ USAGE
   $ bf orchestrator:predict
 
 OPTIONS
-  -d, --debug
-  -h, --help         show CLI help
-
-  -i, --in=in        The path to source label files from where orchestrator example file will be created from. Default
-                     to current working directory.
-
-  -m, --model=model  Path to Orchestrator model.
-
-  -o, --out=out      Path where generated orchestrator example file will be placed. Default to current working
-                     directory.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'predict' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file. Optional.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files.
+  -o, --out=out                   Directory where analysis files will be placed.
 ```
+
+DESCRIPTION
+  The 'predict' command is an interactive process that can help a user doing the following
+  1) Predict the intent of an input utterance using the 'p' commandlet.
+  2) Analyze a model example set, by executing the 'v' (validation) commandlet and produce an evaluation
+     report in real-time.
+  3) Add, remove, or change the intents of an input utterace using the 'a', 'r', and 'c' commandlets,
+     respectively. Users can reference a validation report and choose an ambiguous, misclassified, or
+     low-confidence utterance and change their intent labels.
+  4) Remove some labels completely from the model example set using the 'rl' commandlet.
+  5) Create a new model example set snapshot using the 'n' commandlet.
+
+  Below is a list of the commandlets that can be issued during a 'predict' session.
+
+  Commandlets: h, q, d, s, u, cu, i, ci, ni, cni, q, p, v, vd, va, vm, vl, a, r, c, rl, n
+    h   - print this help message
+    q   - quit
+    d   - display utterance, intent label array inputs, Orchestrator config, and the label-index map
+          and the label-index map
+    s   - show label-utterance statistics of the model examples
+    u   - enter a new utterance and save it as the "current" utterance input
+    cu  - clear the "current" utterance input
+    i   - enter an intent and add it to the "current" intent label array input 
+          (can be an index for retrieving a label from the label-index map)
+    ci  - clear the "current" intent label array input
+    ni  - enter an intent and add it to the "new" intent label array input 
+          (can be an index for retrieving a label from the label-index map)
+    cni - clear the "new" intent label array input
+    f   - find the "current" utterance and see if it is already in the model example set
+    p   - make a prediction on the "current" utterance input
+    v   - validate the model and save analyses (validation report) to 
+          "${this.predictingSetSummaryOutputFilename}"`);
+    vd  - reference the validation Duplicates report (previously generated by the "v" command) 
+          and enter an index for retrieving utterance/intents and save them into "current"
+    va  - reference the validation Ambiguous report (previously generated by the "v" command) 
+          and enter an index for retrieving utterance/intents and save them into "current"
+    vm  - reference the validation Misclassified report (previously generated by the "v" command) 
+          and enter an index for retrieving utterance/intents and save them into "current"
+    vl  - reference the validation LowConfidence report (previously generated by the "v" command) 
+          and enter an index for retrieving utterance/intents and save them into "current"
+    a   - add the "current" utterance and intent labels to the model example set
+    r   - remove the "current" utterance and intent labels from the model example set
+    c   - remove the "current" utterance\'s intent labels and then 
+          add it with the "new" intent labels to the model example set
+    rl  - remove the "current" intent labels from the model example set
+    n   - create a new snapshot of model examples and save it to 
+          ${this.trainingFileOutput}
+
+EXAMPLE
 
 _See code: [src\commands\orchestrator\predict.ts](https://github.com/microsoft/botframework-cli/blob/v1.0.0/src\commands\orchestrator\predict.ts)_
 
 ## `bf orchestrator:test`
 
-Run orchestrator test evaluation using given test file
+Test utterance/label samples from an input file and create an evaluation report
 
 ```
 USAGE
   $ bf orchestrator:test
 
 OPTIONS
-  -d, --debug
-  -h, --help         show CLI help
-  -i, --in=in        The path to source label file from where orchestrator example file will be created from.
-  -m, --model=model  Path to Orchestrator model.
-
-  -o, --out=out      Path where generated orchestrator example file will be placed. Default to current working
-                     directory.
-
-  -t, --test=test    The path to test label file from where orchestrator example file will be created from.
+  -a, --ambiguous=threshold       Ambiguous analysis threshild. Default to 0.2.
+  -d, --debug                     Print debugging information during execution.
+  -h, --help                      Orchestrator 'test' command help.
+  -i, --in=in                     Path to a previously created Orchestrator .blu file.
+  -l, --low_confidence=threshold  Low confidence analysis threshold. Default to 0.5.
+  -m, --model=model               Directory or a config file hosting Orchestrator model files.
+  -o, --out=out                   Directory where analysis files will be placed.
+  -t, --test=test                 Path to a test file.
 ```
+
+DESCRIPTION
+  The 'test' command can test an Orchestrator model and example set on an input utterance/intent file.
+
+EXAMPLE
 
 _See code: [src\commands\orchestrator\test.ts](https://github.com/microsoft/botframework-cli/blob/v1.0.0/src\commands\orchestrator\test.ts)_
 <!-- commandsstop -->

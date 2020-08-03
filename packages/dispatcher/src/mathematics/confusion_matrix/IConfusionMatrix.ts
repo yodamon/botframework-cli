@@ -13,20 +13,74 @@ export interface IConfusionMatrix {
         "confusionMatrix": IConfusionMatrix,
         "labelBinaryConfusionMatrixBasicMetricMap": { [id: string]: { [id: string]: number } },
         "labelBinaryConfusionMatrixMap": { [id: string]: BinaryConfusionMatrix },
+        "microAverageMetrics": {
+            "accuracy": number,
+            "truePositives": number,
+            "falsePositives": number,
+            "falseNegatives": number,
+            "total": number },
         "macroAverageMetrics": {
             "averagePrecision": number,
             "averageRecall": number,
             "averageF1Score": number,
-            "support": number },
-        "microAverageMetrics": {
-            "accuracy": number,
-            "truePositives": number,
-            "support": number },
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "summationMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "positiveSupportLabelMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
+        "positiveSupportLabelSummationMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number },
         "weightedMacroAverageMetrics": {
             "weightedAveragePrecision": number,
             "weightedAverageRecall": number,
             "weightedAverageF1Score": number,
-            "support": number } };
+            "weightedAverageAccuracy": number,
+            "weightedAverageSupport": number,
+            "total": number },
+        "summationWeightedMacroAverageMetrics": {
+            "averagePrecision": number,
+            "averageRecall": number,
+            "averageF1Score": number,
+            "averageAccuracy": number,
+            "averageTruePositives": number,
+            "averageFalsePositives": number,
+            "averageTrueNegatives": number,
+            "averageFalseNegatives": number,
+            "averageSupport": number,
+            "total": number } };
 
     getNumberLabels(): number;
     getLabels(): string[];
@@ -34,21 +88,81 @@ export interface IConfusionMatrix {
 
     getBinaryConfusionMatrices(): BinaryConfusionMatrix[];
 
+    getTotal(binaryConfusionMatrices: BinaryConfusionMatrix[]): number;
+
     getMicroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
         "averagePrecisionRecallF1Accuracy": number,
         "truePositives": number,
+        "falsePositives": number,
+        "falseNegatives": number,
         "total": number };
 
     getMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getSummationMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getPositiveSupportLabelMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getPositiveSupportLabelSummationMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
         "total": number };
 
     getWeightedMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
         "averagePrecision": number,
         "averageRecall": number,
         "averageF1Score": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
+        "total": number };
+
+    getSummationWeightedMacroAverageMetrics(binaryConfusionMatrices: BinaryConfusionMatrix[]): {
+        "averagePrecision": number,
+        "averageRecall": number,
+        "averageF1Score": number,
+        "averageTruePositives": number,
+        "averageFalsePositives": number,
+        "averageTrueNegatives": number,
+        "averageFalseNegatives": number,
+        "averageAccuracy": number,
+        "averageSupport": number,
         "total": number };
 
     validateLabelId(

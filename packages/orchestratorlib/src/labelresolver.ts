@@ -26,24 +26,27 @@ export class LabelResolver {
 
     if (nlrPath) {
       Utility.debuggingLog('LabelResolver.loadNlrAsync(): Loading NLR..');
-      if (await LabelResolver.Orchestrator.load(nlrPath) === false) {
-        throw new Error(`Failed calling LabelResolver.Orchestrator.load("${nlrPath}")!`);
+      if (await LabelResolver.Orchestrator.loadAsync(nlrPath) === false) {
+        throw new Error(`Failed calling LabelResolver.Orchestrator.loadAsync("${nlrPath}")!`);
       }
-    } else if (await LabelResolver.Orchestrator.load() === false) {
+    } else if (LabelResolver.Orchestrator.load() === false) {
       throw new Error('Failed calling LabelResolver.Orchestrator.load()!');
     }
+
+    return LabelResolver.Orchestrator;
   }
 
   public static async createAsync(nlrPath: string) {
     await LabelResolver.loadNlrAsync(nlrPath);
-    Utility.debuggingLog('LabelResolver.createAsync(): Creating labeler..');
+    Utility.debuggingLog('LabelResolver.createAsync(): Creating labeler...');
     LabelResolver.LabelResolver = LabelResolver.Orchestrator.createLabelResolver();
+    Utility.debuggingLog('LabelResolver.createAsync(): Done creating labeler...');
     return LabelResolver.LabelResolver;
   }
 
   public static async createWithSnapshotAsync(nlrPath: string, snapshotPath: string) {
     const encoder: TextEncoder = new TextEncoder();
-    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readFile(snapshotPath));
+    const snapshot: Uint8Array = encoder.encode(OrchestratorHelper.readBluSnapshotFile(snapshotPath));
     await LabelResolver.loadNlrAsync(nlrPath);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): nlrPath=${nlrPath}`);
     Utility.debuggingLog(`LabelResolver.createWithSnapshotAsync(): typeof(snapshot)=${typeof snapshot}`);
@@ -54,13 +57,16 @@ export class LabelResolver {
     return LabelResolver.LabelResolver;
   }
 
-  public static addExamples(utterancesLabelsMap: {[id: string]: string[]}) {
+  public static addExamples(utteranceLabelsMap: {[id: string]: string[]}, labelResolver: any = null) {
+    if (labelResolver === null) {
+      labelResolver = LabelResolver.LabelResolver;
+    }
     // eslint-disable-next-line guard-for-in
-    for (const utterance in utterancesLabelsMap) {
-      const labels: string[] = utterancesLabelsMap[utterance];
+    for (const utterance in utteranceLabelsMap) {
+      const labels: string[] = utteranceLabelsMap[utterance];
       for (const label of labels) {
         try {
-          const success: any = LabelResolver.LabelResolver.addExample({label: label, text: utterance});
+          const success: any = labelResolver.addExample({label: label, text: utterance});
           if (success) {
             Utility.debuggingLog(`LabelResolver.addExamples(): Added { label: ${label}, text: ${utterance}}`);
           } else {

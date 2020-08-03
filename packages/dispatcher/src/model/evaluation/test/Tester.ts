@@ -151,28 +151,91 @@ export class Tester extends AbstractBaseModelFeaturizerEvaluator {
             "confusionMatrix": IConfusionMatrix,
             "labelBinaryConfusionMatrixBasicMetricMap": { [id: string]: { [id: string]: number } },
             "labelBinaryConfusionMatrixMap": { [id: string]: BinaryConfusionMatrix },
+            "microAverageMetrics": {
+                "accuracy": number,
+                "truePositives": number,
+                "falsePositives": number,
+                "falseNegatives": number,
+                "total": number },
             "macroAverageMetrics": {
                 "averagePrecision": number,
                 "averageRecall": number,
                 "averageF1Score": number,
-                "support": number },
-            "microAverageMetrics": {
-                "accuracy": number,
-                "truePositives": number,
-                "support": number },
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "summationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "positiveSupportLabelMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
+            "positiveSupportLabelSummationMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number },
             "weightedMacroAverageMetrics": {
                 "weightedAveragePrecision": number,
                 "weightedAverageRecall": number,
                 "weightedAverageF1Score": number,
-                "support": number } } =
+                "weightedAverageAccuracy": number,
+                "weightedAverageSupport": number,
+                "total": number },
+            "summationWeightedMacroAverageMetrics": {
+                "averagePrecision": number,
+                "averageRecall": number,
+                "averageF1Score": number,
+                "averageAccuracy": number,
+                "averageTruePositives": number,
+                "averageFalsePositives": number,
+                "averageTrueNegatives": number,
+                "averageFalseNegatives": number,
+                "averageSupport": number,
+                "total": number } } =
             confusionMatrixTest.generateConfusionMatrixMetricStructure();
         Utility.debuggingLog(
-           `confusionMatrixTest.getMicroAverageMetrics()=` +
-           `${confusionMatrixTest.getMicroAverageMetrics()}` +
-           `,confusionMatrixTest.getMacroAverageMetrics()=` +
-           `${confusionMatrixTest.getMacroAverageMetrics()}` +
-           `,confusionMatrixTest.getWeightedMacroAverageMetrics()=` +
-           `${confusionMatrixTest.getWeightedMacroAverageMetrics()}`);
+            `confusionMatrixTest.getMicroAverageMetrics()=` +
+            `${confusionMatrixTest.getMicroAverageMetrics()}` +
+            `,confusionMatrixTest.getMacroAverageMetrics()=` +
+            `${confusionMatrixTest.getMacroAverageMetrics()}` +
+            `,confusionMatrixTest.getSummationMacroAverageMetrics()=` +
+            `${confusionMatrixTest.getSummationMacroAverageMetrics()}` +
+            `,confusionMatrixTest.getPositiveSupportLabelMacroAverageMetrics()=` +
+            `${confusionMatrixTest.getPositiveSupportLabelMacroAverageMetrics()}` +
+            `,confusionMatrixTest.getPositiveSupportLabelSummationMacroAverageMetrics()=` +
+            // tslint:disable-next-line: max-line-length
+            `${confusionMatrixTest.getPositiveSupportLabelSummationMacroAverageMetrics()}` +
+            `,confusionMatrixTest.getWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixTest.getWeightedMacroAverageMetrics()}` +
+            `,confusionMatrixTest.getSummationWeightedMacroAverageMetrics()=` +
+            `${confusionMatrixTest.getSummationWeightedMacroAverageMetrics()}`);
         outputEvaluationReport.confusionMatrixMetricStructure =
             confusionMatrixMetricStructure;
         return outputEvaluationReport;
