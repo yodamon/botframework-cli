@@ -5,7 +5,7 @@
 
 import * as path from 'path';
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
+import {Orchestrator, Utility} from '@microsoft2/bf-orchestrator';
 
 export default class OrchestratorEvaluate extends Command {
   static description: string = 'Create an Orchestrator leave-one-out cross validation (LOOCV) evaluation report on a previously generated .blu file .';

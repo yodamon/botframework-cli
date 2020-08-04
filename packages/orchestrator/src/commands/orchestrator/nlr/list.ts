@@ -4,7 +4,7 @@
  */
 
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {Orchestrator, Utility} from '@microsoft/bf-orchestrator';
+import {Orchestrator, Utility} from '@microsoft2/bf-orchestrator';
 import {OrchestratorSettings} from '../../../utils/settings';
 
 export default class OrchestratorNlrList extends Command {

@@ -4,7 +4,7 @@
  */
 
 import {Command, CLIError, flags} from '@microsoft/bf-cli-command';
-import {OrchestratorHelper} from '@microsoft/bf-orchestrator';
+import {OrchestratorHelper} from '@microsoft2/bf-orchestrator';
 import * as path from 'path';
 import * as fs from 'fs';
 import ErrnoException = NodeJS.ErrnoException;

@@ -7,7 +7,7 @@ import * as path from 'path';
 import {Utility} from './utility';
 import {OrchestratorHelper} from './orchestratorhelper';
 
-const oc: any = require('@microsoft/orchestrator-core');
+const oc: any = require('@microsoft2/orchestrator-core');
 
 export class LabelResolver {
   public static Orchestrator: any;

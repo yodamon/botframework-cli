@@ -4,7 +4,7 @@
  */
 
 import {CLIError} from '@microsoft/bf-cli-command';
-import {OrchestratorHelper, Utility} from '@microsoft/bf-orchestrator';
+import {OrchestratorHelper, Utility} from '@microsoft2/bf-orchestrator';
 
 import * as fs from 'fs-extra';
 import * as path from 'path';
