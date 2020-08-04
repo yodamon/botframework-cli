@@ -50,11 +50,11 @@
       "projectFolder": "packages/cli"
     },
     {
-      "packageName": "@microsoft/bf-orchestrator",
+      "packageName": "@microsoft2/bf-orchestrator",
       "projectFolder": "packages/orchestratorlib"
     },
     {
-      "packageName": "@microsoft/bf-orchestrator-cli",
+      "packageName": "@microsoft2/bf-orchestrator-cli",
       "projectFolder": "packages/orchestrator"
     }
   ]
