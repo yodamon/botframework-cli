@@ -15,7 +15,7 @@
     "fs-extra": "~9.0.0",
     "read-text-file": "~1.1.0",
     "tslib": "^1.10.0",
-    "@microsoft/bf-orchestrator": "1.0.0"
+    "@microsoft2/bf-orchestrator": "1.0.0"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.22.2",
