@@ -297,74 +297,128 @@ export class Builder {
   }
 
   async importUrlReference(
-    url: string,
+    urls: string[],
     subscriptionkey: string,
     endpoint: string,
-    kbName: string) {
+    kbNames: string[]) {
+    // qna api TPS which means concurrent transactions to qna maker api in 1 second
+    // please refer here https://azure.microsoft.com/en-us/pricing/details/cognitive-services/qna-maker/ for more info
+    let qnaApiTps = 3
+
+    // set qna maker call delay duration to 1100 millisecond because 1000 may hit corner case of rate limit
+    let delayDuration = 1100
+
+    let kbToLuContents: string[] = []
+
+    if (urls.length !== kbNames.length) {
+      throw (new exception(retCode.errorCode.INVALID_INPUT, 'urls array must be same size with kb names array.'))
+    }
+
     const qnaBuildCore = new QnaBuildCore(subscriptionkey, endpoint)
     const kbs = (await qnaBuildCore.getKBList()).knowledgebases
 
-    let kbId = ''
-    // find if there is a matched name with current kb under current authoring key
-    for (let kb of kbs) {
-      if (kb.name === kbName) {
-        kbId = kb.id
-        break
-      }
+    while (urls.length > 0) {
+      // get a number(set by qnaApiTps) of urls for each loop
+      const subUrls = urls.splice(0, qnaApiTps)
+      let subKBNames = kbNames.splice(0, qnaApiTps)
+
+      // concurrently handle applications
+      await Promise.all(subUrls.map(async (url, index) => {
+        let kbId = ''
+        // find if there is a matched name with current kb under current authoring key
+        for (let kb of kbs) {
+          if (kb.name === subKBNames[index]) {
+            kbId = kb.id
+            break
+          }
+        }
+
+        // compare models to update the model if a match found
+        // otherwise create a new kb
+        if (kbId !== '') {
+          // To see if need update the model
+          await this.updateUrlKB(qnaBuildCore, url, kbId, delayDuration)
+        } else {
+          // create a new kb
+          kbId = await this.createUrlKB(qnaBuildCore, url, subKBNames[index], delayDuration)
+        }
+
+        await delay(delayDuration)
+        const kbJson = await qnaBuildCore.exportKB(kbId, 'Test')
+        const kb = new KB(kbJson)
+        const kbToLuContent = kb.parseToLuContent()
+
+        await delay(delayDuration)
+        await qnaBuildCore.deleteKB(kbId)
+
+        kbToLuContents.push(kbToLuContent)
+      }))
     }
 
-    // compare models to update the model if a match found
-    // otherwise create a new kb
-    if (kbId !== '') {
-      // To see if need update the model
-      await this.updateUrlKB(qnaBuildCore, url, kbId)
-    } else {
-      // create a new kb
-      kbId = await this.createUrlKB(qnaBuildCore, url, kbName)
-    }
-
-    const kbJson = await qnaBuildCore.exportKB(kbId, 'Test')
-    const kb = new KB(kbJson)
-    const kbToLuContent = kb.parseToLuContent()
-    await qnaBuildCore.deleteKB(kbId)
-
-    return kbToLuContent
+    return kbToLuContents
   }
 
   async importFileReference(
-    fileName: string,
-    fileUri: string,
+    fileNames: string[],
+    fileUris: string[],
     subscriptionkey: string,
     endpoint: string,
-    kbName: string) {
+    kbNames: string[]) {
+    // qna api TPS which means concurrent transactions to qna maker api in 1 second
+    // please refer here https://azure.microsoft.com/en-us/pricing/details/cognitive-services/qna-maker/ for more info
+    let qnaApiTps = 3
+
+    // set qna maker call delay duration to 1100 millisecond because 1000 may hit corner case of rate limit
+    let delayDuration = 1100
+
+    let kbToLuContents: string[] = []
+
+    if (fileNames.length !== fileUris.length || fileNames.length !== kbNames.length) {
+      throw (new exception(retCode.errorCode.INVALID_INPUT, 'file names array must be same size with file uris array and kb names array.'))
+    }
+
     const qnaBuildCore = new QnaBuildCore(subscriptionkey, endpoint)
     const kbs = (await qnaBuildCore.getKBList()).knowledgebases
+    while (fileUris.length > 0) {
+      // get a number(set by qnaApiTps) of urls for each loop
+      const subFileUris = fileUris.splice(0, qnaApiTps)
+      const subFileNames = fileNames.splice(0, qnaApiTps)
+      const subKBNames = kbNames.splice(0, qnaApiTps)
 
-    let kbId = ''
-    // find if there is a matched name with current kb under current authoring key
-    for (let kb of kbs) {
-      if (kb.name === kbName) {
-        kbId = kb.id
-        break
-      }
+      // concurrently handle applications
+      await Promise.all(subFileUris.map(async (fileUri, index) => {
+        let kbId = ''
+        // find if there is a matched name with current kb under current authoring key
+        for (let kb of kbs) {
+          if (kb.name === subKBNames[index]) {
+            kbId = kb.id
+            break
+          }
+        }
+
+        // compare models to update the model if a match found
+        // otherwise create a new kb
+        if (kbId !== '') {
+          // To see if need update the model
+          await this.updateFileKB(qnaBuildCore, subFileNames[index], fileUri, kbId, delayDuration)
+        } else {
+          // create a new kb
+          kbId = await this.createFileKB(qnaBuildCore, subFileNames[index], fileUri, subKBNames[index], delayDuration)
+        }
+
+        await delay(delayDuration)
+        const kbJson = await qnaBuildCore.exportKB(kbId, 'Test')
+        const kb = new KB(kbJson)
+        const kbToLuContent = kb.parseToLuContent()
+
+        await delay(delayDuration)
+        await qnaBuildCore.deleteKB(kbId)
+
+        kbToLuContents.push(kbToLuContent)
+      }))
     }
 
-    // compare models to update the model if a match found
-    // otherwise create a new kb
-    if (kbId !== '') {
-      // To see if need update the model
-      await this.updateFileKB(qnaBuildCore, fileName, fileUri, kbId)
-    } else {
-      // create a new kb
-      kbId = await this.createFileKB(qnaBuildCore, fileName, fileUri, kbName)
-    }
-
-    const kbJson = await qnaBuildCore.exportKB(kbId, 'Test')
-    const kb = new KB(kbJson)
-    const kbToLuContent = kb.parseToLuContent()
-    await qnaBuildCore.deleteKB(kbId)
-
-    return kbToLuContent
+    return kbToLuContents
   }
 
   async writeDialogAssets(contents: any[], force: boolean, out: string) {
@@ -485,7 +539,8 @@ export class Builder {
     return true
   }
 
-  async updateUrlKB(qnaBuildCore: QnaBuildCore, url: string, kbId: string) {
+  async updateUrlKB(qnaBuildCore: QnaBuildCore, url: string, kbId: string, delayDuration: number) {
+    await delay(delayDuration)
     await qnaBuildCore.replaceKB(kbId, {
       qnaList: [],
       urls: [],
@@ -498,12 +553,14 @@ export class Builder {
       }
     }
 
+    await delay(delayDuration)
     const response = await qnaBuildCore.updateKB(kbId, updateConfig)
     const operationId = response.operationId
-    await this.getKBOperationStatus(qnaBuildCore, operationId, 1000)
+
+    await this.getKBOperationStatus(qnaBuildCore, operationId, delayDuration)
   }
 
-  async createUrlKB(qnaBuildCore: QnaBuildCore, url: string, kbName: string) {
+  async createUrlKB(qnaBuildCore: QnaBuildCore, url: string, kbName: string, delayDuration: number) {
     const kbJson = {
       name: kbName,
       qnaList: [],
@@ -511,15 +568,17 @@ export class Builder {
       files: []
     }
 
+    await delay(delayDuration)
     let response = await qnaBuildCore.importKB(kbJson)
     let operationId = response.operationId
-    const opResult = await this.getKBOperationStatus(qnaBuildCore, operationId, 1000)
+    const opResult = await this.getKBOperationStatus(qnaBuildCore, operationId, delayDuration)
     const kbId = opResult.resourceLocation.split('/')[2]
 
     return kbId
   }
 
-  async updateFileKB(qnaBuildCore: QnaBuildCore, fileName: string, fileUri: string, kbId: string) {
+  async updateFileKB(qnaBuildCore: QnaBuildCore, fileName: string, fileUri: string, kbId: string, delayDuration: number) {
+    await delay(delayDuration)
     await qnaBuildCore.replaceKB(kbId, {
       qnaList: [],
       urls: [],
@@ -535,12 +594,13 @@ export class Builder {
       }
     }
 
+    await delay(delayDuration)
     const response = await qnaBuildCore.updateKB(kbId, updateConfig)
     const operationId = response.operationId
-    await this.getKBOperationStatus(qnaBuildCore, operationId, 1000)
+    await this.getKBOperationStatus(qnaBuildCore, operationId, delayDuration)
   }
 
-  async createFileKB(qnaBuildCore: QnaBuildCore, fileName: string, fileUri: string, kbName: string) {
+  async createFileKB(qnaBuildCore: QnaBuildCore, fileName: string, fileUri: string, kbName: string, delayDuration: number) {
     let kbJson = {
       name: kbName,
       qnaList: [],
@@ -551,9 +611,10 @@ export class Builder {
       }]
     }
 
+    await delay(delayDuration)
     let response = await qnaBuildCore.importKB(kbJson)
     let operationId = response.operationId
-    const opResult = await this.getKBOperationStatus(qnaBuildCore, operationId, 1000)
+    const opResult = await this.getKBOperationStatus(qnaBuildCore, operationId, delayDuration)
     const kbId = opResult.resourceLocation.split('/')[2]
 
     return kbId

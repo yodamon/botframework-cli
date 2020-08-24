@@ -18,7 +18,7 @@ describe('builder: importUrlOrFileReference function return lu content from file
         knowledgebases:
           [{
             name: 'test.en-us.qna',
-            id: 'f8c64e2a-1111-3a09-8f78-39d7adc76ec5',
+            id: 'f8c64e2a-0000-3a09-8f78-39d7adc76ec5',
             hostName: 'https://myqnamakerbot.azurewebsites.net'
           }]
       })
@@ -28,45 +28,138 @@ describe('builder: importUrlOrFileReference function return lu content from file
       .reply(202, {
         operationId: 'f8c64e2a-aaaa-3a09-8f78-39d7adc76ec5'
       })
-    
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-bbbb-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-cccc-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-1111-3a09-8f78-39d7adc76ec5'
+      })
+
     nock('https://westus.api.cognitive.microsoft.com')
       .get(uri => uri.includes('operations'))
       .reply(200, {
         operationState: 'Succeeded',
         resourceLocation: 'a/b/f8c64e2a-2222-3a09-8f78-39d7adc76ec5'
       })
-    
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-3333-3a09-8f78-39d7adc76ec5'
+      })
+
     nock('https://westus.api.cognitive.microsoft.com')
       .get(uri => uri.includes('knowledgebases'))
       .reply(200, {
         qnaDocuments: [{
           id: 1,
-          source: 'SurfaceManual.pdf',
+          source: 'SurfaceManual1.pdf',
           questions: ['how many sandwich types do you have'],
           answer: '25 types',
           metadata: []
         }]
       })
-  })
 
-  nock('https://westus.api.cognitive.microsoft.com')
-    .delete(uri => uri.includes('knowledgebases'))
-    .reply(200)
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'SurfaceManual2.pdf',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'SurfaceManual3.pdf',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-dddd-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-4444-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'SurfaceManual4.pdf',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+  })
 
   it('should return lu content from file successfully', async () => {
     const builder = new Builder()
-    const luContent = await builder.importFileReference(
-      'SurfaceManual.pdf',
-      'https://download.microsoft.com/download/2/9/B/29B20383-302C-4517-A006-B0186F04BE28/surface-pro-4-user-guide-EN.pdf',
+    const luContents = await builder.importFileReference(
+      ['SurfaceManual1.pdf', 'SurfaceManual2.pdf', 'SurfaceManual3.pdf', 'SurfaceManual4.pdf'],
+      ['https://download.microsoft.com/download/2/9/B/29B20383-302C-4517-A006-B0186F04BE28/surface-pro-4-user-guide-EN.pdf',
+        'https://download.microsoft.com/download/2/9/B/29B20383-302C-4517-A006-B0186F04BE28/surface-pro-4-user-guide-EN.pdf',
+        'https://download.microsoft.com/download/2/9/B/29B20383-302C-4517-A006-B0186F04BE28/surface-pro-4-user-guide-EN.pdf',
+        'https://download.microsoft.com/download/2/9/B/29B20383-302C-4517-A006-B0186F04BE28/surface-pro-4-user-guide-EN.pdf'],
       uuidv1(),
       'https://westus.api.cognitive.microsoft.com/qnamaker/v4.0',
-      'mytest.en-us.qna')
-    assert.equal(luContent, `> # QnA pairs${NEWLINE}${NEWLINE}` +
-                            `> !# @qna.pair.source = SurfaceManual.pdf${NEWLINE}${NEWLINE}` +
-                            `<a id = "1"></a>${NEWLINE}${NEWLINE}` +
-                            `## ? how many sandwich types do you have${NEWLINE}${NEWLINE}` +
-                            `\`\`\`markdown${NEWLINE}` +
-                            `25 types${NEWLINE}\`\`\`${NEWLINE}${NEWLINE}`)
+      ['mytest1.en-us.qna', 'mytest2.en-us.qna', 'mytest3.en-us.qna', 'mytest4.en-us.qna'])
+
+    luContents.forEach((luContent, index) => {
+      assert.equal(luContent, `> # QnA pairs${NEWLINE}${NEWLINE}` +
+        `> !# @qna.pair.source = SurfaceManual${index + 1}.pdf${NEWLINE}${NEWLINE}` +
+        `<a id = "1"></a>${NEWLINE}${NEWLINE}` +
+        `## ? how many sandwich types do you have${NEWLINE}${NEWLINE}` +
+        `\`\`\`markdown${NEWLINE}` +
+        `25 types${NEWLINE}\`\`\`${NEWLINE}${NEWLINE}`)
+    })
   })
 })
 
@@ -78,7 +171,7 @@ describe('builder: importUrlOrFileReference function return lu content from url 
         knowledgebases:
           [{
             name: 'test.en-us.qna',
-            id: 'f8c64e2a-1111-3a09-8f78-39d7adc76ec5',
+            id: 'f8c64e2a-0000-3a09-8f78-39d7adc76ec5',
             hostName: 'https://myqnamakerbot.azurewebsites.net'
           }]
       })
@@ -88,20 +181,107 @@ describe('builder: importUrlOrFileReference function return lu content from url 
       .reply(202, {
         operationId: 'f8c64e2a-aaaa-3a09-8f78-39d7adc76ec5'
       })
-    
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-bbbb-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-cccc-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-1111-3a09-8f78-39d7adc76ec5'
+      })
+
     nock('https://westus.api.cognitive.microsoft.com')
       .get(uri => uri.includes('operations'))
       .reply(200, {
         operationState: 'Succeeded',
         resourceLocation: 'a/b/f8c64e2a-2222-3a09-8f78-39d7adc76ec5'
       })
-    
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-3333-3a09-8f78-39d7adc76ec5'
+      })
+
     nock('https://westus.api.cognitive.microsoft.com')
       .get(uri => uri.includes('knowledgebases'))
       .reply(200, {
         qnaDocuments: [{
           id: 1,
-          source: 'faqs',
+          source: 'faqs1',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'faqs2',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'faqs3',
+          questions: ['how many sandwich types do you have'],
+          answer: '25 types',
+          metadata: []
+        }]
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .delete(uri => uri.includes('knowledgebases'))
+      .reply(200)
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .post(uri => uri.includes('createasync'))
+      .reply(202, {
+        operationId: 'f8c64e2a-dddd-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('operations'))
+      .reply(200, {
+        operationState: 'Succeeded',
+        resourceLocation: 'a/b/f8c64e2a-4444-3a09-8f78-39d7adc76ec5'
+      })
+
+    nock('https://westus.api.cognitive.microsoft.com')
+      .get(uri => uri.includes('knowledgebases'))
+      .reply(200, {
+        qnaDocuments: [{
+          id: 1,
+          source: 'faqs4',
           questions: ['how many sandwich types do you have'],
           answer: '25 types',
           metadata: []
@@ -115,17 +295,23 @@ describe('builder: importUrlOrFileReference function return lu content from url 
 
   it('should return lu content from url successfully', async () => {
     const builder = new Builder()
-    const luContent = await builder.importUrlReference(
-      'https://docs.microsoft.com/en-in/azure/cognitive-services/qnamaker/faqs',
+    const luContents = await builder.importUrlReference(
+      ['https://docs.microsoft.com/en-in/azure/cognitive-services/qnamaker/faqs',
+        'https://docs.microsoft.com/en-in/azure/cognitive-services/qnamaker/faqs',
+        'https://docs.microsoft.com/en-in/azure/cognitive-services/qnamaker/faqs',
+        'https://docs.microsoft.com/en-in/azure/cognitive-services/qnamaker/faqs'],
       uuidv1(),
       'https://westus.api.cognitive.microsoft.com/qnamaker/v4.0',
-      'mytest.en-us.qna')
-    assert.equal(luContent, `> # QnA pairs${NEWLINE}${NEWLINE}` +
-                            `> !# @qna.pair.source = faqs${NEWLINE}${NEWLINE}` +
-                            `<a id = "1"></a>${NEWLINE}${NEWLINE}` +
-                            `## ? how many sandwich types do you have${NEWLINE}${NEWLINE}` +
-                            `\`\`\`markdown${NEWLINE}` +
-                            `25 types${NEWLINE}\`\`\`${NEWLINE}${NEWLINE}`)
+      ['mytest1.en-us.qna', 'mytest2.en-us.qna', 'mytest3.en-us.qna', 'mytest4.en-us.qna'])
+
+    luContents.forEach((luContent, index) => {
+      assert.equal(luContent, `> # QnA pairs${NEWLINE}${NEWLINE}` +
+        `> !# @qna.pair.source = faqs${index+1}${NEWLINE}${NEWLINE}` +
+        `<a id = "1"></a>${NEWLINE}${NEWLINE}` +
+        `## ? how many sandwich types do you have${NEWLINE}${NEWLINE}` +
+        `\`\`\`markdown${NEWLINE}` +
+        `25 types${NEWLINE}\`\`\`${NEWLINE}${NEWLINE}`)
+    })
   })
 })
 
