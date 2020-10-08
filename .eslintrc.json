@@ -1,0 +1,24 @@
+{
+  "env": {
+    "es6": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "impliedStrict": true
+    }
+  },
+  "ignorePatterns": ["lib/**/*"],
+  "plugins": [
+    "@typescript-eslint",
+    "prettier",
+    "security",
+    "oclif",
+    "header"
+  ],
+  "rules": {
+    "prettier/prettier": "warn",
+    "header/header": ["error", "../../header/header.ts"]
+  }
+}
