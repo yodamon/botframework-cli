@@ -1,26 +1,26 @@
 /**
- * Copyright(c) Microsoft Corporation.All rights reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
 module.exports = class ConversationAccount {
-    /**
-     * @property isGroup
-     */
-    /**
-     * @property name
-     */
+  /**
+   * @property isGroup
+   */
+  /**
+   * @property name
+   */
 
-    /**
-     * @property id
-     */
+  /**
+   * @property id
+   */
 
-    /**
-     *
-     * @param isGroup
-     * @param name
-     * @param id
-     */
-    constructor({isGroup, name, id} = {}) {
-        Object.assign(this, {isGroup, name, id});
-    }
+  /**
+   *
+   * @param isGroup
+   * @param name
+   * @param id
+   */
+  constructor({ isGroup, name, id } = {}) {
+    Object.assign(this, { isGroup, name, id });
+  }
 };

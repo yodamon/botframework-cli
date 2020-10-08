@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 const cmdEnum = {
-    luis: 'luis',
-    qna: 'qna'
+  luis: 'luis',
+  qna: 'qna',
 };
 
 module.exports = cmdEnum;

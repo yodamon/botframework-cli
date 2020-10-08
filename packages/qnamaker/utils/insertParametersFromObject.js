@@ -1,5 +1,5 @@
 /**
- * Copyright(c) Microsoft Corporation.All rights reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
 const tokenRegExp = /({\w+})/g;
@@ -13,17 +13,17 @@ const tokenRegExp = /({\w+})/g;
  * @returns {string} The string containing the replaced parameters from the source object.
  */
 function insertParametersFromObject(parameterizedString, sourceObj) {
-    let result;
-    let payload = parameterizedString;
-    while ((result = tokenRegExp.exec(parameterizedString))) {
-        const token = result[1];
-        const propertyName = token.replace(/[{}]/g, '');
-        if (!(propertyName in sourceObj)) {
-            continue;
-        }
-        payload = payload.replace(token, '' + sourceObj[propertyName]);
+  let result;
+  let payload = parameterizedString;
+  while ((result = tokenRegExp.exec(parameterizedString))) {
+    const token = result[1];
+    const propertyName = token.replace(/[{}]/g, '');
+    if (!(propertyName in sourceObj)) {
+      continue;
     }
-    return payload;
+    payload = payload.replace(token, '' + sourceObj[propertyName]);
+  }
+  return payload;
 }
 
-module.exports = {insertParametersFromObject};
+module.exports = { insertParametersFromObject };

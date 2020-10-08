@@ -6,33 +6,35 @@ const parseFile = require('./../../../src/parser/lufile/parseFileContents');
 var chai = require('chai');
 var assert = chai.assert;
 describe('Model as feature definitions', function () {
-    describe('Features to intent', function(){
-        it('Intent cannot add itself as a feature', function(done) {
-            let luFile = `
+  describe('Features to intent', function () {
+    it('Intent cannot add itself as a feature', function (done) {
+      let luFile = `
                 # test
                 - one 
                 @ intent test usesFeature test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        })
-        it('Feature to an intent must be defined', function (done) {
-            let luFile = `
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
+    it('Feature to an intent must be defined', function (done) {
+      let luFile = `
                 @ intent xyz usesFeature abc
 
                 # xyz 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('Intent can be added as a feature to another intent', function (done) {
-            let luFile = `
+    it('Intent can be added as a feature to another intent', function (done) {
+      let luFile = `
                 @ intent xyz usesFeature abc
 
                 # xyz 
@@ -42,124 +44,151 @@ describe('Model as feature definitions', function () {
                 - foo
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 2);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'xyz');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'abc');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 2);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'xyz');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'abc'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Simple entity can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Simple entity can be added as a feature to an intent', function (done) {
+      let luFile = `
                 @ intent abc usesFeature simple1
                 @ ml simple1
                 # abc 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'simple1');
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'simple1');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'simple1'
+          );
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'simple1');
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Prebuilt entity can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Prebuilt entity can be added as a feature to an intent', function (done) {
+      let luFile = `
                 @ intent abc usesFeature number
                 @ prebuilt number
                 # abc 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'number');
-                    assert.equal(res.LUISJsonStructure.prebuiltEntities.length, 1);
-                    assert.equal(res.LUISJsonStructure.prebuiltEntities[0].name, 'number');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'number'
+          );
+          assert.equal(res.LUISJsonStructure.prebuiltEntities.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.prebuiltEntities[0].name,
+            'number'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('list entity can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('list entity can be added as a feature to an intent', function (done) {
+      let luFile = `
                 @ intent abc usesFeature number
                 @ list number
                 # abc 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'number');
-                    assert.equal(res.LUISJsonStructure.closedLists.length, 1);
-                    assert.equal(res.LUISJsonStructure.closedLists[0].name, 'number');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'number'
+          );
+          assert.equal(res.LUISJsonStructure.closedLists.length, 1);
+          assert.equal(res.LUISJsonStructure.closedLists[0].name, 'number');
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Composite entity can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Composite entity can be added as a feature to an intent', function (done) {
+      let luFile = `
                 @ intent abc usesFeature number
                 @ composite number
                 # abc 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'number');
-                    assert.equal(res.LUISJsonStructure.composites.length, 1);
-                    assert.equal(res.LUISJsonStructure.composites[0].name, 'number');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'number'
+          );
+          assert.equal(res.LUISJsonStructure.composites.length, 1);
+          assert.equal(res.LUISJsonStructure.composites[0].name, 'number');
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Regex entity can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Regex entity can be added as a feature to an intent', function (done) {
+      let luFile = `
                 @ intent abc usesFeature number
                 @ regex number
                 # abc 
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, 'number');
-                    assert.equal(res.LUISJsonStructure.regex_entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.regex_entities[0].name, 'number');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'number'
+          );
+          assert.equal(res.LUISJsonStructure.regex_entities.length, 1);
+          assert.equal(res.LUISJsonStructure.regex_entities[0].name, 'number');
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('multiple features can be assigned to an intent', function(done) {
-            let luFile = `
+    it('multiple features can be assigned to an intent', function (done) {
+      let luFile = `
                 # test
                 - one
 
@@ -187,20 +216,31 @@ describe('Model as feature definitions', function () {
                 - abc
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 2);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'test');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 8);
-                    assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.modelName).length, 7);
-                    assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.featureName).length, 1);
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 2);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'test');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 8);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features.filter(
+              (item) => item.modelName
+            ).length,
+            7
+          );
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features.filter(
+              (item) => item.featureName
+            ).length,
+            1
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it('Duplicates are handled correctly', function(done) {
-            let luFile = `
+    it('Duplicates are handled correctly', function (done) {
+      let luFile = `
                 # test
                 - one
 
@@ -229,130 +269,162 @@ describe('Model as feature definitions', function () {
                 - abc
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents.length, 2);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'test');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 8);
-                    assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.modelName).length, 7);
-                    assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.featureName).length, 1);
-                    done();
-                })
-                .catch(err => done(err))
-        });
-        
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.intents.length, 2);
+          assert.equal(res.LUISJsonStructure.intents[0].name, 'test');
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 8);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features.filter(
+              (item) => item.modelName
+            ).length,
+            7
+          );
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features.filter(
+              (item) => item.featureName
+            ).length,
+            1
+          );
+          done();
+        })
+        .catch((err) => done(err));
     });
+  });
 
-    describe('Entity as feature to entity', function() {
-        it('Entity cannot add itself as a feature', function(done) {
-            let luFile = `
+  describe('Entity as feature to entity', function () {
+    it('Entity cannot add itself as a feature', function (done) {
+      let luFile = `
                 @ ml s1
                 @ s1 usesFeature s1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        })
-        it('Simple entity can be added as a feature to a simple', function(done) {
-            let luFile = `
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
+    it('Simple entity can be added as a feature to a simple', function (done) {
+      let luFile = `
                 @ ml abc usesFeature simple1
                 @ ml simple1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 2);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].modelName, 'simple1');
-                    assert.equal(res.LUISJsonStructure.entities[1].name, 'simple1');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 2);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].modelName,
+            'simple1'
+          );
+          assert.equal(res.LUISJsonStructure.entities[1].name, 'simple1');
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Simple entity can be added as a feature to a regex entity', function(done) {
-            let luFile = `
+    it('Simple entity can be added as a feature to a regex entity', function (done) {
+      let luFile = `
                 @ ml abc usesFeature simple1
                 @ regex simple1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].modelName, 'simple1');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].modelName,
+            'simple1'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Simple entity can be added as a feature to a list entity', function(done) {
-            let luFile = `
+    it('Simple entity can be added as a feature to a list entity', function (done) {
+      let luFile = `
                 @ ml abc usesFeature simple1
                 @ list simple1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].modelName, 'simple1');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].modelName,
+            'simple1'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Simple entity can be added as a feature to a composite entity', function(done) {
-            let luFile = `
+    it('Simple entity can be added as a feature to a composite entity', function (done) {
+      let luFile = `
                 @ ml abc usesFeature simple1
                 @ composite simple1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].modelName, 'simple1');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].modelName,
+            'simple1'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Simple entity can be added as a feature to a prebuilt entity', function(done) {
-            let luFile = `
+    it('Simple entity can be added as a feature to a prebuilt entity', function (done) {
+      let luFile = `
                 @ ml abc usesFeature number
                 @ prebuilt number
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
-                    assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].modelName, 'number');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(res.LUISJsonStructure.entities[0].name, 'abc');
+          assert.equal(res.LUISJsonStructure.entities[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].modelName,
+            'number'
+          );
+          done();
+        })
+        .catch((err) => done(err));
     });
-    it('Circular dependency for usesFeature is not allowed - simple case', function(done) {
-        let luFile = `
+  });
+  it('Circular dependency for usesFeature is not allowed - simple case', function (done) {
+    let luFile = `
             @ list l1 usesFeature s2
             @ ml s2 usesFeature l1
         `;
 
-        parseFile.parseFile(luFile)
-            .then(res => done(res))
-            .catch(err => done())
-    });
+    parseFile
+      .parseFile(luFile)
+      .then((res) => done(res))
+      .catch((err) => done());
+  });
 
-    it('Circular dependency for usesFeature is not allowed - complex case', function(done) {
-        let luFile = `
+  it('Circular dependency for usesFeature is not allowed - complex case', function (done) {
+    let luFile = `
             # test
             - abc
             
@@ -376,10 +448,9 @@ describe('Model as feature definitions', function () {
             @ s1 usesFeature test
         `;
 
-        parseFile.parseFile(luFile)
-            .then(res => done(res))
-            .catch(err => done())
-    });
-
-
+    parseFile
+      .parseFile(luFile)
+      .then((res) => done(res))
+      .catch((err) => done());
+  });
 });

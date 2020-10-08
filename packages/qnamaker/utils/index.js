@@ -1,8 +1,8 @@
 /**
- * Copyright(c) Microsoft Corporation.All rights reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-const {ServiceBase} = require('./api/serviceBase');
+const { ServiceBase } = require('./api/serviceBase');
 const api = require('./api');
 const dataModels = require('./api/dataModels');
 
@@ -23,31 +23,40 @@ const dataModels = require('./api/dataModels');
  *
  * @returns {Promise<*|Promise|{enumerable}|void|JSON|Promise<any>>}
  */
-module.exports = async function qnamaker(config, serviceManifest, args, requestBody) {
-    // Provide the config to the ServiceBase
-    ServiceBase.config = config;
-    
-    // If a request body is specified and a typed data model
-    // is available, create it and pass the source in.
-    // This guarantees the endpoint will get only the
-    // properties it expects since the user can specify
-    // any json file with any number of properties that
-    // may or may not be valid.
-    const {identifier, operation} = serviceManifest;
-    let requestBodyDataModel;
-    // Allow untyped request bodies to seep through unchanged
-    if (requestBody && operation.entityType && dataModels[operation.entityType]) {
-        requestBodyDataModel = dataModels[operation.entityType].fromJSON(requestBody);
-    }
-    // Create the target service and kick off the request.
-    const service = new api[identifier]();
-    const response = await service[operation.name](args, (requestBodyDataModel || requestBody));
-    //console.log(' requestBodyDataModel '+requestBodyDataModel +' entityType '+operation.entityType+' requestBody '+ requestBody)
-    const text = await response.text();
-    try {
-        return JSON.parse(text);
-    }
-    catch (e) {
-        return text;
-    }
+module.exports = async function qnamaker(
+  config,
+  serviceManifest,
+  args,
+  requestBody
+) {
+  // Provide the config to the ServiceBase
+  ServiceBase.config = config;
+
+  // If a request body is specified and a typed data model
+  // is available, create it and pass the source in.
+  // This guarantees the endpoint will get only the
+  // properties it expects since the user can specify
+  // any json file with any number of properties that
+  // may or may not be valid.
+  const { identifier, operation } = serviceManifest;
+  let requestBodyDataModel;
+  // Allow untyped request bodies to seep through unchanged
+  if (requestBody && operation.entityType && dataModels[operation.entityType]) {
+    requestBodyDataModel = dataModels[operation.entityType].fromJSON(
+      requestBody
+    );
+  }
+  // Create the target service and kick off the request.
+  const service = new api[identifier]();
+  const response = await service[operation.name](
+    args,
+    requestBodyDataModel || requestBody
+  );
+  //console.log(' requestBodyDataModel '+requestBodyDataModel +' entityType '+operation.entityType+' requestBody '+ requestBody)
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch (e) {
+    return text;
+  }
 };

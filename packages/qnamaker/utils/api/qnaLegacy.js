@@ -1,20 +1,20 @@
 /**
- * Copyright(c) Microsoft Corporation.All rights reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
 
 const { ServiceBase } = require('./serviceBase');
 class QnaLegacy extends ServiceBase {
-    constructor() {
-        super('/knowledgebases/{kbId}');
-    }
+  constructor() {
+    super('/knowledgebases/{kbId}');
+  }
 
-    /**
-    * 
-    */
-    async downloadLegacyKnowledgebase(params) {
-        params.legacy = true;
-        return await this.createRequest('', params, 'get');
-    }
+  /**
+   *
+   */
+  async downloadLegacyKnowledgebase(params) {
+    params.legacy = true;
+    return await this.createRequest('', params, 'get');
+  }
 }
 module.exports = QnaLegacy;

@@ -9,19 +9,20 @@ const entityNameWithSpaceAndFeature = require('../../fixtures/testcases/entityNa
 var chai = require('chai');
 var assert = chai.assert;
 describe('Model as feature definitions', function () {
-    describe('Features to intent', function(){
-        it('Intent can only have features and nothing else - roles throws', function (done) {
-            let luFile = `
+  describe('Features to intent', function () {
+    it('Intent can only have features and nothing else - roles throws', function (done) {
+      let luFile = `
                 @ intent xyz hasRoles r1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
-        
-        it('Intent can have empty uses feature assignment line', function (done) {
-            let luFile = `
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
+
+    it('Intent can have empty uses feature assignment line', function (done) {
+      let luFile = `
             ## None
             - all of them
             - i want them all
@@ -30,13 +31,14 @@ describe('Model as feature definitions', function () {
             @ intent None
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done())
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done())
+        .catch((err) => done(err));
+    });
 
-        it('Intent must be defined before a feature can be added to it.', function(done) {
-            let luFile = `
+    it('Intent must be defined before a feature can be added to it.', function (done) {
+      let luFile = `
                 @ intent getUserProfileIntent usesFeature city
                 
                 @ phraselist city(interchangeable) = 
@@ -46,13 +48,14 @@ describe('Model as feature definitions', function () {
                     - SEA
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        })
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('Features must be defined before they can be added.', function(done) {
-            let luFile = `
+    it('Features must be defined before they can be added.', function (done) {
+      let luFile = `
                 > phrase list as feature to intent (also applicable to entities)
                 @ intent getUserProfileIntent usesFeature city
                 
@@ -60,13 +63,14 @@ describe('Model as feature definitions', function () {
                 - test
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('Phrase list can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Phrase list can be added as a feature to an intent', function (done) {
+      let luFile = `
                 > phrase list as feature to intent (also applicable to entities)
                 @ intent getUserProfileIntent usesFeature city
                 
@@ -80,43 +84,63 @@ describe('Model as feature definitions', function () {
                     - SEA
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.phraselists.length, 1);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].mode, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'getUserProfileIntent');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].featureName, 'city');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.phraselists.length, 1);
+          assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+          assert.equal(res.LUISJsonStructure.phraselists[0].mode, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].words,
+            'Seattle,SEATAC,SEA'
+          );
+          assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+            false
+          );
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].name,
+            'getUserProfileIntent'
+          );
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].featureName,
+            'city'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Phrase lists marked as disabled for all models is handled correctly', function(done) {
-            let luFile = `
+    it('Phrase lists marked as disabled for all models is handled correctly', function (done) {
+      let luFile = `
 @ phraselist pl1(interchangeable) 
 @ pl1 disabled, disabledForAllModels
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.model_features.length, 1);
-                    assert.equal(res.LUISJsonStructure.model_features[0].name, 'pl1');
-                    assert.equal(res.LUISJsonStructure.model_features[0].mode, true);
-                    assert.equal(res.LUISJsonStructure.model_features[0].activated, false);
-                    assert.equal(res.LUISJsonStructure.model_features[0].enabledForAllModels, false);
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.model_features.length, 1);
+          assert.equal(res.LUISJsonStructure.model_features[0].name, 'pl1');
+          assert.equal(res.LUISJsonStructure.model_features[0].mode, true);
+          assert.equal(
+            res.LUISJsonStructure.model_features[0].activated,
+            false
+          );
+          assert.equal(
+            res.LUISJsonStructure.model_features[0].enabledForAllModels,
+            false
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it('Phrase list marked as interchangeable can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Phrase list marked as interchangeable can be added as a feature to an intent', function (done) {
+      let luFile = `
                 > phrase list as feature to intent (also applicable to entities)
                 @ intent getUserProfileIntent usesFeature city
                 
@@ -130,25 +154,38 @@ describe('Model as feature definitions', function () {
                     - SEA
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.phraselists.length, 1);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'getUserProfileIntent');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].featureName, 'city');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.phraselists.length, 1);
+          assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+          assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].words,
+            'Seattle,SEATAC,SEA'
+          );
+          assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+            false
+          );
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].name,
+            'getUserProfileIntent'
+          );
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].featureName,
+            'city'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it('Multiple phrase lists with different interchangeable definitions can be added as a feature to an intent', function(done) {
-            let luFile = `
+    it('Multiple phrase lists with different interchangeable definitions can be added as a feature to an intent', function (done) {
+      let luFile = `
                 > phrase list as feature to intent (also applicable to entities)
                 @ intent getUserProfileIntent usesFeature city, city2
                 
@@ -166,54 +203,78 @@ describe('Model as feature definitions', function () {
                     - PDX
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                    assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                    assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                    assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                    assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                    assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, false);
-                    assert.equal(res.LUISJsonStructure.intents.length, 1);
-                    assert.equal(res.LUISJsonStructure.intents[0].name, 'getUserProfileIntent');
-                    assert.equal(res.LUISJsonStructure.intents[0].features.length, 2);
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].featureName, 'city');
-                    assert.equal(res.LUISJsonStructure.intents[0].features[1].featureName, 'city2');
-                    done();
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+          assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+          assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].words,
+            'Seattle,SEATAC,SEA'
+          );
+          assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+            false
+          );
+          assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+          assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[1].words,
+            'portland,PDX'
+          );
+          assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+          assert.equal(
+            res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+            false
+          );
+          assert.equal(res.LUISJsonStructure.intents.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].name,
+            'getUserProfileIntent'
+          );
+          assert.equal(res.LUISJsonStructure.intents[0].features.length, 2);
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].featureName,
+            'city'
+          );
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[1].featureName,
+            'city2'
+          );
+          done();
+        })
+        .catch((err) => done(err));
     });
+  });
 
-    describe('Features to entity', function() {
-        describe('Simple entity', function() {
-            it('Features must be defined before they can be added.', function(done) {
-                let luFile = `
+  describe('Features to entity', function () {
+    describe('Simple entity', function () {
+      it('Features must be defined before they can be added.', function (done) {
+        let luFile = `
                     @ ml x1
                     @ x1 usesFeature city3
                 `;
-                luisBuilder.fromContentAsync(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
-    
-            it('Entity must be defined before a feature can be assigned to it', function(done) {
-                let luFile = `
+        luisBuilder
+          .fromContentAsync(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+
+      it('Entity must be defined before a feature can be assigned to it', function (done) {
+        let luFile = `
                     @ x1 usesFeature city3
                 `;
-    
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            })
-    
-            it('Feature can be added to a simple entity', function(done) {
-                let luFile = `
+
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+
+      it('Feature can be added to a simple entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -227,31 +288,47 @@ describe('Model as feature definitions', function () {
                     @ ml x1
                     @ x1 usesFeature city
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.entities.length, 1);
-                        assert.equal(res.LUISJsonStructure.entities[0].name, 'x1');
-                        assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
-                        assert.equal(res.LUISJsonStructure.entities[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, true);
-                        done();
-                    })
-                    .catch(err => done(err))
-            })
-    
-            it('Multiple features can be added to a simple entity', function(done) {
-                let luFile = `
+
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.entities.length, 1);
+            assert.equal(res.LUISJsonStructure.entities[0].name, 'x1');
+            assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              true
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
+      it('Multiple features can be added to a simple entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -265,32 +342,51 @@ describe('Model as feature definitions', function () {
                     @ ml x1
                     @ x1 usesFeature city, city2
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.entities.length, 1);
-                        assert.equal(res.LUISJsonStructure.entities[0].name, 'x1');
-                        assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
-                        assert.equal(res.LUISJsonStructure.entities[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.entities[0].features[1].featureName, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, false);
-                        done();
-                    })
-                    .catch(err => done(err))
-            });
 
-            it('Feature, roles can be defined in the same line can be added to a prebuilt entity', function(done) {
-                let luFile = `
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.entities.length, 1);
+            assert.equal(res.LUISJsonStructure.entities[0].name, 'x1');
+            assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[1].featureName,
+              'city2'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              false
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
+      it('Feature, roles can be defined in the same line can be added to a prebuilt entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -304,33 +400,49 @@ describe('Model as feature definitions', function () {
                     @ ml number hasRoles r1 usesFeature city 
                     @ number usesFeature city
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.entities.length, 1);
-                        assert.equal(res.LUISJsonStructure.entities[0].name, 'number');
-                        assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
-                        assert.equal(res.LUISJsonStructure.entities[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.entities[0].roles.length, 1);
-                        assert.deepEqual(res.LUISJsonStructure.entities[0].roles, ['r1']);
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, true);
-                        done();
-                    })
-                    .catch(err => done(err))
-            });
 
-            it('Multiple features, roles can be defined in the same line can be added to a prebuilt entity', function(done) {
-                let luFile = `
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.entities.length, 1);
+            assert.equal(res.LUISJsonStructure.entities[0].name, 'number');
+            assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(res.LUISJsonStructure.entities[0].roles.length, 1);
+            assert.deepEqual(res.LUISJsonStructure.entities[0].roles, ['r1']);
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              true
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
+      it('Multiple features, roles can be defined in the same line can be added to a prebuilt entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -344,38 +456,58 @@ describe('Model as feature definitions', function () {
                     @ ml number hasRoles r1, r2 usesFeatures city, city2 
                     @ number usesFeature city
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.entities.length, 1);
-                        assert.equal(res.LUISJsonStructure.entities[0].name, 'number');
-                        assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
-                        assert.equal(res.LUISJsonStructure.entities[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.entities[0].features[1].featureName, 'city2');
-                        assert.equal(res.LUISJsonStructure.entities[0].roles.length, 2);
-                        assert.deepEqual(res.LUISJsonStructure.entities[0].roles, ['r1', 'r2']);
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, false);
-                        done();
-                    })
-                    .catch(err => done(err))
-            });
 
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.entities.length, 1);
+            assert.equal(res.LUISJsonStructure.entities[0].name, 'number');
+            assert.equal(res.LUISJsonStructure.entities[0].features.length, 2);
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(
+              res.LUISJsonStructure.entities[0].features[1].featureName,
+              'city2'
+            );
+            assert.equal(res.LUISJsonStructure.entities[0].roles.length, 2);
+            assert.deepEqual(res.LUISJsonStructure.entities[0].roles, [
+              'r1',
+              'r2',
+            ]);
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              false
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+    });
 
-        });
-
-        describe('Prebuilt, list, pattern.any, regex entities cannot have phrase list as feature', function() {
-            it('prebuilt entity cannot have a phrase list as a feature', function(done) {
-                let luFile = `
+    describe('Prebuilt, list, pattern.any, regex entities cannot have phrase list as feature', function () {
+      it('prebuilt entity cannot have a phrase list as a feature', function (done) {
+        let luFile = `
                     @ prebuilt number usesFeature city
                     @ phraselist city =
                         - Seattle
@@ -383,13 +515,14 @@ describe('Model as feature definitions', function () {
                         - SEA
                 `;
 
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
-            
-            it('list entity cannot have a phrase list as a feature', function(done) {
-                let luFile = `
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+
+      it('list entity cannot have a phrase list as a feature', function (done) {
+        let luFile = `
                     @ list number usesFeature city
                     @ phraselist city =
                         - Seattle
@@ -397,13 +530,14 @@ describe('Model as feature definitions', function () {
                         - SEA
                 `;
 
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
 
-            it('pattern.any entity cannot have a phrase list as a feature', function(done) {
-                let luFile = `
+      it('pattern.any entity cannot have a phrase list as a feature', function (done) {
+        let luFile = `
                     @ patternany number usesFeature city
                     @ phraselist city =
                         - Seattle
@@ -411,14 +545,14 @@ describe('Model as feature definitions', function () {
                         - SEA
                 `;
 
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
-            
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
 
-            it('regex entity cannot have a phrase list as a feature', function(done) {
-                let luFile = `
+      it('regex entity cannot have a phrase list as a feature', function (done) {
+        let luFile = `
                     @ regex number usesFeature city = /[0-9]{7}/
                     @ phraselist city =
                         - Seattle
@@ -426,35 +560,38 @@ describe('Model as feature definitions', function () {
                         - SEA
                 `;
 
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
-        });
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+    });
 
-        describe('Composite entity', function() {
-            it('Features must be defined before they can be added.', function(done) {
-                let luFile = `
+    describe('Composite entity', function () {
+      it('Features must be defined before they can be added.', function (done) {
+        let luFile = `
                     @ composite x1
                     @ x1 usesFeature city3
                 `;
-                luisBuilder.fromContentAsync(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            });
-    
-            it('Entity must be defined before a feature can be assigned to it', function(done) {
-                let luFile = `
+        luisBuilder
+          .fromContentAsync(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+
+      it('Entity must be defined before a feature can be assigned to it', function (done) {
+        let luFile = `
                     @ x1 usesFeature city3
                 `;
-    
-                parseFile.parseFile(luFile)
-                    .then(res => done(res))
-                    .catch(err => done())
-            })
-    
-            it('Feature can be added to a composite entity', function(done) {
-                let luFile = `
+
+        parseFile
+          .parseFile(luFile)
+          .then((res) => done(res))
+          .catch((err) => done());
+      });
+
+      it('Feature can be added to a composite entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -470,31 +607,50 @@ describe('Model as feature definitions', function () {
                     @ ml s1
                     @ prebuilt number
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.composites.length, 1);
-                        assert.equal(res.LUISJsonStructure.composites[0].name, 'x1');
-                        assert.equal(res.LUISJsonStructure.composites[0].features.length, 1);
-                        assert.equal(res.LUISJsonStructure.composites[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, true);
-                        done();
-                    })
-                    .catch(err => done(err))
-            })
-    
-            it('Multiple features can be added to a composite entity', function(done) {
-                let luFile = `
+
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.composites.length, 1);
+            assert.equal(res.LUISJsonStructure.composites[0].name, 'x1');
+            assert.equal(
+              res.LUISJsonStructure.composites[0].features.length,
+              1
+            );
+            assert.equal(
+              res.LUISJsonStructure.composites[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              true
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+
+      it('Multiple features can be added to a composite entity', function (done) {
+        let luFile = `
                     @ phraselist city
                     @ city =
                         - Seattle
@@ -510,33 +666,55 @@ describe('Model as feature definitions', function () {
                     @ ml s1
                     @ prebuilt number
                 `;
-    
-                parseFile.parseFile(luFile) 
-                    .then(res => {
-                        assert.equal(res.LUISJsonStructure.composites.length, 1);
-                        assert.equal(res.LUISJsonStructure.composites[0].name, 'x1');
-                        assert.equal(res.LUISJsonStructure.composites[0].features.length, 2);
-                        assert.equal(res.LUISJsonStructure.composites[0].features[0].featureName, 'city');
-                        assert.equal(res.LUISJsonStructure.composites[0].features[1].featureName, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists.length, 2);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].words, 'Seattle,SEATAC,SEA');
-                        assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[0].enabledForAllModels, false);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].words, 'portland,PDX');
-                        assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
-                        assert.equal(res.LUISJsonStructure.phraselists[1].enabledForAllModels, false);
-                        done();
-                    })
-                    .catch(err => done(err))
-            });
-        });
 
-        it('phrase lists cannot be added as a feature to other phrase lists', function(done) {
-            let luFile = `
+        parseFile
+          .parseFile(luFile)
+          .then((res) => {
+            assert.equal(res.LUISJsonStructure.composites.length, 1);
+            assert.equal(res.LUISJsonStructure.composites[0].name, 'x1');
+            assert.equal(
+              res.LUISJsonStructure.composites[0].features.length,
+              2
+            );
+            assert.equal(
+              res.LUISJsonStructure.composites[0].features[0].featureName,
+              'city'
+            );
+            assert.equal(
+              res.LUISJsonStructure.composites[0].features[1].featureName,
+              'city2'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists.length, 2);
+            assert.equal(res.LUISJsonStructure.phraselists[0].name, 'city');
+            assert.equal(res.LUISJsonStructure.phraselists[0].mode, false);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].words,
+              'Seattle,SEATAC,SEA'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[0].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[0].enabledForAllModels,
+              false
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].name, 'city2');
+            assert.equal(res.LUISJsonStructure.phraselists[1].mode, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].words,
+              'portland,PDX'
+            );
+            assert.equal(res.LUISJsonStructure.phraselists[1].activated, true);
+            assert.equal(
+              res.LUISJsonStructure.phraselists[1].enabledForAllModels,
+              false
+            );
+            done();
+          })
+          .catch((err) => done(err));
+      });
+    });
+
+    it('phrase lists cannot be added as a feature to other phrase lists', function (done) {
+      let luFile = `
                 @phraselist xyz =
                     - a
                     - b
@@ -547,97 +725,97 @@ describe('Model as feature definitions', function () {
                     - 3
             `;
 
-            parseFile.parseFile(luFile) 
-                .then(res => done(res))
-                .catch(err => done())
-        })
-        
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
     });
+  });
 
-    describe('Negative tests', function(done) {
-        it('Intent cannot use patternany as a feature', function(done) {
-            let luFile = `
+  describe('Negative tests', function (done) {
+    it('Intent cannot use patternany as a feature', function (done) {
+      let luFile = `
                 @ patternany p1
                 # test
                 - one
                 @ intent test usesFeature p1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('simple entity cannot use patternany as a feature', function(done) {
-            let luFile = `
+    it('simple entity cannot use patternany as a feature', function (done) {
+      let luFile = `
                 @ patternany p1
                 @ ml s1 usesFeature p1
             `;
 
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('composite entity cannot use patternany as a feature', function(done) {
-            let luFile = `
+    it('composite entity cannot use patternany as a feature', function (done) {
+      let luFile = `
                 @ patternany p1
                 @ composite c1 usesFeature p1
             `;
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        });
-
-        it('phrase lists cannot have any features', function(done) {
-            let luFile = `
+    it('phrase lists cannot have any features', function (done) {
+      let luFile = `
                 @ ml c1
                 @ phraselist p1 usesFeature c1
             `;
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-        });
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        it('regex entity cannot have any features', function(done) {
-            let luFile = `
+    it('regex entity cannot have any features', function (done) {
+      let luFile = `
                 @ ml s1
                 @ regex r1 usesFeature s1
             `;
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        })
-
-        it('list entity cannot have any features', function(done) {
-            let luFile = `
+    it('list entity cannot have any features', function (done) {
+      let luFile = `
                 @ ml s1
                 @ list r1 usesFeature s1
             `;
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
+    });
 
-        })
-
-        it('prebuilt entity cannot have any features', function(done) {
-            let luFile = `
+    it('prebuilt entity cannot have any features', function (done) {
+      let luFile = `
                 @ ml s1
                 @ prebuilt number usesFeature s1
             `;
-            parseFile.parseFile(luFile)
-                .then(res => done(res))
-                .catch(err => done())
-
-        })
-
-        
-
+      parseFile
+        .parseFile(luFile)
+        .then((res) => done(res))
+        .catch((err) => done());
     });
-    it('Intent, simple entity, composite entity can use anything as a feature except for patternany', function(done) {
-        let luFile = `
+  });
+  it('Intent, simple entity, composite entity can use anything as a feature except for patternany', function (done) {
+    let luFile = `
             @ ml s1
             @ list l1
             @ composite c1
@@ -653,25 +831,56 @@ describe('Model as feature definitions', function () {
             @ c1 usesFeature test2, l1, number, r1, PL1, s1
         `;
 
-        parseFile.parseFile(luFile)
-            .then(res => {
-                assert.equal(res.LUISJsonStructure.intents[0].features.length, 6);
-                assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.modelName).length, 5);
-                assert.equal(res.LUISJsonStructure.intents[0].features.filter(item => item.featureName).length, 1);
-                assert.equal(res.LUISJsonStructure.entities[0].features.length, 6);
-                assert.equal(res.LUISJsonStructure.entities[0].features.filter(item => item.modelName).length, 5);
-                assert.equal(res.LUISJsonStructure.entities[0].features.filter(item => item.featureName).length, 1);
-                assert.equal(res.LUISJsonStructure.composites[0].features.length, 6);
-                assert.equal(res.LUISJsonStructure.composites[0].features.filter(item => item.modelName).length, 5);
-                assert.equal(res.LUISJsonStructure.composites[0].features.filter(item => item.featureName).length, 1);
-                done();
-            })
-            .catch(err => done(err))
-    });
+    parseFile
+      .parseFile(luFile)
+      .then((res) => {
+        assert.equal(res.LUISJsonStructure.intents[0].features.length, 6);
+        assert.equal(
+          res.LUISJsonStructure.intents[0].features.filter(
+            (item) => item.modelName
+          ).length,
+          5
+        );
+        assert.equal(
+          res.LUISJsonStructure.intents[0].features.filter(
+            (item) => item.featureName
+          ).length,
+          1
+        );
+        assert.equal(res.LUISJsonStructure.entities[0].features.length, 6);
+        assert.equal(
+          res.LUISJsonStructure.entities[0].features.filter(
+            (item) => item.modelName
+          ).length,
+          5
+        );
+        assert.equal(
+          res.LUISJsonStructure.entities[0].features.filter(
+            (item) => item.featureName
+          ).length,
+          1
+        );
+        assert.equal(res.LUISJsonStructure.composites[0].features.length, 6);
+        assert.equal(
+          res.LUISJsonStructure.composites[0].features.filter(
+            (item) => item.modelName
+          ).length,
+          5
+        );
+        assert.equal(
+          res.LUISJsonStructure.composites[0].features.filter(
+            (item) => item.featureName
+          ).length,
+          1
+        );
+        done();
+      })
+      .catch((err) => done(err));
+  });
 
-    describe("[BF CLI #472 - entities can have spaces in the name", function() {
-        it ('Phrase list can be added to ml entity with spaces in its name', function(done) {
-            let lufile = `
+  describe('[BF CLI #472 - entities can have spaces in the name', function () {
+    it('Phrase list can be added to ml entity with spaces in its name', function (done) {
+      let lufile = `
     ## Demo
     - demo
     
@@ -681,110 +890,137 @@ describe('Model as feature definitions', function () {
         - phone,phone number,telephone,cellphone
             `;
 
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities.length, 1);
-                    assert.equal(res.LUISJsonStructure.entities[0].name, "phone number entity");
-                    assert.equal(res.LUISJsonStructure.entities[0].features[0].featureName, "phonePL");
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.entities.length, 1);
+          assert.equal(
+            res.LUISJsonStructure.entities[0].name,
+            'phone number entity'
+          );
+          assert.equal(
+            res.LUISJsonStructure.entities[0].features[0].featureName,
+            'phonePL'
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('ml entity names with spaces are converted correctly to lu', function(done) {
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ ml "phone number entity"`), true);
-            done()
-        })
+    it('ml entity names with spaces are converted correctly to lu', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(luContent.includes(`@ ml "phone number entity"`), true);
+      done();
+    });
 
-        it ('phrase list names can have spaces in it', function(done) {
-            let lufile = `
+    it('phrase list names can have spaces in it', function (done) {
+      let lufile = `
 @ phraselist "phone pl"(interchangeable) = 
     - phone,phone number,telephone,cellphone
 `;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.model_features[0].name, "phone pl");
-                    assert.equal(res.LUISJsonStructure.model_features[0].mode, true);
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.model_features[0].name,
+            'phone pl'
+          );
+          assert.equal(res.LUISJsonStructure.model_features[0].mode, true);
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('phrase list names with spaces in them convert correctly to lu format', function(done){
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ phraselist "phone pl"(interchangeable)`), true);
-            done()
-        })
+    it('phrase list names with spaces in them convert correctly to lu format', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(
+        luContent.includes(`@ phraselist "phone pl"(interchangeable)`),
+        true
+      );
+      done();
+    });
 
-        it ('list entity names can have spaces in it', function(done) {
-            let lufile = `
+    it('list entity names can have spaces in it', function (done) {
+      let lufile = `
 @ list "my city"
 `;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.closedLists[0].name, "my city");
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(res.LUISJsonStructure.closedLists[0].name, 'my city');
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('list entity names with spaces in them convert correctly to lu format', function(done){
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ list "my city"`), true);
-            done()
-        })
+    it('list entity names with spaces in them convert correctly to lu format', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(luContent.includes(`@ list "my city"`), true);
+      done();
+    });
 
-        it ('composite entity names can have spaces in it', function(done) {
-            let lufile = `
+    it('composite entity names can have spaces in it', function (done) {
+      let lufile = `
 @ composite "test composite"
 `;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.composites[0].name, "test composite");
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.composites[0].name,
+            'test composite'
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('composite entity names with spaces in them convert correctly to lu format', function(done){
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ composite "test composite"`), true);
-            done()
-        })
+    it('composite entity names with spaces in them convert correctly to lu format', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(luContent.includes(`@ composite "test composite"`), true);
+      done();
+    });
 
-        it ('regex entity names can have spaces in it', function(done) {
-            let lufile = `
+    it('regex entity names can have spaces in it', function (done) {
+      let lufile = `
 @ regex "test regex"
 `;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.regex_entities[0].name, "test regex");
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.regex_entities[0].name,
+            'test regex'
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('regex entity names with spaces in them convert correctly to lu format', function(done){
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ regex "test regex"`), true);
-            done()
-        })
+    it('regex entity names with spaces in them convert correctly to lu format', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(luContent.includes(`@ regex "test regex"`), true);
+      done();
+    });
 
-        it ('pattern.any entity names can have spaces in it', function(done) {
-            let lufile = `
+    it('pattern.any entity names can have spaces in it', function (done) {
+      let lufile = `
 @ patternany "test pa"
 `;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.patternAnyEntities[0].name, "test pa");
-                    done();
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.patternAnyEntities[0].name,
+            'test pa'
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('uses feature supports spaces for all features', function(done) {
-            let lufile = `
+    it('uses feature supports spaces for all features', function (done) {
+      let lufile = `
 # test intent
 - foo
 
@@ -794,81 +1030,118 @@ describe('Model as feature definitions', function () {
 
 @ ml "another entity" usesFeatures "test intent", "test ml entity", "test pl"`;
 
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.entities[1].features.length, 3);
-                    assert.equal(res.LUISJsonStructure.entities[1].features[0].modelName, "test intent");
-                    assert.equal(res.LUISJsonStructure.entities[1].features[1].modelName, "test ml entity");
-                    assert.equal(res.LUISJsonStructure.entities[1].features[2].featureName, "test pl");
-                    done();
-                })
-        });
+      parseFile.parseFile(lufile).then((res) => {
+        assert.equal(res.LUISJsonStructure.entities[1].features.length, 3);
+        assert.equal(
+          res.LUISJsonStructure.entities[1].features[0].modelName,
+          'test intent'
+        );
+        assert.equal(
+          res.LUISJsonStructure.entities[1].features[1].modelName,
+          'test ml entity'
+        );
+        assert.equal(
+          res.LUISJsonStructure.entities[1].features[2].featureName,
+          'test pl'
+        );
+        done();
+      });
+    });
 
-        it ('intent with spaces in it can be assigned features', function(done) {
-            let lufile = `
+    it('intent with spaces in it can be assigned features', function (done) {
+      let lufile = `
 # test intent
 - foo
 
 @ ml bar
 
 @ intent "test intent" usesFeature bar`;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.intents[0].features[0].modelName, "bar");
-                    done()
-                })
-                .catch(err => done(err))
-        });
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.intents[0].features[0].modelName,
+            'bar'
+          );
+          done();
+        })
+        .catch((err) => done(err));
+    });
 
-        it ('ml entity with spaces in it can be lablled', function(done) {
-            let lufile = `
+    it('ml entity with spaces in it can be lablled', function (done) {
+      let lufile = `
 # test intent
 - I want {@food type = tomato}
 
 @ ml 'food type'`;
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.equal(res.LUISJsonStructure.utterances[0].entities[0].entity, "food type")
-                    done()
-                })
-                .catch(err => done(err))
-        });
-
-        it ('roles can have spaces in them', function(done) {
-            let lufile = `
-@ ml "entity 1" hasRoles "role 1", "role 2"
-`   
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.deepEqual(res.LUISJsonStructure.entities[0].roles, ["role 1", "role 2"]);
-                    done()
-                })
-                .catch(err => done(err))
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.equal(
+            res.LUISJsonStructure.utterances[0].entities[0].entity,
+            'food type'
+          );
+          done();
         })
+        .catch((err) => done(err));
+    });
 
-        it ('roles with spaces can be lablled in an utterance', function(done) {
-            let lufile = `
+    it('roles can have spaces in them', function (done) {
+      let lufile = `
+@ ml "entity 1" hasRoles "role 1", "role 2"
+`;
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.deepEqual(res.LUISJsonStructure.entities[0].roles, [
+            'role 1',
+            'role 2',
+          ]);
+          done();
+        })
+        .catch((err) => done(err));
+    });
+
+    it('roles with spaces can be lablled in an utterance', function (done) {
+      let lufile = `
 @ ml "entity 1" hasRoles "role 1", "role 2"
 
 # test intent
 - I want {@role 1 = something}
-`   
-            parseFile.parseFile(lufile)
-                .then(res => {
-                    assert.deepEqual(res.LUISJsonStructure.entities[0].roles, ["role 1", "role 2"]);
-                    assert.equal(res.LUISJsonStructure.utterances[0].entities[0].entity, "entity 1");
-                    assert.equal(res.LUISJsonStructure.utterances[0].entities[0].role, "role 1");
-                    done()
-                })
-                .catch(err => done(err))
-        });
-
-        it ('entity definitions with roles (with spaces in them) and features (with spaces in them) convert back correctly back to lu' , function(done) {
-            let luContent = luconvert(entityNameWithSpaceAndFeature);
-            assert.equal(luContent.includes(`@ ml "phone number entity" hasRole "role 1" usesFeature "phone pl"`), true)
-            assert.equal(luContent.includes(`@ regex "test regex" hasRole "role 4"`), true);
-            done()
+`;
+      parseFile
+        .parseFile(lufile)
+        .then((res) => {
+          assert.deepEqual(res.LUISJsonStructure.entities[0].roles, [
+            'role 1',
+            'role 2',
+          ]);
+          assert.equal(
+            res.LUISJsonStructure.utterances[0].entities[0].entity,
+            'entity 1'
+          );
+          assert.equal(
+            res.LUISJsonStructure.utterances[0].entities[0].role,
+            'role 1'
+          );
+          done();
         })
-        
-    })
+        .catch((err) => done(err));
+    });
+
+    it('entity definitions with roles (with spaces in them) and features (with spaces in them) convert back correctly back to lu', function (done) {
+      let luContent = luconvert(entityNameWithSpaceAndFeature);
+      assert.equal(
+        luContent.includes(
+          `@ ml "phone number entity" hasRole "role 1" usesFeature "phone pl"`
+        ),
+        true
+      );
+      assert.equal(
+        luContent.includes(`@ regex "test regex" hasRole "role 4"`),
+        true
+      );
+      done();
+    });
+  });
 });

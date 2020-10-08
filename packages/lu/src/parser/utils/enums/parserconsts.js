@@ -3,17 +3,17 @@
  * Licensed under the MIT License.
  */
 module.exports = {
-    FILEREF: "#ref",
-    INTENT: "#",
-    ENTITY: "$",
-    QNA: "?",
-    URLREF: "#url",
-    COMMENT: ">",
-    URLORFILEREF: "[",
-    QNATABLE: "|",
-    ANSWER: "```",
-    FILTER: "**",
-    QNAALTERATIONS: "qna-alterations",
-    MODELINFO: "!#",
-    NEWENTITY: "@"
+  FILEREF: '#ref',
+  INTENT: '#',
+  ENTITY: '$',
+  QNA: '?',
+  URLREF: '#url',
+  COMMENT: '>',
+  URLORFILEREF: '[',
+  QNATABLE: '|',
+  ANSWER: '```',
+  FILTER: '**',
+  QNAALTERATIONS: 'qna-alterations',
+  MODELINFO: '!#',
+  NEWENTITY: '@',
 };

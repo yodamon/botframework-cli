@@ -1,546 +1,380 @@
-// Generated from ../LUFileParser.g4 by ANTLR 4.8
-// jshint ignore: start
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
 var antlr4 = require('antlr4/index');
 
 // This class defines a complete listener for a parse tree produced by LUFileParser.
 function LUFileParserListener() {
-	antlr4.tree.ParseTreeListener.call(this);
-	return this;
+  antlr4.tree.ParseTreeListener.call(this);
+  return this;
 }
 
-LUFileParserListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);
+LUFileParserListener.prototype = Object.create(
+  antlr4.tree.ParseTreeListener.prototype
+);
 LUFileParserListener.prototype.constructor = LUFileParserListener;
 
 // Enter a parse tree produced by LUFileParser#file.
-LUFileParserListener.prototype.enterFile = function(ctx) {
-};
+LUFileParserListener.prototype.enterFile = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#file.
-LUFileParserListener.prototype.exitFile = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitFile = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#paragraph.
-LUFileParserListener.prototype.enterParagraph = function(ctx) {
-};
+LUFileParserListener.prototype.enterParagraph = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#paragraph.
-LUFileParserListener.prototype.exitParagraph = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitParagraph = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newline.
-LUFileParserListener.prototype.enterNewline = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewline = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newline.
-LUFileParserListener.prototype.exitNewline = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewline = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#errorString.
-LUFileParserListener.prototype.enterErrorString = function(ctx) {
-};
+LUFileParserListener.prototype.enterErrorString = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#errorString.
-LUFileParserListener.prototype.exitErrorString = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitErrorString = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#nestedIntentSection.
-LUFileParserListener.prototype.enterNestedIntentSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterNestedIntentSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#nestedIntentSection.
-LUFileParserListener.prototype.exitNestedIntentSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNestedIntentSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#nestedIntentNameLine.
-LUFileParserListener.prototype.enterNestedIntentNameLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterNestedIntentNameLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#nestedIntentNameLine.
-LUFileParserListener.prototype.exitNestedIntentNameLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNestedIntentNameLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#nestedIntentName.
-LUFileParserListener.prototype.enterNestedIntentName = function(ctx) {
-};
+LUFileParserListener.prototype.enterNestedIntentName = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#nestedIntentName.
-LUFileParserListener.prototype.exitNestedIntentName = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNestedIntentName = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#nameIdentifier.
-LUFileParserListener.prototype.enterNameIdentifier = function(ctx) {
-};
+LUFileParserListener.prototype.enterNameIdentifier = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#nameIdentifier.
-LUFileParserListener.prototype.exitNameIdentifier = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNameIdentifier = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#nestedIntentBodyDefinition.
-LUFileParserListener.prototype.enterNestedIntentBodyDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterNestedIntentBodyDefinition = function (
+  ctx
+) {};
 
 // Exit a parse tree produced by LUFileParser#nestedIntentBodyDefinition.
-LUFileParserListener.prototype.exitNestedIntentBodyDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNestedIntentBodyDefinition = function (
+  ctx
+) {};
 
 // Enter a parse tree produced by LUFileParser#subIntentDefinition.
-LUFileParserListener.prototype.enterSubIntentDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterSubIntentDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#subIntentDefinition.
-LUFileParserListener.prototype.exitSubIntentDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitSubIntentDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#simpleIntentSection.
-LUFileParserListener.prototype.enterSimpleIntentSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterSimpleIntentSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#simpleIntentSection.
-LUFileParserListener.prototype.exitSimpleIntentSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitSimpleIntentSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#intentDefinition.
-LUFileParserListener.prototype.enterIntentDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterIntentDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#intentDefinition.
-LUFileParserListener.prototype.exitIntentDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitIntentDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#intentNameLine.
-LUFileParserListener.prototype.enterIntentNameLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterIntentNameLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#intentNameLine.
-LUFileParserListener.prototype.exitIntentNameLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitIntentNameLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#intentName.
-LUFileParserListener.prototype.enterIntentName = function(ctx) {
-};
+LUFileParserListener.prototype.enterIntentName = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#intentName.
-LUFileParserListener.prototype.exitIntentName = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitIntentName = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#intentBody.
-LUFileParserListener.prototype.enterIntentBody = function(ctx) {
-};
+LUFileParserListener.prototype.enterIntentBody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#intentBody.
-LUFileParserListener.prototype.exitIntentBody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitIntentBody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#normalIntentBody.
-LUFileParserListener.prototype.enterNormalIntentBody = function(ctx) {
-};
+LUFileParserListener.prototype.enterNormalIntentBody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#normalIntentBody.
-LUFileParserListener.prototype.exitNormalIntentBody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNormalIntentBody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#normalIntentString.
-LUFileParserListener.prototype.enterNormalIntentString = function(ctx) {
-};
+LUFileParserListener.prototype.enterNormalIntentString = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#normalIntentString.
-LUFileParserListener.prototype.exitNormalIntentString = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNormalIntentString = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntitySection.
-LUFileParserListener.prototype.enterNewEntitySection = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntitySection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntitySection.
-LUFileParserListener.prototype.exitNewEntitySection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntitySection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityDefinition.
-LUFileParserListener.prototype.enterNewEntityDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityDefinition.
-LUFileParserListener.prototype.exitNewEntityDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityListbody.
-LUFileParserListener.prototype.enterNewEntityListbody = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityListbody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityListbody.
-LUFileParserListener.prototype.exitNewEntityListbody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityListbody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityLine.
-LUFileParserListener.prototype.enterNewEntityLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityLine.
-LUFileParserListener.prototype.exitNewEntityLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newCompositeDefinition.
-LUFileParserListener.prototype.enterNewCompositeDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewCompositeDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newCompositeDefinition.
-LUFileParserListener.prototype.exitNewCompositeDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewCompositeDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newRegexDefinition.
-LUFileParserListener.prototype.enterNewRegexDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewRegexDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newRegexDefinition.
-LUFileParserListener.prototype.exitNewRegexDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewRegexDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityType.
-LUFileParserListener.prototype.enterNewEntityType = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityType = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityType.
-LUFileParserListener.prototype.exitNewEntityType = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityType = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityRoles.
-LUFileParserListener.prototype.enterNewEntityRoles = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityRoles = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityRoles.
-LUFileParserListener.prototype.exitNewEntityRoles = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityRoles = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityUsesFeatures.
-LUFileParserListener.prototype.enterNewEntityUsesFeatures = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityUsesFeatures = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityUsesFeatures.
-LUFileParserListener.prototype.exitNewEntityUsesFeatures = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityUsesFeatures = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityRoleOrFeatures.
-LUFileParserListener.prototype.enterNewEntityRoleOrFeatures = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityRoleOrFeatures = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityRoleOrFeatures.
-LUFileParserListener.prototype.exitNewEntityRoleOrFeatures = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityRoleOrFeatures = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityName.
-LUFileParserListener.prototype.enterNewEntityName = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityName = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityName.
-LUFileParserListener.prototype.exitNewEntityName = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityName = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#newEntityNameWithWS.
-LUFileParserListener.prototype.enterNewEntityNameWithWS = function(ctx) {
-};
+LUFileParserListener.prototype.enterNewEntityNameWithWS = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#newEntityNameWithWS.
-LUFileParserListener.prototype.exitNewEntityNameWithWS = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNewEntityNameWithWS = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entitySection.
-LUFileParserListener.prototype.enterEntitySection = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntitySection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entitySection.
-LUFileParserListener.prototype.exitEntitySection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntitySection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entityDefinition.
-LUFileParserListener.prototype.enterEntityDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntityDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entityDefinition.
-LUFileParserListener.prototype.exitEntityDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntityDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entityLine.
-LUFileParserListener.prototype.enterEntityLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntityLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entityLine.
-LUFileParserListener.prototype.exitEntityLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntityLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entityName.
-LUFileParserListener.prototype.enterEntityName = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntityName = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entityName.
-LUFileParserListener.prototype.exitEntityName = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntityName = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entityType.
-LUFileParserListener.prototype.enterEntityType = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntityType = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entityType.
-LUFileParserListener.prototype.exitEntityType = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntityType = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#compositeEntityIdentifier.
-LUFileParserListener.prototype.enterCompositeEntityIdentifier = function(ctx) {
-};
+LUFileParserListener.prototype.enterCompositeEntityIdentifier = function (
+  ctx
+) {};
 
 // Exit a parse tree produced by LUFileParser#compositeEntityIdentifier.
-LUFileParserListener.prototype.exitCompositeEntityIdentifier = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitCompositeEntityIdentifier = function (
+  ctx
+) {};
 
 // Enter a parse tree produced by LUFileParser#regexEntityIdentifier.
-LUFileParserListener.prototype.enterRegexEntityIdentifier = function(ctx) {
-};
+LUFileParserListener.prototype.enterRegexEntityIdentifier = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#regexEntityIdentifier.
-LUFileParserListener.prototype.exitRegexEntityIdentifier = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitRegexEntityIdentifier = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#entityListBody.
-LUFileParserListener.prototype.enterEntityListBody = function(ctx) {
-};
+LUFileParserListener.prototype.enterEntityListBody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#entityListBody.
-LUFileParserListener.prototype.exitEntityListBody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitEntityListBody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#normalItemString.
-LUFileParserListener.prototype.enterNormalItemString = function(ctx) {
-};
+LUFileParserListener.prototype.enterNormalItemString = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#normalItemString.
-LUFileParserListener.prototype.exitNormalItemString = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitNormalItemString = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#importSection.
-LUFileParserListener.prototype.enterImportSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterImportSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#importSection.
-LUFileParserListener.prototype.exitImportSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitImportSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#importDefinition.
-LUFileParserListener.prototype.enterImportDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterImportDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#importDefinition.
-LUFileParserListener.prototype.exitImportDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitImportDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#referenceSection.
-LUFileParserListener.prototype.enterReferenceSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterReferenceSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#referenceSection.
-LUFileParserListener.prototype.exitReferenceSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitReferenceSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#referenceDefinition.
-LUFileParserListener.prototype.enterReferenceDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterReferenceDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#referenceDefinition.
-LUFileParserListener.prototype.exitReferenceDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitReferenceDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaSection.
-LUFileParserListener.prototype.enterQnaSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaSection.
-LUFileParserListener.prototype.exitQnaSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaDefinition.
-LUFileParserListener.prototype.enterQnaDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaDefinition.
-LUFileParserListener.prototype.exitQnaDefinition = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaDefinition = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaSourceInfo.
-LUFileParserListener.prototype.enterQnaSourceInfo = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaSourceInfo = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaSourceInfo.
-LUFileParserListener.prototype.exitQnaSourceInfo = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaSourceInfo = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaIdMark.
-LUFileParserListener.prototype.enterQnaIdMark = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaIdMark = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaIdMark.
-LUFileParserListener.prototype.exitQnaIdMark = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaIdMark = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaQuestion.
-LUFileParserListener.prototype.enterQnaQuestion = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaQuestion = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaQuestion.
-LUFileParserListener.prototype.exitQnaQuestion = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaQuestion = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#questionText.
-LUFileParserListener.prototype.enterQuestionText = function(ctx) {
-};
+LUFileParserListener.prototype.enterQuestionText = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#questionText.
-LUFileParserListener.prototype.exitQuestionText = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQuestionText = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#moreQuestionsBody.
-LUFileParserListener.prototype.enterMoreQuestionsBody = function(ctx) {
-};
+LUFileParserListener.prototype.enterMoreQuestionsBody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#moreQuestionsBody.
-LUFileParserListener.prototype.exitMoreQuestionsBody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitMoreQuestionsBody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#moreQuestion.
-LUFileParserListener.prototype.enterMoreQuestion = function(ctx) {
-};
+LUFileParserListener.prototype.enterMoreQuestion = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#moreQuestion.
-LUFileParserListener.prototype.exitMoreQuestion = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitMoreQuestion = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#errorQuestionString.
-LUFileParserListener.prototype.enterErrorQuestionString = function(ctx) {
-};
+LUFileParserListener.prototype.enterErrorQuestionString = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#errorQuestionString.
-LUFileParserListener.prototype.exitErrorQuestionString = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitErrorQuestionString = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#qnaAnswerBody.
-LUFileParserListener.prototype.enterQnaAnswerBody = function(ctx) {
-};
+LUFileParserListener.prototype.enterQnaAnswerBody = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#qnaAnswerBody.
-LUFileParserListener.prototype.exitQnaAnswerBody = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitQnaAnswerBody = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#filterSection.
-LUFileParserListener.prototype.enterFilterSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterFilterSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#filterSection.
-LUFileParserListener.prototype.exitFilterSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitFilterSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#promptSection.
-LUFileParserListener.prototype.enterPromptSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterPromptSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#promptSection.
-LUFileParserListener.prototype.exitPromptSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitPromptSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#filterLine.
-LUFileParserListener.prototype.enterFilterLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterFilterLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#filterLine.
-LUFileParserListener.prototype.exitFilterLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitFilterLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#errorFilterLine.
-LUFileParserListener.prototype.enterErrorFilterLine = function(ctx) {
-};
+LUFileParserListener.prototype.enterErrorFilterLine = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#errorFilterLine.
-LUFileParserListener.prototype.exitErrorFilterLine = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitErrorFilterLine = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#multiLineAnswer.
-LUFileParserListener.prototype.enterMultiLineAnswer = function(ctx) {
-};
+LUFileParserListener.prototype.enterMultiLineAnswer = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#multiLineAnswer.
-LUFileParserListener.prototype.exitMultiLineAnswer = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitMultiLineAnswer = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#modelInfoSection.
-LUFileParserListener.prototype.enterModelInfoSection = function(ctx) {
-};
+LUFileParserListener.prototype.enterModelInfoSection = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#modelInfoSection.
-LUFileParserListener.prototype.exitModelInfoSection = function(ctx) {
-};
-
+LUFileParserListener.prototype.exitModelInfoSection = function (ctx) {};
 
 // Enter a parse tree produced by LUFileParser#modelInfoDefinition.
-LUFileParserListener.prototype.enterModelInfoDefinition = function(ctx) {
-};
+LUFileParserListener.prototype.enterModelInfoDefinition = function (ctx) {};
 
 // Exit a parse tree produced by LUFileParser#modelInfoDefinition.
-LUFileParserListener.prototype.exitModelInfoDefinition = function(ctx) {
-};
-
-
+LUFileParserListener.prototype.exitModelInfoDefinition = function (ctx) {};
 
 exports.LUFileParserListener = LUFileParserListener;

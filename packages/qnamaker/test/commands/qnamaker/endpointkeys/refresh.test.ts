@@ -1,30 +1,38 @@
-import {expect, test} from '@oclif/test'
-const nock = require('nock')
-import {deleteTestConfigFile, initTestConfigFile} from '../../../configfilehelper'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
+const nock = require('nock');
+import {
+  deleteTestConfigFile,
+  initTestConfigFile,
+} from '../../../configfilehelper';
 
 describe('qnamaker:endpointkeys:refresh', () => {
   before(async function () {
-    await initTestConfigFile()
+    await initTestConfigFile();
     // runs before all tests in this block
     nock('https://westus.api.cognitive.microsoft.com/qnamaker/v4.0')
       .patch('/endpointkeys/PrimaryKey')
-      .reply(200,
-      {
+      .reply(200, {
         primaryEndpointKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         secondaryEndpointKey: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
         installedVersion: '4.0.5',
-        lastStableVersion: '4.0.6'
-      })
-  })
+        lastStableVersion: '4.0.6',
+      });
+  });
 
   after(async function () {
-    await deleteTestConfigFile()
-  })
+    await deleteTestConfigFile();
+  });
 
   test
     .stdout()
     .command(['qnamaker:endpointkeys:refresh', '--keyType', 'PrimaryKey'])
-    .it('Deletes kb', ctx => {
-      expect(ctx.stdout).to.contain('"primaryEndpointKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"')
-    })
-})
+    .it('Deletes kb', (ctx) => {
+      expect(ctx.stdout).to.contain(
+        '"primaryEndpointKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"'
+      );
+    });
+});

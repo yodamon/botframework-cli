@@ -1,12 +1,19 @@
-import {expect, test} from '@oclif/test'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
 
 describe('chatdown', () => {
-
-    test
+  test
     .stdout()
     .command(['chatdown', '--help'])
-    .it('should print the help contents when --help is passed as an argument', ctx => {
-      expect(ctx.stdout).to.contain('Converts chat dialog files in <filename>.')
-    })
-
-})
+    .it(
+      'should print the help contents when --help is passed as an argument',
+      (ctx) => {
+        expect(ctx.stdout).to.contain(
+          'Converts chat dialog files in <filename>.'
+        );
+      }
+    );
+});

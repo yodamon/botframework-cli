@@ -1,29 +1,29 @@
 /**
- * Copyright(c) Microsoft Corporation.All rights reserved.
+ * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
-const os = require('os')
-const packageJSON = require('./../../../package')
+const os = require('os');
+const packageJSON = require('./../../../package');
 
-const fetch = require('node-fetch')
+const fetch = require('node-fetch');
 
 global.fetch = function (...args) {
   // No Proxy
   if (!process.env.HTTPS_PROXY) {
-    return fetch(...args)
+    return fetch(...args);
   }
-  const [urlOrRequest, requestInit = {}, ...rest] = args
+  const [urlOrRequest, requestInit = {}, ...rest] = args;
   // URL is first param attach the proxy
   // to the RequestInit
-  const HttpsProxyAgent = require('https-proxy-agent')
-  const agent = new HttpsProxyAgent(process.env.HTTPS_PROXY)
+  const HttpsProxyAgent = require('https-proxy-agent');
+  const agent = new HttpsProxyAgent(process.env.HTTPS_PROXY);
   if (typeof urlOrRequest === 'string') {
-    requestInit.agent = agent
+    requestInit.agent = agent;
   } else {
-    urlOrRequest.agent = agent
+    urlOrRequest.agent = agent;
   }
-  return fetch(urlOrRequest, requestInit, ...rest)
-}
+  return fetch(urlOrRequest, requestInit, ...rest);
+};
 
 /**
  * Base class for all services
@@ -35,8 +35,8 @@ class ServiceBase {
    * @param {string} subscriptionkey The subscription key for this service
    */
   constructor(rootEndpoint, subscriptionkey) {
-    this.rootEndpoint = rootEndpoint
-    this.headers = this.commonHeaders(subscriptionkey)
+    this.rootEndpoint = rootEndpoint;
+    this.headers = this.commonHeaders(subscriptionkey);
   }
 
   /**
@@ -49,35 +49,37 @@ class ServiceBase {
    * @returns {Promise<Response>} The promise representing the request
    */
   createRequest(relativeEndpoint, method, data) {
-    let URL = this.rootEndpoint + relativeEndpoint
-    let body
+    let URL = this.rootEndpoint + relativeEndpoint;
+    let body;
     if (typeof data === 'string') {
-      URL += URL.includes('?') ? '&qnaformat=true' : '?qnaformat=true'
-      this.headers['Content-Type'] = 'application/text'
-      body = data
+      URL += URL.includes('?') ? '&qnaformat=true' : '?qnaformat=true';
+      this.headers['Content-Type'] = 'application/text';
+      body = data;
     } else if (typeof data === 'object') {
-      this.headers['Content-Type'] = 'application/json'
-      body = JSON.stringify(data)
+      this.headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(data);
     }
-    
-    return fetch(URL, {headers: this.headers, method, body})
+
+    return fetch(URL, { headers: this.headers, method, body });
   }
 
   commonHeaders(subscriptionKey) {
     return {
       'Content-Type': 'application/json',
       'User-Agent': this.getUserAgent(),
-      'Ocp-Apim-Subscription-Key': subscriptionKey
-    }
+      'Ocp-Apim-Subscription-Key': subscriptionKey,
+    };
   }
 
   getUserAgent() {
-    const packageUserAgent = `${packageJSON.name}/${packageJSON.version}`
-    const platformUserAgent = `(${os.arch()}-${os.type()}-${os.release()}; Node.js,Version=${process.version})`
-    const userAgent = `${packageUserAgent} ${platformUserAgent}`
+    const packageUserAgent = `${packageJSON.name}/${packageJSON.version}`;
+    const platformUserAgent = `(${os.arch()}-${os.type()}-${os.release()}; Node.js,Version=${
+      process.version
+    })`;
+    const userAgent = `${packageUserAgent} ${platformUserAgent}`;
 
-    return userAgent
+    return userAgent;
   }
 }
 
-module.exports = {ServiceBase}
+module.exports = { ServiceBase };

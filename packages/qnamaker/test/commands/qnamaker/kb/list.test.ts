@@ -1,15 +1,22 @@
-import {expect, test} from '@oclif/test'
-const nock = require('nock')
-import {deleteTestConfigFile, initEmptyTestConfigFile, initTestConfigFile} from '../../../configfilehelper'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
+const nock = require('nock');
+import {
+  deleteTestConfigFile,
+  initEmptyTestConfigFile,
+  initTestConfigFile,
+} from '../../../configfilehelper';
 
 describe('qnamaker:kb:list', () => {
   before(async function () {
-    await initTestConfigFile()
+    await initTestConfigFile();
     // runs before all tests in this block
     nock('https://westus.api.cognitive.microsoft.com/qnamaker/v4.0')
       .get('/knowledgebases')
-      .reply(200,
-      {
+      .reply(200, {
         knowledgebases: [
           {
             id: 'alksdjhfla878453l2ty8f',
@@ -20,12 +27,10 @@ describe('qnamaker:kb:list', () => {
             name: 'name_test',
             userId: 'ejw494875p23rhrlewjkf',
             urls: [],
-            sources: [
-              'Editorial'
-            ],
+            sources: ['Editorial'],
             language: 'English',
             enableHierarchicalExtraction: false,
-            createdTimestamp: '2019-06-28T20:19:22Z'
+            createdTimestamp: '2019-06-28T20:19:22Z',
           },
           {
             id: 'kasdjhfliu4849r4',
@@ -35,44 +40,42 @@ describe('qnamaker:kb:list', () => {
             name: 'QnA Maker FAQ',
             userId: 'kq438lyriuhdleaihflkj',
             urls: [],
-            sources: [
-              'Manual.pdf',
-              'Custom Editorial'
-            ],
+            sources: ['Manual.pdf', 'Custom Editorial'],
             language: 'English',
             enableHierarchicalExtraction: false,
-            createdTimestamp : '2019-08-07T22:45:26Z'
-          }
-        ]
-      })
-
-  })
+            createdTimestamp: '2019-08-07T22:45:26Z',
+          },
+        ],
+      });
+  });
 
   after(async function () {
-    await deleteTestConfigFile()
-  })
+    await deleteTestConfigFile();
+  });
 
   test
     .stdout()
     .command(['qnamaker:kb:list'])
-    .it('Gets knowledgebase list', ctx => {
-      expect(ctx.stdout).to.contain('"createdTimestamp": "2019-06-28T20:19:22Z"\n    },\n    {\n      "id": "kasdjhfliu4849r4",\n      "hostName": "https://some.hostname.net"')
-    })
-})
+    .it('Gets knowledgebase list', (ctx) => {
+      expect(ctx.stdout).to.contain(
+        '"createdTimestamp": "2019-06-28T20:19:22Z"\n    },\n    {\n      "id": "kasdjhfliu4849r4",\n      "hostName": "https://some.hostname.net"'
+      );
+    });
+});
 
 describe('qnamaker:kb:list', () => {
   before(async function () {
-    await initEmptyTestConfigFile()
-  })
+    await initEmptyTestConfigFile();
+  });
 
   after(async function () {
-    await deleteTestConfigFile()
-  })
+    await deleteTestConfigFile();
+  });
 
   test
     .stderr()
     .command(['qnamaker:kb:list'])
-    .it('Prompts the user if no config passed or set in config.file', ctx => {
-      expect(ctx.stderr).to.contain('Did you run bf qnamaker:init yet?')
-    })
-})
+    .it('Prompts the user if no config passed or set in config.file', (ctx) => {
+      expect(ctx.stderr).to.contain('Did you run bf qnamaker:init yet?');
+    });
+});

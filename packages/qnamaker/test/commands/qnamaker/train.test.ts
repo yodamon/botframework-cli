@@ -1,10 +1,16 @@
-import {expect, test} from '@oclif/test'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
 
 describe('qnamaker:train', () => {
-    test
+  test
     .stderr()
     .command(['qnamaker:train'])
-    .it('qnamaker:train no input passed', ctx => {
-      expect(ctx.stderr).to.contain('No input. Please set file path with --in or pipe required data to the command')
-    })
-})
+    .it('qnamaker:train no input passed', (ctx) => {
+      expect(ctx.stderr).to.contain(
+        'No input. Please set file path with --in or pipe required data to the command'
+      );
+    });
+});

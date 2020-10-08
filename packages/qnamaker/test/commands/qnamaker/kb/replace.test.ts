@@ -1,43 +1,72 @@
-import {expect, test} from '@oclif/test'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
 
-import {deleteTestConfigFile, initTestConfigFile} from '../../../configfilehelper'
-const path = require('path')
-const nock = require('nock')
+import {
+  deleteTestConfigFile,
+  initTestConfigFile,
+} from '../../../configfilehelper';
+const path = require('path');
+const nock = require('nock');
 
 describe('qnamaker:kb:replace', () => {
   before(async function () {
-    await initTestConfigFile()
+    await initTestConfigFile();
     nock('https://westus.api.cognitive.microsoft.com/qnamaker/v4.0')
       .put('/knowledgebases/287ce749-012c-4eed-a39c-e4f8f06616cf')
-      .reply(204)
-    
+      .reply(204);
+
     nock('https://westus.api.cognitive.microsoft.com/qnamaker/v4.0')
-      .put('/knowledgebases/287ce749-012c-4eed-a39c-e4f8f06616cf?qnaformat=true')
-      .reply(204)
-  })
+      .put(
+        '/knowledgebases/287ce749-012c-4eed-a39c-e4f8f06616cf?qnaformat=true'
+      )
+      .reply(204);
+  });
 
   after(async function () {
-    await deleteTestConfigFile()
-  })
+    await deleteTestConfigFile();
+  });
 
   test
     .stdout()
-    .command(['qnamaker:kb:replace', '--kbId', '287ce749-012c-4eed-a39c-e4f8f06616cf', '--in', `${path.join(__dirname, '../../../fixtures/replacekb.json')}`])
-    .it('runs qnamaker:kb:replace --kbId xxxxxxxxxx --in replace.json', ctx => {
-      expect(ctx.stdout).to.equal('')
-    })
+    .command([
+      'qnamaker:kb:replace',
+      '--kbId',
+      '287ce749-012c-4eed-a39c-e4f8f06616cf',
+      '--in',
+      `${path.join(__dirname, '../../../fixtures/replacekb.json')}`,
+    ])
+    .it(
+      'runs qnamaker:kb:replace --kbId xxxxxxxxxx --in replace.json',
+      (ctx) => {
+        expect(ctx.stdout).to.equal('');
+      }
+    );
 
   test
     .stdout()
-    .command(['qnamaker:kb:replace', '--kbId', '287ce749-012c-4eed-a39c-e4f8f06616cf', '--in', `${path.join(__dirname, '../../../fixtures/replacekb.qna')}`])
-    .it('[qnaformat] runs qnamaker:kb:replace --kbId xxxxxxxxxx --in replace.qna', ctx => {
-      expect(ctx.stdout).to.equal('')
-    })
+    .command([
+      'qnamaker:kb:replace',
+      '--kbId',
+      '287ce749-012c-4eed-a39c-e4f8f06616cf',
+      '--in',
+      `${path.join(__dirname, '../../../fixtures/replacekb.qna')}`,
+    ])
+    .it(
+      '[qnaformat] runs qnamaker:kb:replace --kbId xxxxxxxxxx --in replace.qna',
+      (ctx) => {
+        expect(ctx.stdout).to.equal('');
+      }
+    );
 
   test
     .stderr()
     .command(['qnamaker:kb:replace'])
-    .it('runs qnamaker:kb:replace', ctx => {
-      expect(ctx.stderr).to.contain('No input. Please set file path with --in or pipe required data to the command')
-    })
-})
+    .it('runs qnamaker:kb:replace', (ctx) => {
+      expect(ctx.stderr).to.contain(
+        'No input. Please set file path with --in or pipe required data to the command'
+      );
+    });
+});

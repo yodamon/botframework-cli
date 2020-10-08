@@ -3,11 +3,11 @@
  * Licensed under the MIT License.
  */
 module.exports.tests = {
-    "qna": {
-        "lufile":``
-    },
-    "phraselist": {
-        "lufile": `$ChocolateType:phraseList
+  qna: {
+    lufile: ``,
+  },
+  phraselist: {
+    lufile: `$ChocolateType:phraseList
         - m&m,mars,mints,spearmings,payday,jelly,kit kat,kitkat,twix
         
         
@@ -15,35 +15,35 @@ module.exports.tests = {
         - are you
         - you are
         `,
-        "luisJSON": {
-          "intents": [],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [
-            {
-              "name": "ChocolateType",
-              "mode": false,
-              "words": "m&m,mars,mints,spearmings,payday,jelly,kit kat,kitkat,twix",
-              "activated": true
-            },
-            {
-              "name": "question",
-              "mode": true,
-              "words": "are you,you are",
-              "activated": true
-            }
-          ],
-          "regex_features": [],
-          "utterances": [],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
+    luisJSON: {
+      intents: [],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [
+        {
+          name: 'ChocolateType',
+          mode: false,
+          words: 'm&m,mars,mints,spearmings,payday,jelly,kit kat,kitkat,twix',
+          activated: true,
         },
-    "all-entity-types": {
-        "lufile":`$userName:simple
+        {
+          name: 'question',
+          mode: true,
+          words: 'are you,you are',
+          activated: true,
+        },
+      ],
+      regex_features: [],
+      utterances: [],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
+    },
+  },
+  'all-entity-types': {
+    lufile: `$userName:simple
         $PREBUILT:datetimeV2
         $PREBUILT:age
         $PREBUILT:dimension
@@ -63,90 +63,90 @@ module.exports.tests = {
             - cell phone
             - phone
         `,
-        "luisJSON":{
-          "intents": [],
-          "entities": [
+    luisJSON: {
+      intents: [],
+      entities: [
+        {
+          name: 'userName',
+          roles: [],
+        },
+      ],
+      composites: [],
+      closedLists: [
+        {
+          name: 'commPreference',
+          subLists: [
             {
-              "name": "userName",
-              "roles": []
-            }
-          ],
-          "composites": [],
-          "closedLists": [
-            {
-              "name": "commPreference",
-              "subLists": [
-                {
-                  "canonicalForm": "call",
-                  "list": [
-                    "phone call",
-                    "give me a ring",
-                    "ring",
-                    "call",
-                    "cell phone",
-                    "phone"
-                  ]
-                }
+              canonicalForm: 'call',
+              list: [
+                'phone call',
+                'give me a ring',
+                'ring',
+                'call',
+                'cell phone',
+                'phone',
               ],
-              "roles": []
-            }
+            },
           ],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [
-            {
-              "name": "datetimeV2",
-              "roles": []
-            },
-            {
-              "name": "age",
-              "roles": []
-            },
-            {
-              "name": "dimension",
-              "roles": []
-            },
-            {
-              "name": "email",
-              "roles": []
-            },
-            {
-              "name": "money",
-              "roles": []
-            },
-            {
-              "name": "number",
-              "roles": []
-            },
-            {
-              "name": "ordinal",
-              "roles": []
-            },
-            {
-              "name": "percentage",
-              "roles": []
-            },
-            {
-              "name": "phonenumber",
-              "roles": []
-            },
-            {
-              "name": "temperature",
-              "roles": []
-            },
-            {
-              "name": "url",
-              "roles": []
-            }
-          ],
-        }
+          roles: [],
+        },
+      ],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [
+        {
+          name: 'datetimeV2',
+          roles: [],
+        },
+        {
+          name: 'age',
+          roles: [],
+        },
+        {
+          name: 'dimension',
+          roles: [],
+        },
+        {
+          name: 'email',
+          roles: [],
+        },
+        {
+          name: 'money',
+          roles: [],
+        },
+        {
+          name: 'number',
+          roles: [],
+        },
+        {
+          name: 'ordinal',
+          roles: [],
+        },
+        {
+          name: 'percentage',
+          roles: [],
+        },
+        {
+          name: 'phonenumber',
+          roles: [],
+        },
+        {
+          name: 'temperature',
+          roles: [],
+        },
+        {
+          name: 'url',
+          roles: [],
+        },
+      ],
     },
-    "3-intents-patterns":{
-        "lufile":`> Doing everything as a pattern
+  },
+  '3-intents-patterns': {
+    lufile: `> Doing everything as a pattern
         # AskForUserName
         - {userName}
         - I'm {userName}
@@ -154,63 +154,63 @@ module.exports.tests = {
         - my name is {userName}
         - {userName} is my name
         - you can call me {userName}`,
-        "luisJSON":{
-          "intents": [
-            {
-              "name": "AskForUserName"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "{userName}",
-              "intent": "AskForUserName",
-              "entities": []
-            }
-          ],
-          "patterns": [
-            {
-              "pattern": "{userName}",
-              "intent": "AskForUserName"
-            },
-            {
-              "pattern": "I'm {userName}",
-              "intent": "AskForUserName"
-            },
-            {
-              "pattern": "call me {userName}",
-              "intent": "AskForUserName"
-            },
-            {
-              "pattern": "my name is {userName}",
-              "intent": "AskForUserName"
-            },
-            {
-              "pattern": "{userName} is my name",
-              "intent": "AskForUserName"
-            },
-            {
-              "pattern": "you can call me {userName}",
-              "intent": "AskForUserName"
-            }
-          ],
-          "patternAnyEntities": [
-            {
-              "name": "userName",
-              "explicitList": [],
-              "roles": []
-            }
-          ],
-          "prebuiltEntities": [],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'AskForUserName',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: '{userName}',
+          intent: 'AskForUserName',
+          entities: [],
+        },
+      ],
+      patterns: [
+        {
+          pattern: '{userName}',
+          intent: 'AskForUserName',
+        },
+        {
+          pattern: "I'm {userName}",
+          intent: 'AskForUserName',
+        },
+        {
+          pattern: 'call me {userName}',
+          intent: 'AskForUserName',
+        },
+        {
+          pattern: 'my name is {userName}',
+          intent: 'AskForUserName',
+        },
+        {
+          pattern: '{userName} is my name',
+          intent: 'AskForUserName',
+        },
+        {
+          pattern: 'you can call me {userName}',
+          intent: 'AskForUserName',
+        },
+      ],
+      patternAnyEntities: [
+        {
+          name: 'userName',
+          explicitList: [],
+          roles: [],
+        },
+      ],
+      prebuiltEntities: [],
     },
-    "2-intent": {
-        "lufile":`# Greeting
+  },
+  '2-intent': {
+    lufile: `# Greeting
         - Hi
         - Hello
         - Good morning
@@ -220,65 +220,65 @@ module.exports.tests = {
         - help
         - I need help
         - please help`,
-        "luisJSON": {
-          "intents": [
-            {
-              "name": "Greeting"
-            },
-            {
-              "name": "Help"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "Hi",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Hello",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Good morning",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Good evening",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "help",
-              "intent": "Help",
-              "entities": []
-            },
-            {
-              "text": "I need help",
-              "intent": "Help",
-              "entities": []
-            },
-            {
-              "text": "please help",
-              "intent": "Help",
-              "entities": []
-            }
-          ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'Greeting',
+        },
+        {
+          name: 'Help',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'Hi',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Hello',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Good morning',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Good evening',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'help',
+          intent: 'Help',
+          entities: [],
+        },
+        {
+          text: 'I need help',
+          intent: 'Help',
+          entities: [],
+        },
+        {
+          text: 'please help',
+          intent: 'Help',
+          entities: [],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
     },
-    "2-intent-scattered-list": {
-        "lufile":`> These are defined as patterns with commPreference as list entity type
+  },
+  '2-intent-scattered-list': {
+    lufile: `> These are defined as patterns with commPreference as list entity type
         # CommunicationPreference
         - set phone call as my communication preference
         - I prefer to receive text messages
@@ -304,257 +304,247 @@ module.exports.tests = {
         $commPreference:fax=
             - fax
             - fascimile`,
-            "luisJSON": {
-              "intents": [
-                {
-                  "name": "CommunicationPreference"
-                },
-                {
-                  "name": "Help"
-                }
+    luisJSON: {
+      intents: [
+        {
+          name: 'CommunicationPreference',
+        },
+        {
+          name: 'Help',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [
+        {
+          name: 'commPreference',
+          subLists: [
+            {
+              canonicalForm: 'call',
+              list: [
+                'phone call',
+                'give me a ring',
+                'ring',
+                'call',
+                'cell phone',
+                'phone',
               ],
-              "entities": [],
-              "composites": [],
-              "closedLists": [
-                {
-                  "name": "commPreference",
-                  "subLists": [
-                    {
-                      "canonicalForm": "call",
-                      "list": [
-                        "phone call",
-                        "give me a ring",
-                        "ring",
-                        "call",
-                        "cell phone",
-                        "phone"
-                      ]
-                    },
-                    {
-                      "canonicalForm": "text",
-                      "list": [
-                        "message",
-                        "text",
-                        "sms",
-                        "text message"
-                      ]
-                    },
-                    {
-                      "canonicalForm": "fax",
-                      "list": [
-                        "fax",
-                        "fascimile"
-                      ]
-                    }
-                  ],
-                  "roles": []
-                }
-              ],
-              "regex_entities": [],
-              "model_features": [],
-              "regex_features": [],
-              "utterances": [
-                {
-                  "text": "set phone call as my communication preference",
-                  "intent": "CommunicationPreference",
-                  "entities": []
-                },
-                {
-                  "text": "I prefer to receive text messages",
-                  "intent": "CommunicationPreference",
-                  "entities": []
-                },
-                {
-                  "text": "can you help",
-                  "intent": "Help",
-                  "entities": []
-                }
-              ],
-              "patterns": [],
-              "patternAnyEntities": [],
-              "prebuiltEntities": [],
-            }
+            },
+            {
+              canonicalForm: 'text',
+              list: ['message', 'text', 'sms', 'text message'],
+            },
+            {
+              canonicalForm: 'fax',
+              list: ['fax', 'fascimile'],
+            },
+          ],
+          roles: [],
+        },
+      ],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'set phone call as my communication preference',
+          intent: 'CommunicationPreference',
+          entities: [],
+        },
+        {
+          text: 'I prefer to receive text messages',
+          intent: 'CommunicationPreference',
+          entities: [],
+        },
+        {
+          text: 'can you help',
+          intent: 'Help',
+          entities: [],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
     },
-    "1-intent": {
-        "lufile":`# Greeting
+  },
+  '1-intent': {
+    lufile: `# Greeting
         - Hi
         - Hello
         - Good morning
         - Good evening`,
-        "luisJSON": {
-          "intents": [
-            {
-              "name": "Greeting"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "Hi",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Hello",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Good morning",
-              "intent": "Greeting",
-              "entities": []
-            },
-            {
-              "text": "Good evening",
-              "intent": "Greeting",
-              "entities": []
-            }
-          ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'Greeting',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'Hi',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Hello',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Good morning',
+          intent: 'Greeting',
+          entities: [],
+        },
+        {
+          text: 'Good evening',
+          intent: 'Greeting',
+          entities: [],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
     },
-    "1-intent-prebuilt-entity":{
-        "lufile":`$PREBUILT:datetimeV2
+  },
+  '1-intent-prebuilt-entity': {
+    lufile: `$PREBUILT:datetimeV2
 
         # CreateAlarm
         - create an alarm
         - create an alarm for 7AM
         - set an alarm for 7AM next thursday`,
-        "luisJSON":{
-          "intents": [
-            {
-              "name": "CreateAlarm"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "create an alarm",
-              "intent": "CreateAlarm",
-              "entities": []
-            },
-            {
-              "text": "create an alarm for 7AM",
-              "intent": "CreateAlarm",
-              "entities": []
-            },
-            {
-              "text": "set an alarm for 7AM next thursday",
-              "intent": "CreateAlarm",
-              "entities": []
-            }
-          ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [
-            {
-              "name": "datetimeV2",
-              "roles": []
-            }
-          ],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'CreateAlarm',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'create an alarm',
+          intent: 'CreateAlarm',
+          entities: [],
+        },
+        {
+          text: 'create an alarm for 7AM',
+          intent: 'CreateAlarm',
+          entities: [],
+        },
+        {
+          text: 'set an alarm for 7AM next thursday',
+          intent: 'CreateAlarm',
+          entities: [],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [
+        {
+          name: 'datetimeV2',
+          roles: [],
+        },
+      ],
     },
-    "1-intent-patern-prebuilt":{
-        "lufile":`> add these as patterns
+  },
+  '1-intent-patern-prebuilt': {
+    lufile: `> add these as patterns
         # DeleteAlarm
         - delete alarm
         - (delete|remove) the {alarmTime} alarm
         
         > alarmTime is a role for prebuilt datetimev2 entity
         $alarmTime:datetimeV2`,
-        "luisJSON":{
-          "intents": [
-            {
-              "name": "DeleteAlarm"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "delete alarm",
-              "intent": "DeleteAlarm",
-              "entities": []
-            }
-          ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [
-            {
-              "name": "datetimeV2",
-              "roles": []
-            },
-            {
-              "type": "datetimeV2",
-              "roles": [
-                "alarmTime"
-              ]
-            }
-          ],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'DeleteAlarm',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'delete alarm',
+          intent: 'DeleteAlarm',
+          entities: [],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [
+        {
+          name: 'datetimeV2',
+          roles: [],
+        },
+        {
+          type: 'datetimeV2',
+          roles: ['alarmTime'],
+        },
+      ],
     },
-    "1-intent-pattern-patternAny": {
-        "lufile":`> These are defined as patterns with commPreference as pattern.any entity type
+  },
+  '1-intent-pattern-patternAny': {
+    lufile: `> These are defined as patterns with commPreference as pattern.any entity type
         # CommunicationPreference
         - set {commPreference} as my communication preference
         - I prefer to receive {commPreference}`,
-        "luisJSON":{
-          "intents": [
-            {
-              "name": "CommunicationPreference"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "set {commPreference} as my communication preference",
-              "intent": "CommunicationPreference",
-              "entities": []
-            }
-          ],
-          "patterns": [
-            {
-              "pattern": "set {commPreference} as my communication preference",
-              "intent": "CommunicationPreference"
-            },
-            {
-              "pattern": "I prefer to receive {commPreference}",
-              "intent": "CommunicationPreference"
-            }
-          ],
-          "patternAnyEntities": [
-            {
-              "name": "commPreference",
-              "explicitList": [],
-              "roles": []
-            }
-          ],
-          "prebuiltEntities": [],
-        }
+    luisJSON: {
+      intents: [
+        {
+          name: 'CommunicationPreference',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'set {commPreference} as my communication preference',
+          intent: 'CommunicationPreference',
+          entities: [],
+        },
+      ],
+      patterns: [
+        {
+          pattern: 'set {commPreference} as my communication preference',
+          intent: 'CommunicationPreference',
+        },
+        {
+          pattern: 'I prefer to receive {commPreference}',
+          intent: 'CommunicationPreference',
+        },
+      ],
+      patternAnyEntities: [
+        {
+          name: 'commPreference',
+          explicitList: [],
+          roles: [],
+        },
+      ],
+      prebuiltEntities: [],
     },
-    "1-intent-pattern-list": {
-        "lufile":`> These are defined as patterns with commPreference as pattern.any entity type
+  },
+  '1-intent-pattern-list': {
+    lufile: `> These are defined as patterns with commPreference as pattern.any entity type
         # CommunicationPreference
         - set {commPreference} as my communication preference
         - I prefer to receive {commPreference}
@@ -567,157 +557,157 @@ module.exports.tests = {
             - cell phone
             - phone
         `,
-        "luisJSON":{
-          "intents": [
+    luisJSON: {
+      intents: [
+        {
+          name: 'CommunicationPreference',
+        },
+      ],
+      entities: [],
+      composites: [],
+      closedLists: [
+        {
+          name: 'commPreference',
+          subLists: [
             {
-              "name": "CommunicationPreference"
-            }
-          ],
-          "entities": [],
-          "composites": [],
-          "closedLists": [
-            {
-              "name": "commPreference",
-              "subLists": [
-                {
-                  "canonicalForm": "call",
-                  "list": [
-                    "phone call",
-                    "give me a ring",
-                    "ring",
-                    "call",
-                    "cell phone",
-                    "phone"
-                  ]
-                }
+              canonicalForm: 'call',
+              list: [
+                'phone call',
+                'give me a ring',
+                'ring',
+                'call',
+                'cell phone',
+                'phone',
               ],
-              "roles": []
-            }
-          ],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
-            {
-              "text": "set {commPreference} as my communication preference",
-              "intent": "CommunicationPreference",
-              "entities": []
-            }
-          ],
-          "patterns": [
-            {
-              "pattern": "set {commPreference} as my communication preference",
-              "intent": "CommunicationPreference"
             },
-            {
-              "pattern": "I prefer to receive {commPreference}",
-              "intent": "CommunicationPreference"
-            }
           ],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
+          roles: [],
+        },
+      ],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'set {commPreference} as my communication preference',
+          intent: 'CommunicationPreference',
+          entities: [],
+        },
+      ],
+      patterns: [
+        {
+          pattern: 'set {commPreference} as my communication preference',
+          intent: 'CommunicationPreference',
+        },
+        {
+          pattern: 'I prefer to receive {commPreference}',
+          intent: 'CommunicationPreference',
+        },
+      ],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
     },
-    "1-intent-labelled-utterances": {
-        "lufile":`# AskForUserName
+  },
+  '1-intent-labelled-utterances': {
+    lufile: `# AskForUserName
         - {userName=vishwac}
         - I'm {userName=vishwac}
         - call me {userName=vishwac}
         - my name is {userName=vishwac}
         - {userName=vishwac} is my name
         - you can call me {userName=vishwac}`,
-        "luisJSON": {
-          "intents": [
+    luisJSON: {
+      intents: [
+        {
+          name: 'AskForUserName',
+        },
+      ],
+      entities: [
+        {
+          name: 'userName',
+          roles: [],
+        },
+      ],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'vishwac',
+          intent: 'AskForUserName',
+          entities: [
             {
-              "name": "AskForUserName"
-            }
+              entity: 'userName',
+              startPos: 0,
+              endPos: 6,
+            },
           ],
-          "entities": [
+        },
+        {
+          text: "I'm vishwac",
+          intent: 'AskForUserName',
+          entities: [
             {
-              "name": "userName",
-              "roles": []
-            }
+              entity: 'userName',
+              startPos: 4,
+              endPos: 10,
+            },
           ],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
+        },
+        {
+          text: 'call me vishwac',
+          intent: 'AskForUserName',
+          entities: [
             {
-              "text": "vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 0,
-                  "endPos": 6
-                }
-              ]
+              entity: 'userName',
+              startPos: 8,
+              endPos: 14,
             },
-            {
-              "text": "I'm vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 4,
-                  "endPos": 10
-                }
-              ]
-            },
-            {
-              "text": "call me vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 8,
-                  "endPos": 14
-                }
-              ]
-            },
-            {
-              "text": "my name is vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 11,
-                  "endPos": 17
-                }
-              ]
-            },
-            {
-              "text": "vishwac is my name",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 0,
-                  "endPos": 6
-                }
-              ]
-            },
-            {
-              "text": "you can call me vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 16,
-                  "endPos": 22
-                }
-              ]
-            }
           ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
+        },
+        {
+          text: 'my name is vishwac',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 11,
+              endPos: 17,
+            },
+          ],
+        },
+        {
+          text: 'vishwac is my name',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 0,
+              endPos: 6,
+            },
+          ],
+        },
+        {
+          text: 'you can call me vishwac',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 16,
+              endPos: 22,
+            },
+          ],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
     },
-    "1-intent-1-entity": {
-        "lufile": `# AskForUserName
+  },
+  '1-intent-1-entity': {
+    lufile: `# AskForUserName
         - {userName=vishwac}
         - I'm {userName=vishwac}
         - call me {userName=vishwac}
@@ -726,94 +716,94 @@ module.exports.tests = {
         - you can call me {userName=vishwac}
         
         $userName:simple`,
-        "luisJSON": {
-          "intents": [
+    luisJSON: {
+      intents: [
+        {
+          name: 'AskForUserName',
+        },
+      ],
+      entities: [
+        {
+          name: 'userName',
+          roles: [],
+        },
+      ],
+      composites: [],
+      closedLists: [],
+      regex_entities: [],
+      model_features: [],
+      regex_features: [],
+      utterances: [
+        {
+          text: 'vishwac',
+          intent: 'AskForUserName',
+          entities: [
             {
-              "name": "AskForUserName"
-            }
+              entity: 'userName',
+              startPos: 0,
+              endPos: 6,
+            },
           ],
-          "entities": [
+        },
+        {
+          text: "I'm vishwac",
+          intent: 'AskForUserName',
+          entities: [
             {
-              "name": "userName",
-              "roles": []
-            }
+              entity: 'userName',
+              startPos: 4,
+              endPos: 10,
+            },
           ],
-          "composites": [],
-          "closedLists": [],
-          "regex_entities": [],
-          "model_features": [],
-          "regex_features": [],
-          "utterances": [
+        },
+        {
+          text: 'call me vishwac',
+          intent: 'AskForUserName',
+          entities: [
             {
-              "text": "vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 0,
-                  "endPos": 6
-                }
-              ]
+              entity: 'userName',
+              startPos: 8,
+              endPos: 14,
             },
-            {
-              "text": "I'm vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 4,
-                  "endPos": 10
-                }
-              ]
-            },
-            {
-              "text": "call me vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 8,
-                  "endPos": 14
-                }
-              ]
-            },
-            {
-              "text": "my name is vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 11,
-                  "endPos": 17
-                }
-              ]
-            },
-            {
-              "text": "vishwac is my name",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 0,
-                  "endPos": 6
-                }
-              ]
-            },
-            {
-              "text": "you can call me vishwac",
-              "intent": "AskForUserName",
-              "entities": [
-                {
-                  "entity": "userName",
-                  "startPos": 16,
-                  "endPos": 22
-                }
-              ]
-            }
           ],
-          "patterns": [],
-          "patternAnyEntities": [],
-          "prebuiltEntities": [],
-        }
-    }
+        },
+        {
+          text: 'my name is vishwac',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 11,
+              endPos: 17,
+            },
+          ],
+        },
+        {
+          text: 'vishwac is my name',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 0,
+              endPos: 6,
+            },
+          ],
+        },
+        {
+          text: 'you can call me vishwac',
+          intent: 'AskForUserName',
+          entities: [
+            {
+              entity: 'userName',
+              startPos: 16,
+              endPos: 22,
+            },
+          ],
+        },
+      ],
+      patterns: [],
+      patternAnyEntities: [],
+      prebuiltEntities: [],
+    },
+  },
 };

@@ -1,82 +1,92 @@
-const LUISBuilder = require('./../../../src/parser/luis/luisBuilder')
-const LU = require('./../../../src/parser/lu/lu')
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+const LUISBuilder = require('./../../../src/parser/luis/luisBuilder');
+const LU = require('./../../../src/parser/lu/lu');
 var chai = require('chai');
 const luisobjenum = require('../../../src/parser/utils/enums/luisobjenum');
 var assert = chai.assert;
 
-describe('LUISBuilder', function() {
-    it('Build app from LU content', async() => {
-        let luContent1 = `# Greeting
+describe('LUISBuilder', function () {
+  it('Build app from LU content', async () => {
+    let luContent1 = `# Greeting
 - hi`;
 
-        const luisObject = await LUISBuilder.fromLUAsync(luContent1)
-        assert.equal(luisObject.intents.length, 1)
-    })
-    it('Validate test', async() => {
-        let luContent = `# Greeting
+    const luisObject = await LUISBuilder.fromLUAsync(luContent1);
+    assert.equal(luisObject.intents.length, 1);
+  });
+  it('Validate test', async () => {
+    let luContent = `# Greeting
         - hi`;
 
-const luisObject = await LUISBuilder.fromLUAsync(luContent)
-luisObject.intents[0].name = "testIntent123456789012345678901234567890123"
-assert.isTrue(luisObject.validate())
-    })
-    it('Build luis app from LU content', async () => {
-        let luFile = `
+    const luisObject = await LUISBuilder.fromLUAsync(luContent);
+    luisObject.intents[0].name = 'testIntent123456789012345678901234567890123';
+    assert.isTrue(luisObject.validate());
+  });
+  it('Build luis app from LU content', async () => {
+    let luFile = `
         @ ml test
         # test
         - this is a {@test = one}
         `;
-        const luisObject = await LUISBuilder.fromContentAsync(luFile)
-        assert.equal(luisObject.entities.length, 1);
-        assert.equal(luisObject.entities[0].name, 'test');
-        assert.equal(luisObject.utterances.length, 1);
-        assert.equal(luisObject.utterances[0].entities.length, 1);
-        assert.equal(luisObject.utterances[0].entities[0].entity, 'test');   
-    });
+    const luisObject = await LUISBuilder.fromContentAsync(luFile);
+    assert.equal(luisObject.entities.length, 1);
+    assert.equal(luisObject.entities[0].name, 'test');
+    assert.equal(luisObject.utterances.length, 1);
+    assert.equal(luisObject.utterances[0].entities.length, 1);
+    assert.equal(luisObject.utterances[0].entities[0].entity, 'test');
+  });
 
-    it('Build luis app from LU Object', async () => {
-        let luFile = `
+  it('Build luis app from LU Object', async () => {
+    let luFile = `
         @ ml test
         # test
         - this is a {@test = one}
         `;
-        const luObject = new LU(luFile, '')
-        const luisObject = await LUISBuilder.fromLUAsync([luObject])
-        assert.equal(luisObject.entities.length, 1);
-        assert.equal(luisObject.entities[0].name, 'test');
-        assert.equal(luisObject.utterances.length, 1);
-        assert.equal(luisObject.utterances[0].entities.length, 1);
-        assert.equal(luisObject.utterances[0].entities[0].entity, 'test');   
-    });
+    const luObject = new LU(luFile, '');
+    const luisObject = await LUISBuilder.fromLUAsync([luObject]);
+    assert.equal(luisObject.entities.length, 1);
+    assert.equal(luisObject.entities[0].name, 'test');
+    assert.equal(luisObject.utterances.length, 1);
+    assert.equal(luisObject.utterances[0].entities.length, 1);
+    assert.equal(luisObject.utterances[0].entities[0].entity, 'test');
+  });
 
-    it('Build luis app from LU Object List and collate them', async () => {
-        let testLU1 = `$userName:simple role=firstName`;
-        let testLU2 = `$userName:simple role=lastName`;
-        const luObject1 = new LU(testLU1)
-        const luObject2 = new LU(testLU2)
-        const luisObject = await LUISBuilder.fromLUAsync([luObject1, luObject2])
-        assert.equal(luisObject.entities.length, 1);
-        assert.equal(luisObject.entities[0].roles.length, 2);
-        assert.deepEqual(luisObject.entities[0].roles, ['firstName', 'lastName']);
-    });
+  it('Build luis app from LU Object List and collate them', async () => {
+    let testLU1 = `$userName:simple role=firstName`;
+    let testLU2 = `$userName:simple role=lastName`;
+    const luObject1 = new LU(testLU1);
+    const luObject2 = new LU(testLU2);
+    const luisObject = await LUISBuilder.fromLUAsync([luObject1, luObject2]);
+    assert.equal(luisObject.entities.length, 1);
+    assert.equal(luisObject.entities[0].roles.length, 2);
+    assert.deepEqual(luisObject.entities[0].roles, ['firstName', 'lastName']);
+  });
 
-    it('PL with enabledForAllModels = false is handled correctly', async () => {
-        let testJSON = require('../../fixtures/testcases/plFeatureDisabled.json');
-        const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
-        assert.equal(luisObject.content.includes('disabledForAllModels'), true);
-    })
+  it('PL with enabledForAllModels = false is handled correctly', async () => {
+    let testJSON = require('../../fixtures/testcases/plFeatureDisabled.json');
+    const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
+    assert.equal(luisObject.content.includes('disabledForAllModels'), true);
+  });
 
-    it('Overlapping entities are converted to LU correctly', async () => {
-        let testJSON = require('../../fixtures/testcases/overlappingEntities.json');
-        const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
-        assert.equal(luisObject.content.includes(`- {@add=add {@globalCount={@count={@countNumber=two} apples}}}`), true);
-    })
+  it('Overlapping entities are converted to LU correctly', async () => {
+    let testJSON = require('../../fixtures/testcases/overlappingEntities.json');
+    const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
+    assert.equal(
+      luisObject.content.includes(
+        `- {@add=add {@globalCount={@count={@countNumber=two} apples}}}`
+      ),
+      true
+    );
+  });
 
-    it('Intent name with spaces are handled correctly with feature assignment', async () => {
-        let testJSON = require('../../fixtures/testcases/intentWithSpace.json');
-        const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
-        assert.equal(luisObject.content.includes(`@ intent "test intent" usesFeature bar`), true);
-    })
-
-    
+  it('Intent name with spaces are handled correctly with feature assignment', async () => {
+    let testJSON = require('../../fixtures/testcases/intentWithSpace.json');
+    const luisObject = LUISBuilder.fromJson(testJSON).parseToLU();
+    assert.equal(
+      luisObject.content.includes(`@ intent "test intent" usesFeature bar`),
+      true
+    );
+  });
 });

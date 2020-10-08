@@ -4,31 +4,32 @@
  */
 const chai = require('chai');
 const assert = chai.assert;
-const validateResource = require('../../../src/parser/lufile/parseFileContents').validateResource;
-const luparser = require('../../../src/parser/lufile/luParser')
+const validateResource = require('../../../src/parser/lufile/parseFileContents')
+  .validateResource;
+const luparser = require('../../../src/parser/lufile/luParser');
 
 describe('ML entity config', () => {
   it('Throws when ML entity is disable', function () {
     let fileContent = `@ ml userName`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableMLEntities: false })
-    assert.include(errors[0].Message, 'Do not support ML entity')
+    let errors = validateResource(luresource, { enableMLEntities: false });
+    assert.include(errors[0].Message, 'Do not support ML entity');
   });
 
   it('Throws when ML entity is disable in utterance(1)', function () {
     let fileContent = `# AskForUserName
       - {userName=Jack}`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableMLEntities: false })
-    assert.include(errors[0].Message, 'Do not support ML entity')
+    let errors = validateResource(luresource, { enableMLEntities: false });
+    assert.include(errors[0].Message, 'Do not support ML entity');
   });
 
   it('Throws when ML entity is disable in utterance(2)', function () {
     let fileContent = `# AskForUserName
       - {@userName=Jack}`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableMLEntities: false })
-    assert.include(errors[0].Message, 'Do not support ML entity')
+    let errors = validateResource(luresource, { enableMLEntities: false });
+    assert.include(errors[0].Message, 'Do not support ML entity');
   });
 });
 
@@ -42,8 +43,8 @@ describe('list entity config', () => {
         - five
         - six`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableListEntities: false })
-    assert.include(errors[0].Message, 'Do not support List entity')
+    let errors = validateResource(luresource, { enableListEntities: false });
+    assert.include(errors[0].Message, 'Do not support List entity');
   });
 });
 
@@ -70,8 +71,10 @@ describe('composite entity config', () => {
     $PREBUILT : temperature
     `;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableCompositeEntities: false })
-    assert.include(errors[0].Message, 'Do not support Composite entity')
+    let errors = validateResource(luresource, {
+      enableCompositeEntities: false,
+    });
+    assert.include(errors[0].Message, 'Do not support Composite entity');
   });
 });
 
@@ -83,8 +86,10 @@ describe('prebuilt entity config', () => {
 
     $PREBUILT:datetimeV2`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enablePrebuiltEntities: false })
-    assert.include(errors[0].Message, 'Do not support Prebuilt entity')
+    let errors = validateResource(luresource, {
+      enablePrebuiltEntities: false,
+    });
+    assert.include(errors[0].Message, 'Do not support Prebuilt entity');
   });
 });
 
@@ -92,8 +97,8 @@ describe('regex entity config', () => {
   it('Throws when regex entity is disable', function () {
     let fileContent = `$HRF-number:/hrf-[0-9]{6}/`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableRegexEntities: false })
-    assert.include(errors[0].Message, 'Do not support Regex entity')
+    let errors = validateResource(luresource, { enableRegexEntities: false });
+    assert.include(errors[0].Message, 'Do not support Regex entity');
   });
 });
 
@@ -106,8 +111,8 @@ describe('Phrase Lists config', () => {
     - are you
     - you are`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enablePhraseLists: false })
-    assert.include(errors[0].Message, 'Do not support Phrase Lists')
+    let errors = validateResource(luresource, { enablePhraseLists: false });
+    assert.include(errors[0].Message, 'Do not support Phrase Lists');
   });
 });
 
@@ -117,8 +122,8 @@ describe('user features config', () => {
 
     @ intent intent1 usesFeature phraselist1`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableFeatures: false })
-    assert.include(errors[0].Message, 'Do not support Features')
+    let errors = validateResource(luresource, { enableFeatures: false });
+    assert.include(errors[0].Message, 'Do not support Features');
   });
 });
 
@@ -128,8 +133,10 @@ describe('Model Description config', () => {
 
     # AskForUserName`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableModelDescription: false })
-    assert.include(errors[0].Message, 'Do not support Model Description')
+    let errors = validateResource(luresource, {
+      enableModelDescription: false,
+    });
+    assert.include(errors[0].Message, 'Do not support Model Description');
   });
 });
 
@@ -137,8 +144,10 @@ describe('External References config', () => {
   it('Throws when external references is disable', function () {
     let fileContent = `[all LU files](../**)`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enableExternalReferences: false })
-    assert.include(errors[0].Message, 'Do not support External References')
+    let errors = validateResource(luresource, {
+      enableExternalReferences: false,
+    });
+    assert.include(errors[0].Message, 'Do not support External References');
   });
 });
 
@@ -148,21 +157,21 @@ describe('Pattern config', () => {
     - add {item} to my shopping list
     - pls add {item} to my list`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enablePattern: false })
-    assert.include(errors[0].Message, 'Do not support Pattern')
+    let errors = validateResource(luresource, { enablePattern: false });
+    assert.include(errors[0].Message, 'Do not support Pattern');
   });
 
   it('Throws when pattern is disable', function () {
     let fileContent = `> # Pattern.Any entities
     @ patternany alarmTime`;
     let luresource = luparser.parse(fileContent);
-    let errors = validateResource(luresource, { enablePattern: false })
-    assert.include(errors[0].Message, 'Do not support Pattern')
+    let errors = validateResource(luresource, { enablePattern: false });
+    assert.include(errors[0].Message, 'Do not support Pattern');
   });
 });
 
-describe('ValidateResource don\'t change resource in memory', () => {
-  it('ValidateResource don\'t change resource in memory', function () {
+describe("ValidateResource don't change resource in memory", () => {
+  it("ValidateResource don't change resource in memory", function () {
     let fileContent = `> !# @enableSections = true
  
     # CheckTodo

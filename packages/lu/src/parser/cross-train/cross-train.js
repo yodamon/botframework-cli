@@ -1,14 +1,14 @@
-/*!
+/**
  * Copyright (c) Microsoft Corporation. All rights reserved.
  * Licensed under the MIT License.
  */
 
-const fs = require('fs-extra')
-const path = require('path')
-const file = require('../../utils/filehelper')
-const fileExtEnum = require('../utils/helpers').FileExtTypeEnum
-const crossTrainer = require('./crossTrainer')
-const confighelper = require('./confighelper')
+const fs = require('fs-extra');
+const path = require('path');
+const file = require('../../utils/filehelper');
+const fileExtEnum = require('../utils/helpers').FileExtTypeEnum;
+const crossTrainer = require('./crossTrainer');
+const confighelper = require('./confighelper');
 
 module.exports = {
   /**
@@ -18,9 +18,12 @@ module.exports = {
    * @returns {string} config object json string.
    */
   generateConfig: async function (inputFolder, rootDialogFile) {
-    const configStr = await confighelper.generateConfig(inputFolder, rootDialogFile)
+    const configStr = await confighelper.generateConfig(
+      inputFolder,
+      rootDialogFile
+    );
 
-    return configStr
+    return configStr;
   },
 
   /**
@@ -33,14 +36,25 @@ module.exports = {
    */
   train: async function (input, intentName, config, verbose) {
     // Get all related file content.
-    const luContents = await file.getFilesContent(input, fileExtEnum.LUFile)
-    const qnaContents = await file.getFilesContent(input, fileExtEnum.QnAFile)
-    const configContent = config && !fs.existsSync(config) ? {id: path.join(input, 'config.json'), content: config} : await file.getConfigContent(config)
+    const luContents = await file.getFilesContent(input, fileExtEnum.LUFile);
+    const qnaContents = await file.getFilesContent(input, fileExtEnum.QnAFile);
+    const configContent =
+      config && !fs.existsSync(config)
+        ? { id: path.join(input, 'config.json'), content: config }
+        : await file.getConfigContent(config);
 
-    const configObject = file.getConfigObject(configContent, intentName, verbose)
+    const configObject = file.getConfigObject(
+      configContent,
+      intentName,
+      verbose
+    );
 
-    const trainedResult = await crossTrainer.crossTrain(luContents, qnaContents, configObject)
-    
-    return trainedResult
-  }
-}
+    const trainedResult = await crossTrainer.crossTrain(
+      luContents,
+      qnaContents,
+      configObject
+    );
+
+    return trainedResult;
+  },
+};

@@ -1,28 +1,36 @@
-import {expect, test} from '@oclif/test'
-import {initTestConfigFile, deleteTestConfigFile, getConfigFile} from './../../configfilehelper'
+/**
+ * Copyright (c) Microsoft Corporation. All rights reserved.
+ * Licensed under the MIT License.
+ */
+import { expect, test } from '@oclif/test';
+import {
+  initTestConfigFile,
+  deleteTestConfigFile,
+  getConfigFile,
+} from './../../configfilehelper';
 
 describe('config:show', () => {
-    before(async function() {
-      await initTestConfigFile()
-    });
-  
-    after(async function() {
-      await deleteTestConfigFile()
-    });
-  
-    test
-      .stdout()
-      .command(['config:show'])
-      .it('Displays config file data', ctx => {
-        expect(ctx.stdout).to.contain('"qnamaker__subscriptionKey": "222222cccccctttttth223kk3k33"')
-    })
+  before(async function () {
+    await initTestConfigFile();
+  });
 
-    test
+  after(async function () {
+    await deleteTestConfigFile();
+  });
+
+  test
+    .stdout()
+    .command(['config:show'])
+    .it('Displays config file data', (ctx) => {
+      expect(ctx.stdout).to.contain(
+        '"qnamaker__subscriptionKey": "222222cccccctttttth223kk3k33"'
+      );
+    });
+
+  test
     .stdout()
     .command(['config:show', '--key', 'qnamaker__subscriptionKey'])
-    .it('Displays config file data', ctx => {
-      expect(ctx.stdout).to.contain('"222222cccccctttttth223kk3k33"')
-  })
-})
-
-
+    .it('Displays config file data', (ctx) => {
+      expect(ctx.stdout).to.contain('"222222cccccctttttth223kk3k33"');
+    });
+});

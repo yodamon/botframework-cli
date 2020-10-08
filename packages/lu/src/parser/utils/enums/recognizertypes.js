@@ -3,8 +3,8 @@
  * Licensed under the MIT License.
  */
 module.exports = {
-    LUIS: 'luis',
-    QNAMAKER: 'qnamaker',
-    MULTILANGUAGE: 'multiLanguage',
-    CROSSTRAINED: 'crosstrained'
+  LUIS: 'luis',
+  QNAMAKER: 'qnamaker',
+  MULTILANGUAGE: 'multiLanguage',
+  CROSSTRAINED: 'crosstrained',
 };
