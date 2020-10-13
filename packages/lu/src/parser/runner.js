@@ -201,7 +201,7 @@ const content3 = `> You can include references to other .lu files
 
 async function main(){
     // const LUContent = await getContentFromFile('./test.lu');
-    const luisObject = await LUISBuilder.fromContentAsync(content3);
+    const luisObject = await LUISBuilder.fromContentAsync(content);
     console.log(JSON.stringify(luisObject, null, 2))
 }
 
