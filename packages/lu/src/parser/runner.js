@@ -1,5 +1,7 @@
 const LUISBuilder = require('./luis/luisBuilder');
 const tests = require('./tests')
+const fs = require('fs')
+const path = require('path')
 
 const content = `> This is a comment and will be ignored.
 > INTENT
@@ -204,6 +206,8 @@ async function main(){
     // const LUContent = await getContentFromFile('./test.lu');
     for(let i = 1 ; i <= 123; i++){
         let luContent = tests['testLU' + i]
+
+        const data = fs.writeFileSync(path.join(__dirname, 'testLU' + i + '.txt') , content)
         console.log('Run for testLU' + i)
         try {
             const luisObject = await LUISBuilder.fromContentAsync(luContent);           
