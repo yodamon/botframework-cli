@@ -1,4 +1,5 @@
 const LUISBuilder = require('./luis/luisBuilder');
+const tests = require('./tests')
 
 const content = `> This is a comment and will be ignored.
 > INTENT
@@ -201,8 +202,19 @@ const content3 = `> You can include references to other .lu files
 
 async function main(){
     // const LUContent = await getContentFromFile('./test.lu');
-    const luisObject = await LUISBuilder.fromContentAsync(content);
-    console.log(JSON.stringify(luisObject, null, 2))
+    for(let i = 1 ; i <= 123; i++){
+        let luContent = tests['testLU' + i]
+        console.log('Run for testLU' + i)
+        try {
+            const luisObject = await LUISBuilder.fromContentAsync(luContent);           
+        } catch (error) {
+            console.log('Error thrown for testLU' + i)
+        }
+        console.log('----------------------------------------------------')
+    }
+
+    //const luisObject = await LUISBuilder.fromContentAsync(content);
+    //console.log(JSON.stringify(luisObject, null, 2))
 }
 
 main()
