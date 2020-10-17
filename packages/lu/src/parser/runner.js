@@ -1,6 +1,8 @@
 const LUISBuilder = require('./luis/luisBuilder');
+const Sections = require('./sections/sections');
 const tests = require('./tests')
 const fs = require('fs')
+const fs = require('fs-extra')
 const path = require('path')
 
 const content = `> This is a comment and will be ignored.
@@ -207,10 +209,14 @@ async function main(){
     for(let i = 1 ; i <= 123; i++){
         let luContent = tests['testLU' + i]
 
-        const data = fs.writeFileSync(path.join(__dirname, 'testLU' + i + '.txt') , content)
+        fs.writeFileSync(path.join(__dirname, 'testLU' + i + '.txt') , content)
         console.log('Run for testLU' + i)
         try {
-            const luisObject = await LUISBuilder.fromContentAsync(luContent);           
+            //const luisObject = await LUISBuilder.fromContentAsync(luContent); 
+            const sectionsObject = Sections.fromContentAsync(luContent)
+            let data = JSON.stringify(sectionsObject);
+            fs.writeFileSync('student-2.json', data);
+
         } catch (error) {
             console.log('Error thrown for testLU' + i)
         }
