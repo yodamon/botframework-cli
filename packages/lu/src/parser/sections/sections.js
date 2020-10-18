@@ -4,7 +4,7 @@
  */
 
 const LUResource = require('./../lufile/luResource')
-const parse = require('./../lufile/luParser').parse
+const parser = require('./../lufile/luParser')
 
 class Sections {
     /**
@@ -14,7 +14,7 @@ class Sections {
      * @throws {exception} Throws on errors. exception object includes errCode and text. 
      */
     static fromContentAsync(luContent) {
-        return parse(luContent, undefined)
+        return parser.parse(luContent)
     }
 }
 

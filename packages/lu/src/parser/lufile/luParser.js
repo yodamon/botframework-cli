@@ -183,7 +183,7 @@ class LUParser {
         sections = this.reconstractIntentSections(sections)
 
         this.extractSectionBody(sections, content)
-        console.log(JSON.stringify({sections, content, errors}, null, 2))
+        // console.log(JSON.stringify({sections, content, errors}, null, 2))
         return new LUResource(sections, content, errors);
     }
 
