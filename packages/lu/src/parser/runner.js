@@ -226,4 +226,27 @@ async function main(){
     //console.log(JSON.stringify(luisObject, null, 2))
 }
 
-main()
+//main()
+
+async function test(){
+    // const LUContent = await getContentFromFile('./test.lu');
+    let i = 10;
+    let luContent = tests['testLU' + i]
+
+    console.log('Run for testLU' + i)
+    try {
+        //const luisObject = await LUISBuilder.fromContentAsync(luContent); 
+        const sectionsObject = Sections.fromContentAsync(luContent)
+        let data = JSON.stringify(sectionsObject, null, 2);
+        console.log(data)
+    } catch (error) {
+        console.log('Error thrown for testLU' + i + ' error: ' + error.stack)
+    }
+    console.log('----------------------------------------------------')
+
+
+    //const luisObject = await LUISBuilder.fromContentAsync(content);
+    //console.log(JSON.stringify(luisObject, null, 2))
+}
+
+test()
