@@ -1,6 +1,7 @@
 const LUISBuilder = require('./luis/luisBuilder');
 const Sections = require('./sections/sections');
 const tests = require('./tests')
+const tests2 = require('./tests_2')
 const fs = require('fs')
 const path = require('path')
 
@@ -205,8 +206,8 @@ const content3 = `> You can include references to other .lu files
 
 async function main(){
     // const LUContent = await getContentFromFile('./test.lu');
-    for(let i = 1 ; i <= 123; i++){
-        let luContent = tests['testLU' + i]
+    for(let i = 124 ; i <= 309; i++){
+        let luContent = tests2['testLU' + i]
 
         fs.writeFileSync(path.join(__dirname, 'TestTxtFiles', 'testLU' + i + '.txt') , luContent)
         console.log('Run for testLU' + i)
@@ -225,8 +226,6 @@ async function main(){
     //const luisObject = await LUISBuilder.fromContentAsync(content);
     //console.log(JSON.stringify(luisObject, null, 2))
 }
-
-//main()
 
 async function test(){
     // const LUContent = await getContentFromFile('./test.lu');
@@ -249,4 +248,5 @@ async function test(){
     //console.log(JSON.stringify(luisObject, null, 2))
 }
 
-test()
+//test()
+main()
