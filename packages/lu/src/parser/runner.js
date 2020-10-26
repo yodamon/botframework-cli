@@ -209,13 +209,13 @@ async function main(){
     for(let i = 124 ; i <= 309; i++){
         let luContent = tests2['testLU' + i]
 
-        fs.writeFileSync(path.join(__dirname, 'TestTxtFiles', 'testLU' + i + '.txt') , luContent)
+        fs.writeFileSync(path.join(__dirname, 'TestTxtFiles2', 'testLU' + i + '.txt') , luContent)
         console.log('Run for testLU' + i)
         try {
             //const luisObject = await LUISBuilder.fromContentAsync(luContent); 
             const sectionsObject = Sections.fromContentAsync(luContent)
             let data = JSON.stringify(sectionsObject);
-            fs.writeFileSync(path.join(__dirname, 'TestTxtFiles', 'testLU' + i + '.json'), data);
+            fs.writeFileSync(path.join(__dirname, 'TestTxtFiles2', 'testLU' + i + '.json'), data);
 
         } catch (error) {
             console.log('Error thrown for testLU' + i + ' error: ' + error.stack)
@@ -229,8 +229,8 @@ async function main(){
 
 async function test(){
     // const LUContent = await getContentFromFile('./test.lu');
-    let i = 10;
-    let luContent = tests['testLU' + i]
+    let i = 153;
+    let luContent = tests2['testLU' + i]
 
     console.log('Run for testLU' + i)
     try {
@@ -248,5 +248,5 @@ async function test(){
     //console.log(JSON.stringify(luisObject, null, 2))
 }
 
-//test()
-main()
+test()
+//main()
