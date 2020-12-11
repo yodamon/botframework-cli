@@ -35,7 +35,7 @@ brew install icu4c
 To install the bf-orchestrator-cli plugin:
 
 ```
-bf plugins:install @microsoft/bf-orchestrator-cli@beta
+bf plugins:install @microsoft/bf-orchestrator-cli
 ```
 
 To uninstall the bf-orchestrator-cli plugin, which is a necessary step for upgrading the plugin:
